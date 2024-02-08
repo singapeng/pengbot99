@@ -109,3 +109,34 @@ def get_current_event(schedule):
         # we could break here if row[0] > cycle_minute
         # but assuming the schedule is ordered.
     return started_event
+
+
+def when_event(event_name, schedule, skip=0):
+    """ Returns how many minutes to the next occurence of
+        an event.
+        If skip is given, skip this many events and return
+        the time for next one (skip must be >=0)
+    """
+    cycle_minute = get_cycle_minute(schedule)
+    schedule_length = schedule[-1][0]
+    times = []
+    for row in schedule:
+        if row[1] == event_name:
+            times.append(row[0])
+    if not times:
+        # no such event scheduled
+        return -1
+    # find where we are in the cycle
+    start_index = 0
+    for time in times:
+        if time < cycle_minute:
+            start_index += 1
+    # find the correct schedule entry accounting for skip
+    res_index = (start_index + skip) % len(times)
+    # cycles to pass accounting for skip
+    add_cycles = int((start_index + skip) / len(times))
+    # example - missed King in a Knight/Queen/Knight/Queen/King rotation
+    #  K -- J -- Q -- J -- Q -- K
+    # |   ^     |         |         |
+    res = times[res_index] - cycle_minute + add_cycles * schedule_length
+    return res
