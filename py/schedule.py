@@ -40,12 +40,27 @@ def load_schedule(path, name):
     return schedule
 
 
+def get_minutes_since_origin():
+    now = datetime.utcnow()
+    return int((now - origin).seconds / 60)
+
+
+def get_cycle_minute(schedule):
+    """ Returns which minute it is in the current cycle.
+    """
+    # get the 'repeat' entry
+    schedule_length = schedule[-1][0]
+    # position in current cycle in minute
+    return get_minutes_since_origin() % schedule_length
+
+
+
 def get_cycles(origin, schedule):
     """ How many complete cycles of this schedule occured
         since origin.
     """
     now = datetime.utcnow()
-    minutes_since_origin = int((now - origin).seconds) / 60
+    minutes_since_origin = int((now - origin).seconds / 60)
     # get the 'repeat' entry
     schedule_length = schedule[-1][0]
     return int(minutes_since_origin / schedule_length)
@@ -69,13 +84,12 @@ def get_past_events_count(event_name, schedule):
     if not event_count:
         # this event does not appear in this schedule
         return 0
-    now = datetime.utcnow()
-    minutes_since_origin = int((now - origin).seconds) / 60
+    minutes_since_origin = get_minutes_since_origin()
     # get the 'repeat' entry
     schedule_length = schedule[-1][0]
     past_cycles = int(minutes_since_origin / schedule_length)
     # position in current cycle in minute
-    cycle_minute = minutes_since_origin % schedule_length
+    cycle_minute = get_cycle_minute(schedule)
     cycle_events = 0
     for row in schedule:
         if row[0] < cycle_minute and row[1] == event_name:
@@ -86,12 +100,8 @@ def get_past_events_count(event_name, schedule):
 def get_current_event(schedule):
     """ What event is on now
     """
-    now = datetime.utcnow()
-    minutes_since_origin = int((now - origin).seconds) / 60
-    # get the 'repeat' entry
-    schedule_length = schedule[-1][0]
     # position in current cycle in minute
-    cycle_minute = minutes_since_origin % schedule_length
+    cycle_minute = get_cycle_minute(schedule)
     started_event = ""
     for row in schedule:
         if row[0] <= cycle_minute:
