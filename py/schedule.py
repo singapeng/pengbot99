@@ -98,10 +98,10 @@ class ScheduleManager(object):
         # Saturday and Sunday schedule
         self.weekend = TimeTable(weekend_sched)
 
-    def time_types_since_origin(self):
+    def time_types_since_origin(self, until=None):
         """
         """
-        now = datetime.utcnow()
+        now = until or datetime.utcnow()
         delta = now - self.origin
         # count full weeks
         weeks = delta.days // 7
@@ -136,22 +136,23 @@ class ScheduleManager(object):
         """
         return 60 * 24 // self.weekend.duration
 
-    def is_weekday(self):
-        today = datetime.utcnow().weekday()
-        if today < 5:
+    def is_weekday(self, timestamp=None):
+        timestamp = timestamp or datetime.utcnow()
+        theday = timestamp.weekday()
+        if theday < 5:
             # Monday to Friday
             return True
         else:
             # Saturday or Sunday
             return False
 
-    def get_current_cycle(self):
+    def get_cycle(self, timestamp):
         """ This works when cycles are less than a day
             and there's a weekday/weekend change.
             It will not work for Mystery Tracks.
         """
-        fwds, fweds, mins = self.time_types_since_origin()
-        if self.is_weekday():
+        fwds, fweds, mins = self.time_types_since_origin(timestamp)
+        if self.is_weekday(timestamp):
             today_duration = self.weekday.duration
         else:
             today_duration = self.weekend.duration
@@ -160,16 +161,22 @@ class ScheduleManager(object):
         weekend_cycles = fweds * self.daily_weekend_cycles
         return weekday_cycles + weekend_cycles + today_cycles
 
-    def get_current_event(self):
-        now = datetime.utcnow()
-        if self.is_weekday():
+    def get_current_cycle(self):
+        return self.get_cycle(datetime.utcnow())
+
+    def get_event(self, timestamp):
+        now = timestamp
+        if self.is_weekday(timestamp):
             sched = self.weekday
         else:
             sched = self.weekend
-        cycle = self.get_current_cycle()
+        cycle = self.get_cycle(timestamp)
         today_minutes = now.hour * 60 + now.minute
         cycle_minute = today_minutes % sched.duration
         return sched.get_event(cycle, cycle_minute)
+
+    def get_current_event(self):
+        return self.get_event(datetime.utcnow())
 
 
 def get_cycles(origin, schedule):
