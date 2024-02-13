@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import csv
 
@@ -6,23 +6,7 @@ import csv
 # This should mark a cycle origin in UTC time
 # UTC 2024-02-06, 00:00:00
 # First Knight league after a King.
-origin = datetime(2024, 2, 6, 0, 0, 0, 0)
-
-
-def load_env():
-    """ Reads the .env file and returns a dict
-    """
-    env = {}
-    with open(".env") as fd:
-        lines = fd.readlines()
-    for line in lines:
-        line = line.strip()
-        if line.startswith('#'):
-            # ignore comments
-            continue
-        var_name, var_value = line.split('=', 1)
-        env[var_name] = var_value
-    return env
+origin = datetime(2024, 2, 6, 0, 0, 0, 0, tzinfo=timezone.utc)
 
 
 def load_schedule(path, name):
@@ -40,6 +24,15 @@ def load_schedule(path, name):
                 raise
     assert schedule[-1][1] == "next", "Must end with next"
     return schedule
+
+
+def cptime(dt):
+    year = dt.year
+    month = dt.month
+    day = dt.day
+    hour = dt.hour
+    minute = dt.minute
+    return datetime(year, month, day, hour, minute, tzinfo=timezone.utc)
 
 
 class TimeTable(object):
@@ -124,7 +117,7 @@ class ScheduleManager(object):
     def time_types_since_origin(self, until=None):
         """
         """
-        now = until or datetime.utcnow()
+        now = until or datetime.now(timezone.utc)
         delta = now - self.origin
         # count full weeks
         weeks = delta.days // 7
@@ -160,7 +153,7 @@ class ScheduleManager(object):
         return 60 * 24 // self.weekend.duration
 
     def is_weekday(self, timestamp=None):
-        timestamp = timestamp or datetime.utcnow()
+        timestamp = timestamp or datetime.now(timezone.utc)
         theday = timestamp.weekday()
         if theday < 5:
             # Monday to Friday
@@ -185,12 +178,12 @@ class ScheduleManager(object):
         return weekday_cycles + weekend_cycles + today_cycles
 
     def get_current_cycle(self):
-        return self.get_cycle(datetime.utcnow())
+        return self.get_cycle(datetime.now(timezone.utc))
 
     def get_cycle_info(self, timestamp=None):
         """ Get cycle id and cycle minute
         """
-        timestamp = timestamp or datetime.utcnow()
+        timestamp = timestamp or datetime.now(timezone.utc)
         if self.is_weekday(timestamp):
             sched = self.weekday
         else:
@@ -212,19 +205,18 @@ class ScheduleManager(object):
         ts_events = []
         for event in events:
             minutes_in = event[0] - cycle_minute
-            event_start = datetime(timestamp.year, timestamp.month, timestamp.day,
-                    timestamp.hour, timestamp.minute) + timedelta(minutes=minutes_in)
+            event_start = cptime(timestamp) + timedelta(minutes=minutes_in)
             ts_events.append((event_start, event[1]))
         return ts_events
 
     def get_current_event(self):
-        return self.get_event(datetime.utcnow())
+        return self.get_event(datetime.now(timezone.utc))
 
     def get_events(self, timestamp=None, next=60):
         """ Get a list of all events and their start time
             for the next 'next' minutes.
         """
-        timestamp = timestamp or datetime.utcnow()
+        timestamp = timestamp or datetime.now(timezone.utc)
         events = []
         # the event happening now
         start_event = self.get_event(timestamp)
