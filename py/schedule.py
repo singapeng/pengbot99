@@ -52,20 +52,57 @@ class TimeTable(object):
         self._data = data
         self.duration = data[-1][0]
 
-    def get_event(self, cycle, minute):
-        """ What event is on at specified cycle and minute
-        """
+    def _get_active_row(self, minute):
         active_row = []
         for row in self._data:
             if row[0] <= minute:
-                active_row = row[1:]
+                active_row = row[:]
             # we could break here if row[0] > cycle_minute
             # but assuming the schedule is ordered.
+        return active_row
+
+    def _get_next_row(self, minute):
+        next_row = []
+        for row in self._data:
+            if row[0] > minute:
+                next_row = row[:]
+        return next_row
+
+    def get_event(self, cycle, minute):
+        """ What event is on at specified cycle and minute
+        """
+        active_row = self._get_active_row(minute)
         if active_row:
+            # trim time entry
+            active_row = active_row[1:]
             rotation_index = cycle % len(active_row)
             return active_row[rotation_index]
         else:
             return ''
+
+    def get_time_left(self, cycle, minute):
+        """ How many full minutes remain in the event that is
+            active at the given cycle and minute.
+        """
+        next_row = self._get_next_row(minute)
+        if next_row:
+            return next_row[0] - minute
+        else:
+            return -1
+
+    def get_remaining_events(self, cycle, minute, all=False):
+        """ Returns a list of events in the cycle that have yet
+            to start.
+        """
+        if all:
+            # ignore the cycle minute to return every event
+            minute = -1
+        events = []
+        for row in self._data:
+            if row[0] > minute:
+                rotation_index = cycle % (len(row) - 1)
+                events.append((row[0], row[1:][rotation_index]))
+        return events
 
 
 class ScheduleManager(object):
@@ -150,16 +187,62 @@ class ScheduleManager(object):
     def get_current_cycle(self):
         return self.get_cycle(datetime.utcnow())
 
-    def get_event(self, timestamp):
-        now = timestamp
+    def get_cycle_info(self, timestamp=None):
+        """ Get cycle id and cycle minute
+        """
+        timestamp = timestamp or datetime.utcnow()
         if self.is_weekday(timestamp):
             sched = self.weekday
         else:
             sched = self.weekend
         cycle = self.get_cycle(timestamp)
-        today_minutes = now.hour * 60 + now.minute
-        cycle_minute = today_minutes % sched.duration
+        day_minutes = timestamp.hour * 60 + timestamp.minute
+        cycle_minute = day_minutes % sched.duration
+        return (cycle, cycle_minute, sched)
+
+    def get_event(self, timestamp):
+        cycle, cycle_minute, sched = self.get_cycle_info(timestamp)
         return sched.get_event(cycle, cycle_minute)
+
+    def get_remaining_events(self, timestamp, all=False):
+        """ Events left in the current cycle.
+        """
+        cycle, cycle_minute, sched = self.get_cycle_info(timestamp)
+        events = sched.get_remaining_events(cycle, cycle_minute, all)
+        ts_events = []
+        for event in events:
+            minutes_in = event[0] - cycle_minute
+            event_start = datetime(timestamp.year, timestamp.month, timestamp.day,
+                    timestamp.hour, timestamp.minute) + timedelta(minutes=minutes_in)
+            ts_events.append((event_start, event[1]))
+        return ts_events
 
     def get_current_event(self):
         return self.get_event(datetime.utcnow())
+
+    def get_events(self, timestamp=None, next=60):
+        """ Get a list of all events and their start time
+            for the next 'next' minutes.
+        """
+        timestamp = timestamp or datetime.utcnow()
+        events = []
+        # the event happening now
+        start_event = self.get_event(timestamp)
+        events.append((timestamp, start_event))
+        all = False
+        # events left in current cycle
+        cycle_start = timestamp
+        while cycle_start is not None:
+            next_events = self.get_remaining_events(cycle_start, all=all)
+            for event in next_events:
+                if event[0] <= timestamp + timedelta(minutes=next):
+                    if event[1] == 'next':
+                        # we need to query the next cycle
+                        cycle_start = event[0]
+                        all = True
+                    else:
+                        events.append((event[0], event[1]))
+                else:
+                    # the next event is outside the timeframe
+                    cycle_start = None
+        return events
