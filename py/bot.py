@@ -29,24 +29,54 @@ mgr = schedule.ScheduleManager(schedule.origin, wdsched, wesched)
 
 bot = discord.Bot()
 
+event_display_names = {
+    "classic": "Classic",
+    "king": ":crown: King League",
+    "knight": ":horse: Knight League",
+    "miniprix": "Mini-Prix",
+    "protracks": "Pro-Tracks",
+    "queen": "Queen League",
+    "teambattle": "Team Battle",
+}
+
+
+def format_current_event(event_name, event_end):
+    """ Nice display for current event
+    """
+    discord_text = 'Ongoing: {0} (ends <t:{1}:R>)'
+    end = int(event_end.timestamp())
+    evt_name = event_display_names.get(event_name)
+    return discord_text.format(evt_name, end)
+
+
+def format_future_event(event_row):
+    """ Nice display for events in the future
+    """
+    discord_text = 'At <t:{0}:t>: {1} (<t:{2}:R>)'
+    evt_time = int(event_row[0].timestamp())
+    evt_name = event_display_names.get(event_row[1])
+    return discord_text.format(evt_time, evt_name, evt_time)
+
 
 @bot.event
 async def on_ready():
     print(f"{bot.user} is ready and online!")
 
 
-@bot.slash_command(name = "hello", description = "Say hello to the bot")
-async def hello(ctx):
-    await ctx.respond("Hey!")
-
 @bot.slash_command(name = "showevents", description = "Shows upcoming events")
 async def showevents(ctx):
     evts = mgr.get_events()
-    response = ["Upcoming Events:"]
-    for evt in evts:
-        ts = int(evt[0].timestamp())
-        response.append('<t:{0}>: {1} (<t:{2}:R>)'.format(ts, evt[1], ts))
+    if not evts:
+        print("Could not fetch any event :(")
+        return None
+    response = ["F-Zero 99 Upcoming events in your local time:"]
+    ongoing_evt = evts[0][1]
+    ongoing_evt_end = evts[1][0]
+    response.append(format_current_event(ongoing_evt, ongoing_evt_end))
+    for evt in evts[1:]:
+        response.append(format_future_event(evt))
     await ctx.respond('\n'.join(response))
+
 
 @bot.slash_command(name="ping", description="Sends the bot's latency.")
 async def ping(ctx): # a slash command will be created with the name "ping"
