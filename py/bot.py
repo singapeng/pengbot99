@@ -65,7 +65,7 @@ async def on_ready():
 
 @bot.slash_command(name = "showevents", description = "Shows upcoming events")
 async def showevents(ctx):
-    evts = mgr.get_events()
+    evts = mgr.list_events()
     if not evts:
         print("Could not fetch any event :(")
         return None

@@ -83,7 +83,7 @@ class TimeTable(object):
         else:
             return -1
 
-    def get_remaining_events(self, cycle, minute, all=False):
+    def get_remaining_events(self, cycle, minute, all=False, filter=None):
         """ Returns a list of events in the cycle that have yet
             to start.
         """
@@ -94,7 +94,9 @@ class TimeTable(object):
         for row in self._data:
             if row[0] > minute:
                 rotation_index = cycle % (len(row) - 1)
-                events.append((row[0], row[1:][rotation_index]))
+                current = row[1:][rotation_index]
+                if not filter or current in filter or current == 'next':
+                    events.append((row[0], current))
         return events
 
 
@@ -197,11 +199,12 @@ class ScheduleManager(object):
         cycle, cycle_minute, sched = self.get_cycle_info(timestamp)
         return sched.get_event(cycle, cycle_minute)
 
-    def get_remaining_events(self, timestamp, all=False):
+    def get_remaining_events(self, timestamp, all=False, filter=None):
         """ Events left in the current cycle.
         """
         cycle, cycle_minute, sched = self.get_cycle_info(timestamp)
-        events = sched.get_remaining_events(cycle, cycle_minute, all)
+        events = sched.get_remaining_events(cycle, cycle_minute, all, filter)
+        # convert events relative times to datetimes
         ts_events = []
         for event in events:
             minutes_in = event[0] - cycle_minute
@@ -212,29 +215,59 @@ class ScheduleManager(object):
     def get_current_event(self):
         return self.get_event(datetime.now(timezone.utc))
 
-    def get_events(self, timestamp=None, next=60):
+    def get_events(self, names=None, count=0, timestamp=None, limit=10080):
         """ Get a list of all events and their start time
             for the next 'next' minutes.
+
+            names: a list of event names to filter on, or
+                   None to return any event name
+            count: the maximum number of events to return
+                   or set to zero for no maximum
+            timestamp: get events from this time onwards,
+                       or None from current time.
+            limit: allow events to be looked up to this many
+                   minutes in the future. Defaults to 7 days.
         """
         timestamp = timestamp or datetime.now(timezone.utc)
         events = []
-        # the event happening now
-        start_event = self.get_event(timestamp)
-        events.append((timestamp, start_event))
+        ts_limit = timestamp + timedelta(minutes=limit)
         all = False
         # events left in current cycle
         cycle_start = timestamp
         while cycle_start is not None:
-            next_events = self.get_remaining_events(cycle_start, all=all)
+            next_events = self.get_remaining_events(cycle_start, all=all, filter=names)
             for event in next_events:
-                if event[0] <= timestamp + timedelta(minutes=next):
+                if event[0] <= ts_limit:
                     if event[1] == 'next':
                         # we need to query the next cycle
                         cycle_start = event[0]
                         all = True
                     else:
                         events.append((event[0], event[1]))
+                        if count and len(events) >= count:
+                            # we reached the specified count of events
+                            return events
                 else:
                     # the next event is outside the timeframe
                     cycle_start = None
         return events
+
+    def list_events(self, timestamp=None, next=60):
+        """ Get a list of all events and their start time
+            current and future for the next 'next' minutes.
+            This is a short-hand to get_events that also
+            fetches current, and sets a short minutes lookahead.
+        """
+        timestamp = timestamp or datetime.now(timezone.utc)
+        events = self.get_events(timestamp=timestamp, limit=next)
+        # the event happening now
+        start_event = self.get_event(timestamp)
+        return [(timestamp, start_event)] + events
+
+    def when_event(self, names, count=1, timestamp=None, limit=10080):
+        """ When is the next instance of an event.
+            This is a shorthand to get_events that sets count to 1
+            and requires a names filter.
+            names can be given as a list of events to search for
+        """
+        return self.get_events(names=names, count=count, timestamp=timestamp, limit=limit)
