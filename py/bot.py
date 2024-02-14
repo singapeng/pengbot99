@@ -40,6 +40,19 @@ event_display_names = {
 }
 
 
+event_choices = {
+    "Classic": ["classic"],
+    "Grand Prix": ["knight", "queen", "king"],
+    "King League": ["king"],
+    "Knight League": ["knight"],
+    "Mini-Prix": ["miniprix"],
+    "Pro-Tracks": ["protracks"],
+    "Queen League": ["queen"],
+    "Retro": ["classic"],
+    "Team Battle": ["teambattle"],
+}
+
+
 def format_current_event(event_name, event_end):
     """ Nice display for current event
     """
@@ -58,6 +71,12 @@ def format_future_event(event_row):
     return discord_text.format(evt_time, evt_name, evt_time)
 
 
+async def get_event_types(ctx: discord.AutocompleteContext):
+    """ 
+    """
+    return list(event_choices.keys())
+
+
 @bot.event
 async def on_ready():
     print(f"{bot.user} is ready and online!")
@@ -74,6 +93,23 @@ async def showevents(ctx):
     ongoing_evt_end = evts[1][0]
     response.append(format_current_event(ongoing_evt, ongoing_evt_end))
     for evt in evts[1:]:
+        response.append(format_future_event(evt))
+    await ctx.respond('\n'.join(response))
+
+
+@bot.slash_command(name="when", description="List time for specific events", guild_ids=[945747217522753587])
+async def when(
+        ctx: discord.ApplicationContext,
+        event_type: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_event_types)),
+        ):
+    names = event_choices.get(event_type)
+    count = 5
+    evts = mgr.when_event(names=names, count=count)
+    if not evts:
+        print("Could not fetch any event :(")
+        return None
+    response = ["Next {0} events in your local time:".format(event_type)]
+    for evt in evts:
         response.append(format_future_event(evt))
     await ctx.respond('\n'.join(response))
 
