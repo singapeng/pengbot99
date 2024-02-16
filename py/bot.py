@@ -34,12 +34,21 @@ bot = discord.Bot()
 
 event_display_names = {
     "classic": "Classic",
-    "king": ":crown: King League",
-    "knight": ":horse: Knight League",
+    "glitch99": "Mystery Track ???",
+    "king": "King League",
+    "knight": "Knight League",
     "miniprix": "Mini-Prix",
     "protracks": "Pro-Tracks",
     "queen": "Queen League",
     "teambattle": "Team Battle",
+}
+
+
+event_custom_emoji = {
+    "king": "<:GPKing:1195076258002899024>",
+    "knight": "<:GPKnight:1195076261232525332>",
+    "miniprix": "<:MPMini:1195076264294363187>",
+    "queen": "<:GPQueen:1195076266311811233>",
 }
 
 
@@ -57,12 +66,22 @@ event_choices = {
 }
 
 
+def format_event_name(internal_name):
+    """ Adds custom emojis to event name
+    """
+    name = event_display_names.get(internal_name)
+    emoji = event_custom_emoji.get(internal_name)
+    if emoji:
+        name = '{0} {1}'.format(emoji, name)
+    return name
+
+
 def format_current_event(event_name, event_end):
     """ Nice display for current event
     """
     discord_text = 'Ongoing: {0} (ends <t:{1}:R>)'
     end = int(event_end.timestamp())
-    evt_name = event_display_names.get(event_name)
+    evt_name = format_event_name(event_name)
     return discord_text.format(evt_name, end)
 
 
@@ -71,7 +90,7 @@ def format_future_event(event_row):
     """
     discord_text = 'At <t:{0}:t>: {1} (<t:{2}:R>)'
     evt_time = int(event_row[0].timestamp())
-    evt_name = event_display_names.get(event_row[1])
+    evt_name = format_event_name(event_row[1])
     return discord_text.format(evt_time, evt_name, evt_time)
 
 
@@ -101,7 +120,7 @@ async def showevents(ctx):
     await ctx.respond('\n'.join(response))
 
 
-@bot.slash_command(name="when", description="List time for specific events", guild_ids=[945747217522753587])
+@bot.slash_command(name="when", description="List time for specific events")
 async def when(
         ctx: discord.ApplicationContext,
         event_type: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_event_types)),
