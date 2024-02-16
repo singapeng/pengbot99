@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta, timezone
 
+import abc
 import csv
 
 
@@ -7,6 +8,7 @@ import csv
 # UTC 2024-02-06, 00:00:00
 # First Knight league after a King.
 origin = datetime(2024, 2, 6, 0, 0, 0, 0, tzinfo=timezone.utc)
+glitch_origin = datetime(2024, 2, 13, 0, 59, tzinfo=timezone.utc)
 
 
 def load_schedule(path, name):
@@ -100,100 +102,28 @@ class TimeTable(object):
         return events
 
 
-class ScheduleManager(object):
+class BaseScheduleManager(metaclass=abc.ABCMeta):
     """ Used to manage the cycle of schedules based on current time
         and a time of origin.
     """
-    def __init__(self, origin, weekday_sched, weekend_sched):
+    def __init__(self, origin):
         super().__init__()
         # Should be UTC time of any day starting at 00:00:00
         # The origin must be a time where 00:00:00 matches
         # the beginning of the schedule file, so that all future
         # cycles have the correct offset in the rotation.
         self.origin = origin
-        # Monday to Friday schedule
-        self.weekday = TimeTable(weekday_sched)
-        # Saturday and Sunday schedule
-        self.weekend = TimeTable(weekend_sched)
 
-    def time_types_since_origin(self, until=None):
-        """
-        """
-        now = until or datetime.now(timezone.utc)
-        delta = now - self.origin
-        # count full weeks
-        weeks = delta.days // 7
-        week_days = weeks * 5
-        weekend_days = weeks * 2
-        minutes_today = delta.seconds // 60
-        # add remaining days
-        remainder = delta.days % 7
-        # this list can contain negative weekdays depending what day is now
-        days = [day for day in range(now.weekday() - remainder, now.weekday())]
-        # make all days be an int from 0 (monday) to 6 (sunday)
-        days = [day if day >= 0 else day + 7 for day in days]
-        # update count for week days and week end days
-        for day in days:
-            if day < 5:
-                week_days += 1
-            else:
-                weekend_days += 1
-        return (week_days, weekend_days, minutes_today)
-
-    @property
-    def daily_weekday_cycles(self):
-        """ How many cycles occur in a week day
-            Note: at the moment we assume this is an integer number
-        """
-        return 60 * 24 // self.weekday.duration
-
-    @property
-    def daily_weekend_cycles(self):
-        """ How many cycles occur in a week end
-            Note: at the moment we assume this is an integer number
-        """
-        return 60 * 24 // self.weekend.duration
-
-    def is_weekday(self, timestamp=None):
-        timestamp = timestamp or datetime.now(timezone.utc)
-        theday = timestamp.weekday()
-        if theday < 5:
-            # Monday to Friday
-            return True
-        else:
-            # Saturday or Sunday
-            return False
-
+    @abc.abstractmethod
     def get_cycle(self, timestamp):
-        """ This works when cycles are less than a day
-            and there's a weekday/weekend change.
-            It will not work for Mystery Tracks.
+        """ Which cycle this timestamp falls in.
+            Cycle 0 starts at origin.
         """
-        fwds, fweds, mins = self.time_types_since_origin(timestamp)
-        if self.is_weekday(timestamp):
-            today_duration = self.weekday.duration
-        else:
-            today_duration = self.weekend.duration
-        today_cycles = mins // today_duration
-        weekday_cycles = fwds * self.daily_weekday_cycles
-        weekend_cycles = fweds * self.daily_weekend_cycles
-        return weekday_cycles + weekend_cycles + today_cycles
 
-    def get_current_cycle(self):
-        return self.get_cycle(datetime.now(timezone.utc))
-
+    @abc.abstractmethod
     def get_cycle_info(self, timestamp=None):
         """ Get cycle id and cycle minute
         """
-        timestamp = timestamp or datetime.now(timezone.utc)
-        if self.is_weekday(timestamp):
-            sched = self.weekday
-        else:
-            sched = self.weekend
-        cycle = self.get_cycle(timestamp)
-        day_minutes = timestamp.hour * 60 + timestamp.minute
-        cycle_minute = day_minutes % sched.duration
-        return (cycle, cycle_minute, sched)
 
     def get_event(self, timestamp):
         cycle, cycle_minute, sched = self.get_cycle_info(timestamp)
@@ -271,3 +201,117 @@ class ScheduleManager(object):
             names can be given as a list of events to search for
         """
         return self.get_events(names=names, count=count, timestamp=timestamp, limit=limit)
+
+
+class Slot1ScheduleManager(BaseScheduleManager):
+    """ Used to manage the cycle of schedules based on current time
+        and a time of origin.
+    """
+    def __init__(self, origin, sched):
+        super().__init__(origin)
+        self.sched = TimeTable(sched)
+
+    def get_cycle(self, timestamp):
+        """ Which cycle this timestamp falls in.
+            Cycle 0 starts at origin.
+        """
+        now = timestamp or datetime.now(timezone.utc)
+        minutes = int((now - self.origin).total_seconds()) // 60
+        return minutes // self.sched.duration
+
+    def get_cycle_info(self, timestamp=None):
+        """ Get cycle id and cycle minute
+        """
+        timestamp = timestamp or datetime.now(timezone.utc)
+        cycle = self.get_cycle(timestamp)
+        minutes = int((timestamp - self.origin).total_seconds()) // 60
+        cycle_minute = minutes % self.sched.duration
+        return (cycle, cycle_minute, self.sched)
+
+
+class Slot2ScheduleManager(BaseScheduleManager):
+    """ Used to manage the cycle of schedules based on current time
+        and a time of origin.
+    """
+    def __init__(self, origin, weekday_sched, weekend_sched):
+        super().__init__(origin)
+        # Monday to Friday schedule
+        self.weekday = TimeTable(weekday_sched)
+        # Saturday and Sunday schedule
+        self.weekend = TimeTable(weekend_sched)
+
+    def time_types_since_origin(self, until=None):
+        """
+        """
+        now = until or datetime.now(timezone.utc)
+        delta = now - self.origin
+        # count full weeks
+        weeks = delta.days // 7
+        week_days = weeks * 5
+        weekend_days = weeks * 2
+        minutes_today = delta.seconds // 60
+        # add remaining days
+        remainder = delta.days % 7
+        # this list can contain negative weekdays depending what day is now
+        days = [day for day in range(now.weekday() - remainder, now.weekday())]
+        # make all days be an int from 0 (monday) to 6 (sunday)
+        days = [day if day >= 0 else day + 7 for day in days]
+        # update count for week days and week end days
+        for day in days:
+            if day < 5:
+                week_days += 1
+            else:
+                weekend_days += 1
+        return (week_days, weekend_days, minutes_today)
+
+    @property
+    def daily_weekday_cycles(self):
+        """ How many cycles occur in a week day
+            Note: at the moment we assume this is an integer number
+        """
+        return 60 * 24 // self.weekday.duration
+
+    @property
+    def daily_weekend_cycles(self):
+        """ How many cycles occur in a week end
+            Note: at the moment we assume this is an integer number
+        """
+        return 60 * 24 // self.weekend.duration
+
+    def is_weekday(self, timestamp=None):
+        timestamp = timestamp or datetime.now(timezone.utc)
+        theday = timestamp.weekday()
+        if theday < 5:
+            # Monday to Friday
+            return True
+        else:
+            # Saturday or Sunday
+            return False
+
+    def get_cycle(self, timestamp):
+        """ This works when cycles are less than a day
+            and there's a weekday/weekend change.
+            It will not work for Mystery Tracks.
+        """
+        fwds, fweds, mins = self.time_types_since_origin(timestamp)
+        if self.is_weekday(timestamp):
+            today_duration = self.weekday.duration
+        else:
+            today_duration = self.weekend.duration
+        today_cycles = mins // today_duration
+        weekday_cycles = fwds * self.daily_weekday_cycles
+        weekend_cycles = fweds * self.daily_weekend_cycles
+        return weekday_cycles + weekend_cycles + today_cycles
+
+    def get_cycle_info(self, timestamp=None):
+        """ Get cycle id and cycle minute
+        """
+        timestamp = timestamp or datetime.now(timezone.utc)
+        if self.is_weekday(timestamp):
+            sched = self.weekday
+        else:
+            sched = self.weekend
+        cycle = self.get_cycle(timestamp)
+        day_minutes = timestamp.hour * 60 + timestamp.minute
+        cycle_minute = day_minutes % sched.duration
+        return (cycle, cycle_minute, sched)

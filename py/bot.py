@@ -23,9 +23,12 @@ def load_env():
 
 env = load_env()
 
+r99sched = schedule.load_schedule(env['CONFIG_PATH'], 'slot1_schedule')
 wdsched = schedule.load_schedule(env['CONFIG_PATH'], 'slot2_schedule')
 wesched = schedule.load_schedule(env['CONFIG_PATH'], 'slot2_schedule_weekend')
-mgr = schedule.ScheduleManager(schedule.origin, wdsched, wesched)
+
+slot1mgr = schedule.Slot1ScheduleManager(schedule.glitch_origin, r99sched)
+slot2mgr = schedule.Slot2ScheduleManager(schedule.origin, wdsched, wesched)
 
 bot = discord.Bot()
 
@@ -42,6 +45,7 @@ event_display_names = {
 
 event_choices = {
     "Classic": ["classic"],
+    "Glitch": ["glitch99"],
     "Grand Prix": ["knight", "queen", "king"],
     "King League": ["king"],
     "Knight League": ["knight"],
@@ -84,7 +88,7 @@ async def on_ready():
 
 @bot.slash_command(name = "showevents", description = "Shows upcoming events")
 async def showevents(ctx):
-    evts = mgr.list_events()
+    evts = slot2mgr.list_events()
     if not evts:
         print("Could not fetch any event :(")
         return None
@@ -104,6 +108,10 @@ async def when(
         ):
     names = event_choices.get(event_type)
     count = 5
+    if event_type == "Glitch":
+        mgr = slot1mgr
+    else:
+        mgr = slot2mgr
     evts = mgr.when_event(names=names, count=count)
     if not evts:
         print("Could not fetch any event :(")
