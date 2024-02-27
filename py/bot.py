@@ -1,5 +1,7 @@
 # 3rd party imports
 import discord
+from discord.ext import tasks
+
 
 # local imports
 import schedule
@@ -103,6 +105,7 @@ async def get_event_types(ctx: discord.AutocompleteContext):
 @bot.event
 async def on_ready():
     print(f"{bot.user} is ready and online!")
+    announce_schedule.start()
 
 
 @bot.slash_command(name = "showevents", description = "Shows upcoming events")
@@ -139,6 +142,38 @@ async def when(
     for evt in evts:
         response.append(format_future_event(evt))
     await ctx.respond('\n'.join(response))
+
+
+@tasks.loop(seconds=3600)
+async def announce_schedule():
+    await bot.wait_until_ready()
+    channel = bot.get_channel(int(env["DISCORD_BOT_CHANNEL"]))
+    evts = slot2mgr.list_events(next=120)
+    glitches = slot1mgr.when_event(names=["glitch99"], count=5, limit=120)
+    if not evts:
+        print("Could not fetch any event :(")
+        return None
+    response = ["F-Zero 99 Upcoming events in your local time:"]
+    ongoing_evt = evts[0][1]
+    ongoing_evt_end = evts[1][0]
+    response.append(format_current_event(ongoing_evt, ongoing_evt_end))
+    for evt in evts[1:]:
+        response.append(format_future_event(evt))
+    if glitches:
+        response.append("\nNext Glitch Races:")
+        for glitch in glitches:
+            response.append(format_future_event(glitch))
+    await channel.send('\n'.join(response))
+
+
+"""
+@announce_schedule.after_loop
+async def set_next_announce_time():
+    evts = slot2mgr.get_events(count=1)
+    next_time = evts[0][0].timetz()
+    announce_schedule.change_interval(time=next_time)
+    print("Set next time to {0}.".format(next_time))
+    """
 
 
 @bot.slash_command(name="ping", description="Sends the bot's latency.")
