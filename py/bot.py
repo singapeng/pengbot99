@@ -40,6 +40,7 @@ event_display_names = {
     "king": "King League",
     "knight": "Knight League",
     "miniprix": "Mini-Prix",
+    "mysteryprix": "Glitch ??? Mini-Prix",
     "protracks": "Pro-Tracks",
     "queen": "Queen League",
     "teambattle": "Team Battle",
@@ -50,17 +51,19 @@ event_custom_emoji = {
     "king": "<:GPKing:1195076258002899024>",
     "knight": "<:GPKnight:1195076261232525332>",
     "miniprix": "<:MPMini:1195076264294363187>",
+    "mysteryprix": "<:MPMini:1195076264294363187>",
     "queen": "<:GPQueen:1195076266311811233>",
 }
 
 
 event_choices = {
     "Classic": ["classic"],
-    "Glitch": ["glitch99"],
+    "Glitch 99": ["glitch99"],
+    "Glitch Mini-Prix": ["mysteryprix"],
     "Grand Prix": ["knight", "queen", "king"],
     "King League": ["king"],
     "Knight League": ["knight"],
-    "Mini-Prix": ["miniprix"],
+    "Mini-Prix": ["miniprix", "mysteryprix"],
     "Pro-Tracks": ["protracks"],
     "Queen League": ["queen"],
     "Retro": ["classic"],
@@ -105,7 +108,8 @@ async def get_event_types(ctx: discord.AutocompleteContext):
 @bot.event
 async def on_ready():
     print(f"{bot.user} is ready and online!")
-    announce_schedule.start()
+    # Kick-off the automatically announce
+    #announce_schedule.start()
 
 
 @bot.slash_command(name = "showevents", description = "Shows upcoming events")
