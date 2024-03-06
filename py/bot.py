@@ -1,3 +1,7 @@
+# Python imports
+from datetime import datetime
+
+
 # 3rd party imports
 import discord
 from discord.ext import tasks
@@ -23,30 +27,47 @@ def load_env():
     return env
 
 
+def log(text):
+    """ Log to stdout with timestamp.
+    TODO: replace with logging
+    """
+    stamp = datetime.now()
+    ymd = "%04d-%02d-%02d" % (stamp.year, stamp.month, stamp.day)
+    hms = "%02d:%02d:%02d" % (stamp.hour, stamp.minute, stamp.second)
+    print("{0} {1} {2}".format(ymd, hms, text))
+
+
 env = load_env()
 
+# load the schedule for slot 1 (99 races)
 r99sched = schedule.load_schedule(env['CONFIG_PATH'], 'slot1_schedule')
+# load the weekday schedule for slot 2 (Prix and special events)
 wdsched = schedule.load_schedule(env['CONFIG_PATH'], 'slot2_schedule')
+# load the weekend schedule for slot 2 (Prix and special events)
 wesched = schedule.load_schedule(env['CONFIG_PATH'], 'slot2_schedule_weekend')
 
+# Create the schedule managers
 slot1mgr = schedule.Slot1ScheduleManager(schedule.glitch_origin, r99sched)
 slot2mgr = schedule.Slot2ScheduleManager(schedule.origin, wdsched, wesched)
 
 bot = discord.Bot()
 
+
+## UI lookup data
+# Nice names for event selection dropdown/auto-complete
 event_display_names = {
     "classic": "Classic",
     "glitch99": "Mystery Track ???",
     "king": "King League",
     "knight": "Knight League",
     "miniprix": "Mini-Prix",
-    "mysteryprix": "Glitch ??? Mini-Prix",
+    "mysteryprix": "Glitch Mini-Prix (first 3 minutes) then Mini-Prix",
     "protracks": "Pro-Tracks",
     "queen": "Queen League",
     "teambattle": "Team Battle",
 }
 
-
+# These are FZD Custom emoji codes to beautify the schedule printout
 event_custom_emoji = {
     "king": "<:GPKing:1195076258002899024>",
     "knight": "<:GPKnight:1195076261232525332>",
@@ -55,7 +76,7 @@ event_custom_emoji = {
     "queen": "<:GPQueen:1195076266311811233>",
 }
 
-
+# Internal event names to look up upon user selection
 event_choices = {
     "Classic": ["classic"],
     "Glitch 99": ["glitch99"],
@@ -108,12 +129,13 @@ async def get_event_types(ctx: discord.AutocompleteContext):
 @bot.event
 async def on_ready():
     print(f"{bot.user} is ready and online!")
-    # Kick-off the automatically announce
-    #announce_schedule.start()
+    # Kick-off the automatic announce
+    announce_schedule.start()
 
 
 @bot.slash_command(name = "showevents", description = "Shows upcoming events")
 async def showevents(ctx):
+    log(f"{ctx.author.name} used {ctx.command}.")
     evts = slot2mgr.list_events()
     if not evts:
         print("Could not fetch any event :(")
@@ -132,6 +154,7 @@ async def when(
         ctx: discord.ApplicationContext,
         event_type: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_event_types)),
         ):
+    log(f"{ctx.author.name} used {ctx.command}.")
     names = event_choices.get(event_type)
     count = 5
     if event_type == "Glitch":
@@ -151,7 +174,7 @@ async def when(
 @tasks.loop(seconds=3600)
 async def announce_schedule():
     await bot.wait_until_ready()
-    channel = bot.get_channel(int(env["DISCORD_BOT_CHANNEL"]))
+    channel = bot.get_channel(int(env["ANNOUNCE_CHANNEL"]))
     evts = slot2mgr.list_events(next=120)
     glitches = slot1mgr.when_event(names=["glitch99"], count=5, limit=120)
     if not evts:
@@ -170,18 +193,10 @@ async def announce_schedule():
     await channel.send('\n'.join(response))
 
 
-"""
-@announce_schedule.after_loop
-async def set_next_announce_time():
-    evts = slot2mgr.get_events(count=1)
-    next_time = evts[0][0].timetz()
-    announce_schedule.change_interval(time=next_time)
-    print("Set next time to {0}.".format(next_time))
-    """
-
 
 @bot.slash_command(name="ping", description="Sends the bot's latency.")
 async def ping(ctx): # a slash command will be created with the name "ping"
+    log(f"{ctx.author.name} used {ctx.command}.")
     await ctx.respond(f"Pong! Latency is {bot.latency}")
 
 

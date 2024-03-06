@@ -8,10 +8,22 @@ import csv
 # UTC 2024-02-06, 00:00:00
 # First Knight league after a King.
 origin = datetime(2024, 2, 6, 0, 0, 0, 0, tzinfo=timezone.utc)
+# A point observed to be a glitch sequence origin.
 glitch_origin = datetime(2024, 2, 13, 0, 59, tzinfo=timezone.utc)
 
 
 def load_schedule(path, name):
+    """ Loads a CSV schedule from the folder 'path' and the file
+        named 'name.csv'.
+        Each line in the csv should be formatted as such:
+        minutes,name[,name,name...]
+        'minutes' represents the event duration as an integer.
+        'name' is the event type.
+        There must be at least one event type name. If several
+        are provided, they represent a rotation for this event.
+        The last line event type should be 'next' and represents
+        the point at which the schedule moves on to the next cycle.
+    """
     schedule_path = '{0}/{1}.csv'.format(path, name)
     with open(schedule_path, newline='') as fd:
         reader = csv.reader(fd, delimiter=',')
@@ -29,6 +41,8 @@ def load_schedule(path, name):
 
 
 def cptime(dt):
+    """ Utility to copy a date time into a new object.
+    """
     year = dt.year
     month = dt.month
     day = dt.day
@@ -126,6 +140,8 @@ class BaseScheduleManager(metaclass=abc.ABCMeta):
         """
 
     def get_event(self, timestamp):
+        """ Returns the name of the event occuring at given timestamp.
+        """
         cycle, cycle_minute, sched = self.get_cycle_info(timestamp)
         return sched.get_event(cycle, cycle_minute)
 
@@ -143,6 +159,8 @@ class BaseScheduleManager(metaclass=abc.ABCMeta):
         return ts_events
 
     def get_current_event(self):
+        """ Returns the name of the event occuring now.
+        """
         return self.get_event(datetime.now(timezone.utc))
 
     def get_events(self, names=None, count=0, timestamp=None, limit=10080):
@@ -206,6 +224,8 @@ class BaseScheduleManager(metaclass=abc.ABCMeta):
 class Slot1ScheduleManager(BaseScheduleManager):
     """ Used to manage the cycle of schedules based on current time
         and a time of origin.
+        This manager is intended to deal with F-Zero 99's 'slot 1'
+        schedule, i.e. the 99 races slot.
     """
     def __init__(self, origin, sched):
         super().__init__(origin)
@@ -232,6 +252,10 @@ class Slot1ScheduleManager(BaseScheduleManager):
 class Slot2ScheduleManager(BaseScheduleManager):
     """ Used to manage the cycle of schedules based on current time
         and a time of origin.
+        This manager is intended to deal with F-Zero 99's 'slot 2'
+        schedule, i.e. the Grand Prix and special events slot.
+        It provides support for a dual-schedule rotation with distinct
+        weekdays and weekend days timetables.
     """
     def __init__(self, origin, weekday_sched, weekend_sched):
         super().__init__(origin)
@@ -241,7 +265,10 @@ class Slot2ScheduleManager(BaseScheduleManager):
         self.weekend = TimeTable(weekend_sched)
 
     def time_types_since_origin(self, until=None):
-        """
+        """ Utility for breaking down the current time (or the optional
+            timestamp) into weekdays, weekend days, and left-over
+            minutes since origin.
+            The result is returned as a tuple of 3 ints.
         """
         now = until or datetime.now(timezone.utc)
         delta = now - self.origin
