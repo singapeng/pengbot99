@@ -1,5 +1,5 @@
 # Python imports
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 # 3rd party imports
@@ -61,7 +61,7 @@ event_display_names = {
     "king": "King League",
     "knight": "Knight League",
     "miniprix": "Mini-Prix",
-    "mysteryprix": "Glitch Mini-Prix (first 3 minutes) then Mini-Prix",
+    "mysteryprix": "Glitch ??? Mini-Prix",
     "protracks": "Pro-Tracks",
     "queen": "Queen League",
     "teambattle": "Team Battle",
@@ -104,6 +104,10 @@ def format_event_name(internal_name):
 
 def format_current_event(event_name, event_end):
     """ Nice display for current event
+        Note 2024/3/7: this does not properly deal with the
+        Mystery Prix/Regular Prix slot at the moment,
+        i.e. it doesn't know that Mystery Prix only
+        run first 3 minutes of the 10 minutes slot.
     """
     discord_text = 'Ongoing: {0} (ends <t:{1}:R>)'
     end = int(event_end.timestamp())
@@ -157,7 +161,7 @@ async def when(
     log(f"{ctx.author.name} used {ctx.command}.")
     names = event_choices.get(event_type)
     count = 5
-    if event_type == "Glitch":
+    if event_type == "Glitch 99":
         mgr = slot1mgr
     else:
         mgr = slot2mgr
@@ -186,6 +190,13 @@ async def announce_schedule():
     response.append(format_current_event(ongoing_evt, ongoing_evt_end))
     for evt in evts[1:]:
         response.append(format_future_event(evt))
+        if evt[1] == "mysteryprix":
+            # As of March 2024, the Mini Prix slot has 3 minutes of
+            # Glitch prix followed by 7 minutes of regular Miniprix.
+            # Let's split mystery prix row in two
+            # so it's clearer for readers
+            mini_time = evt[0] + timedelta(minutes=3)
+            response.append(format_future_event((mini_time, "miniprix")))
     if glitches:
         response.append("\nNext Glitch Races:")
         for glitch in glitches:
@@ -199,5 +210,5 @@ async def ping(ctx): # a slash command will be created with the name "ping"
     log(f"{ctx.author.name} used {ctx.command}.")
     await ctx.respond(f"Pong! Latency is {bot.latency}")
 
-
-bot.run(env['DISCORD_BOT_TOKEN']) # run the bot with the token
+if __name__ == "__main__":
+    bot.run(env['DISCORD_BOT_TOKEN']) # run the bot with the token
