@@ -45,10 +45,13 @@ r99sched = schedule.load_schedule(env['CONFIG_PATH'], 'slot1_schedule')
 wdsched = schedule.load_schedule(env['CONFIG_PATH'], 'slot2_schedule')
 # load the weekend schedule for slot 2 (Prix and special events)
 wesched = schedule.load_schedule(env['CONFIG_PATH'], 'slot2_schedule_weekend')
+# load the schedule for Private Lobbies Mini-Prix
+pmpsched = schedule.load_schedule(env['CONFIG_PATH'], 'pl_miniprix')
 
 # Create the schedule managers
 slot1mgr = schedule.Slot1ScheduleManager(schedule.glitch_origin, r99sched)
 slot2mgr = schedule.Slot2ScheduleManager(schedule.origin, wdsched, wesched)
+plmp_mgr = schedule.Slot1ScheduleManager(schedule.plmp_origin, pmpsched)
 
 bot = discord.Bot()
 
@@ -85,6 +88,7 @@ event_choices = {
     "King League": ["king"],
     "Knight League": ["knight"],
     "Mini-Prix": ["miniprix", "mysteryprix"],
+    "Private Glitch Mini-Prix": ["mysteryprix"],
     "Pro-Tracks": ["protracks"],
     "Queen League": ["queen"],
     "Retro": ["classic"],
@@ -163,6 +167,8 @@ async def when(
     count = 5
     if event_type == "Glitch 99":
         mgr = slot1mgr
+    elif event_type == "Private Glitch Mini-Prix":
+        mgr = plmp_mgr
     else:
         mgr = slot2mgr
     evts = mgr.when_event(names=names, count=count)
