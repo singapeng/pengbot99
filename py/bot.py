@@ -185,12 +185,14 @@ async def announce_schedule():
         print("Could not fetch any event :(")
         return None
     response = ["F-Zero 99 Upcoming events in your local time:"]
+    has_glitch_mp = False
     ongoing_evt = evts[0][1]
     ongoing_evt_end = evts[1][0]
     response.append(format_current_event(ongoing_evt, ongoing_evt_end))
     for evt in evts[1:]:
         response.append(format_future_event(evt))
         if evt[1] == "mysteryprix":
+            has_glitch_mp = True
             # As of March 2024, the Mini Prix slot has 3 minutes of
             # Glitch prix followed by 7 minutes of regular Miniprix.
             # Let's split mystery prix row in two
@@ -201,14 +203,20 @@ async def announce_schedule():
         response.append("\nNext Glitch Races:")
         for glitch in glitches:
             response.append(format_future_event(glitch))
+    if not has_glitch_mp:
+        gmp_evt = slot2mgr.when_event(names=["mysteryprix"], count=1)
+        if gmp_evt:
+            response.append("\nNext Glitch Mini-Prix:")
+            response.append(format_future_event(gmp_evt[0]))
+        
     await channel.send('\n'.join(response))
-
 
 
 @bot.slash_command(name="ping", description="Sends the bot's latency.")
 async def ping(ctx): # a slash command will be created with the name "ping"
     log(f"{ctx.author.name} used {ctx.command}.")
     await ctx.respond(f"Pong! Latency is {bot.latency}")
+
 
 if __name__ == "__main__":
     bot.run(env['DISCORD_BOT_TOKEN']) # run the bot with the token
