@@ -68,7 +68,7 @@ class CycleInfo(object):
             for rot_key in data[tt_key]:
                 # How many times the rotation occurs
                 key_count = data[tt_key][rot_key]
-                if self._data[rot_key]:
+                if self._data.get(rot_key):
                     # This rotation appears in other timetables
                     self._data[rot_key] += tt_cycles * key_count
                 else:
@@ -154,7 +154,7 @@ class TimeTable(object):
         events = []
         for row in self._data:
             if row[0] > minute:
-                cycle = cycle_info.get(active_row[1:])
+                cycle = cycle_info.get(row[1:])
                 rotation_index = cycle % (len(row) - 1)
                 current = row[1:][rotation_index]
                 if not filter or current in filter or current == 'next':
@@ -206,12 +206,12 @@ class BaseScheduleManager(metaclass=abc.ABCMeta):
     def get_remaining_events(self, timestamp, all=False, filter=None):
         """ Events left in the current cycle.
         """
-        cycle_info, sched = self.get_cycle_info(timestamp)
-        events = sched.get_remaining_events(cycle_info, all, filter)
+        cycle_info = self.get_cycle_info(timestamp)
+        events = cycle_info.schedule.get_remaining_events(cycle_info, all, filter)
         # convert events relative times to datetimes
         ts_events = []
         for event in events:
-            minutes_in = event[0] - cycle_minute
+            minutes_in = event[0] - cycle_info.minute
             event_start = cptime(timestamp) + timedelta(minutes=minutes_in)
             ts_events.append((event_start, event[1]))
         return ts_events
@@ -288,7 +288,7 @@ class Slot1ScheduleManager(BaseScheduleManager):
     def __init__(self, origin, sched):
         super().__init__(origin)
         self.sched = TimeTable(sched, "slot1")
-        self.rotation_data = build_rotation_data(self.sched)
+        self.rotation_data = build_rotation_data([self.sched])
 
     def get_cycle_count(self, timestamp):
         """ Which cycle this timestamp falls in.
@@ -323,7 +323,7 @@ class Slot2ScheduleManager(BaseScheduleManager):
         # Saturday and Sunday schedule
         self.weekend = TimeTable(weekend_sched, "weekend")
         # Rotation Data
-        self.rotation_data = build_rotation_data(self.weekday, self.weekend)
+        self.rotation_data = build_rotation_data([self.weekday, self.weekend])
 
     def time_types_since_origin(self, until=None):
         """ Utility for breaking down the current time (or the optional
