@@ -165,6 +165,8 @@ async def when(
     log(f"{ctx.author.name} used {ctx.command}.")
     names = event_choices.get(event_type)
     count = 5
+    if ctx.author.name == "nickg0949":
+        count = 10
     if event_type == "Glitch 99":
         mgr = slot1mgr
     elif event_type == "Private Glitch Mini-Prix":
