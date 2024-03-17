@@ -1,5 +1,5 @@
 # Python imports
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 
 # 3rd party imports
@@ -64,7 +64,7 @@ event_display_names = {
     "king": "King League",
     "knight": "Knight League",
     "miniprix": "Mini-Prix",
-    "mysteryprix": "Glitch ??? Mini-Prix",
+    "mysteryprix": "Glitch Mini-Prix",
     "protracks": "Pro-Tracks",
     "queen": "Queen League",
     "teambattle": "Team Battle",
@@ -75,7 +75,7 @@ event_custom_emoji = {
     "king": "<:GPKing:1195076258002899024>",
     "knight": "<:GPKnight:1195076261232525332>",
     "miniprix": "<:MPMini:1195076264294363187>",
-    "mysteryprix": "<:MPMini:1195076264294363187>",
+    "mysteryprix": "<:WhatQuestionmarksthree:1217243922418368734>",
     "queen": "<:GPQueen:1195076266311811233>",
 }
 
@@ -122,10 +122,17 @@ def format_current_event(event_name, event_end):
 def format_future_event(event_row):
     """ Nice display for events in the future
     """
-    discord_text = 'At <t:{0}:t>: {1} (<t:{2}:R>)'
+    if event_row[0] - datetime.now(timezone.utc) > timedelta(hours=20):
+        # Discord long date with short time
+        t_format = 'f'
+        particle = ''
+    else:
+        t_format = 't'
+        particle = 'At '
+    discord_text = '{0}<t:{1}:{2}>: {3} (<t:{4}:R>)'
     evt_time = int(event_row[0].timestamp())
     evt_name = format_event_name(event_row[1])
-    return discord_text.format(evt_time, evt_name, evt_time)
+    return discord_text.format(particle, evt_time, t_format, evt_name, evt_time)
 
 
 async def get_event_types(ctx: discord.AutocompleteContext):
@@ -194,6 +201,7 @@ async def announce_schedule():
         return None
     response = ["F-Zero 99 Upcoming events in your local time:"]
     has_glitch_mp = False
+    has_king_gp = False
     ongoing_evt = evts[0][1]
     ongoing_evt_end = evts[1][0]
     response.append(format_current_event(ongoing_evt, ongoing_evt_end))
@@ -207,6 +215,8 @@ async def announce_schedule():
             # so it's clearer for readers
             mini_time = evt[0] + timedelta(minutes=3)
             response.append(format_future_event((mini_time, "miniprix")))
+        elif evt[1] == "king":
+            has_king_gp = True
     if glitches:
         response.append("\nNext Glitch Races:")
         for glitch in glitches:
@@ -216,7 +226,11 @@ async def announce_schedule():
         if gmp_evt:
             response.append("\nNext Glitch Mini-Prix:")
             response.append(format_future_event(gmp_evt[0]))
-        
+    if not has_king_gp:
+        king_evt = slot2mgr.when_event(names=["king"], count=1)
+        if king_evt:
+            response.append("\nNext King League:")
+            response.append(format_future_event(king_evt[0]))
     await channel.send('\n'.join(response))
 
 
