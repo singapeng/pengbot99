@@ -164,30 +164,61 @@ async def showevents(ctx):
     await ctx.respond('\n'.join(response))
 
 
-@bot.slash_command(name="when", description="List time for specific events")
-async def when(
-        ctx: discord.ApplicationContext,
-        event_type: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_event_types)),
-        ):
-    log(f"{ctx.author.name} used {ctx.command}.")
+def _when(event_type, from_time=None, count=5):
     names = event_choices.get(event_type)
-    count = 5
-    if ctx.author.name == "nickg0949":
-        count = 10
     if event_type == "Glitch 99":
         mgr = slot1mgr
     elif event_type == "Private Glitch Mini-Prix":
         mgr = plmp_mgr
     else:
         mgr = slot2mgr
-    evts = mgr.when_event(names=names, count=count)
+    evts = mgr.when_event(names=names, count=count, timestamp=from_time)
     if not evts:
         print("Could not fetch any event :(")
         return None
     response = ["Next {0} events in your local time:".format(event_type)]
     for evt in evts:
         response.append(format_future_event(evt))
-    await ctx.respond('\n'.join(response))
+    return '\n'.join(response)
+
+
+@bot.slash_command(name="when", description="List time for specific events")
+async def when(
+        ctx: discord.ApplicationContext,
+        event_type: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_event_types)),
+        ):
+    log(f"{ctx.author.name} used {ctx.command}.")
+    response = _when(event_type)
+    if response:
+        await ctx.respond(response)
+
+
+# command option help tips
+TIP_WHEN_FROM_TIME = "The UTC time from which to display events as YYYY-MM-DD HH:MM"
+TIP_WHEN_COUNT = "How many events to display - must be from 1 to 20 (default 5)"
+
+
+@bot.slash_command(name="utc_when", description="List time for events starting from UTC time")
+async def utc_when(
+        ctx: discord.ApplicationContext,
+        event_type: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_event_types)),
+        from_time: discord.Option(str, description=TIP_WHEN_FROM_TIME),
+        count: discord.Option(int, required=False, default=5, description=TIP_WHEN_COUNT),
+        ):
+    log(f"{ctx.author.name} used {ctx.command}.")
+    if not 0 < count < 13:
+        await ctx.respond("Disqualified! Invalid 'count' value {0}. Must be between 1 and 12.".format(count))
+        return
+    if from_time:
+        try:
+            from_time = datetime.strptime(from_time, "%Y-%m-%d %H:%M").replace(tzinfo=timezone.utc)
+        except ValueError:
+            msg = "Disqualified! Invalid 'from_time' value '{0}'. Need 'YYYY-MM-DD HH:MM'."
+            await ctx.respond(msg.format(from_time))
+            return
+    response = _when(event_type, from_time, count)
+    if response:
+        await ctx.respond(response)
 
 
 @tasks.loop(seconds=3600)
