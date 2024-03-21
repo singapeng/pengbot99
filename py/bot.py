@@ -164,15 +164,42 @@ async def showevents(ctx):
     await ctx.respond('\n'.join(response))
 
 
+def _private_mini_when(names, from_time, count):
+    """ When the Private Lobby Mini-Prix time coincides with a Public
+        Mini-Prix, the private lobby type is overridden by the public
+        type, i.e. if the public lobby is a regular MP, then there
+        won't be a glitch in Private MP lobbies.
+        This function looks up both MP schedules and will discard or
+        add times accordingly.
+        Research credits: SpringyRubber (FZD)
+    """
+    # we look up more events than necessary because we may have to discard some
+    evts = plmp_mgr.when_event(names=names, count=count * 2, timestamp=from_time)
+    # it seems unlikely we'd have to look up very far along the MP schedule
+    # based on current timing - this isn't a very scientific way.
+    pubmp = slot2mgr.when_event(names=event_choices.get("Mini-Prix"), count=count, timestamp=from_time)
+    # we're using timestamps as dict keys and taking advantage of 'update'
+    evts_dict = dict(evts)
+    evts_dict.update(dict(pubmp))
+    merged_evts = []
+    for key in sorted(evts_dict.keys()):
+        if evts_dict[key] == "mysteryprix":
+            merged_evts.append((key, evts_dict[key]))
+        if len(merged_evts) >= count:
+            break
+    return merged_evts
+
+
 def _when(event_type, from_time=None, count=5):
     names = event_choices.get(event_type)
-    if event_type == "Glitch 99":
+    if event_type == "Private Glitch Mini-Prix":
+        evts = _private_mini_when(names, from_time, count)
+    elif event_type == "Glitch 99":
         mgr = slot1mgr
-    elif event_type == "Private Glitch Mini-Prix":
-        mgr = plmp_mgr
+        evts = mgr.when_event(names=names, count=count, timestamp=from_time)
     else:
         mgr = slot2mgr
-    evts = mgr.when_event(names=names, count=count, timestamp=from_time)
+        evts = mgr.when_event(names=names, count=count, timestamp=from_time)
     if not evts:
         print("Could not fetch any event :(")
         return None
