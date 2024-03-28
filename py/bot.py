@@ -120,7 +120,6 @@ event_choices = {
     "Knight League (no mirror)": ["knight"],
     "Mirror Knight League": ["mknight"],
     "Mini-Prix": ["classicprix", "miniprix", "mysteryprix"],
-    "Private Glitch Mini-Prix": ["mysteryprix"],
     "Pro-Tracks": ["protracks"],
     "Queen League": ["queen", "mqueen"],
     "Retro": ["classic"],
@@ -175,7 +174,7 @@ async def get_event_types(ctx: discord.AutocompleteContext):
 
 @bot.event
 async def on_ready():
-    print(f"{bot.user} is ready and online!")
+    log(f"{bot.user} is ready and online!")
     # Kick-off the automatic announce
     announce_schedule.start()
 
@@ -225,6 +224,7 @@ def _private_mini_when(names, from_time, count):
 def _when(event_type, from_time=None, count=5):
     names = event_choices.get(event_type)
     if event_type == "Private Glitch Mini-Prix":
+        # This cannot happen as of 1.3.0 update, so the choice is removed.
         evts = _private_mini_when(names, from_time, count)
     elif event_type == "Glitch 99":
         mgr = slot1mgr
@@ -294,32 +294,18 @@ async def announce_schedule():
         print("Could not fetch any event :(")
         return None
     response = ["F-Zero 99 Upcoming events in your local time:"]
-    has_glitch_mp = False
     has_king_gp = False
     ongoing_evt = evts[0][1]
     ongoing_evt_end = evts[1][0]
     response.append(format_current_event(ongoing_evt, ongoing_evt_end))
     for evt in evts[1:]:
         response.append(format_future_event(evt))
-        if evt[1] == "mysteryprix":
-            has_glitch_mp = True
-            # As of March 2024, the Mini Prix slot has 3 minutes of
-            # Glitch prix followed by 7 minutes of regular Miniprix.
-            # Let's split mystery prix row in two
-            # so it's clearer for readers
-            mini_time = evt[0] + timedelta(minutes=3)
-            response.append(format_future_event((mini_time, "miniprix")))
-        elif evt[1] == "king":
+        if evt[1] == "king":
             has_king_gp = True
     if glitches:
         response.append("\nNext Glitch Races:")
         for glitch in glitches:
             response.append(format_future_event(glitch))
-    if not has_glitch_mp:
-        gmp_evt = slot2mgr.when_event(names=["mysteryprix"], count=1)
-        if gmp_evt:
-            response.append("\nNext Glitch Mini-Prix:")
-            response.append(format_future_event(gmp_evt[0]))
     if not has_king_gp:
         king_evt = slot2mgr.when_event(names=["king"], count=1)
         if king_evt:
