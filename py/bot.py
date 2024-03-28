@@ -93,7 +93,7 @@ event_custom_emoji = {
     "king": "<:GPKing:1195076258002899024>",
     "knight": "<:GPKnight:1195076261232525332>",
     "miniprix": "<:MPMini:1195076264294363187>",
-    "mknight": "<:GPKnight:1195076261232525332>",
+    "mknight": "<:GPMirrorKnight:1222897223054921832>",
     "mysteryprix": "<:WhatQuestionmarksthree:1217243922418368734>",
     "queen": "<:GPQueen:1195076266311811233>",
 }
