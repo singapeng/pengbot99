@@ -60,21 +60,50 @@ bot = discord.Bot()
 # Nice names for event selection dropdown/auto-complete
 event_display_names = {
     "classic": "Classic",
+    "classicprix": "Classic Mini-Prix",
     "glitch99": "Mystery Track ???",
     "king": "King League",
     "knight": "Knight League",
     "miniprix": "Mini-Prix",
+    "mknight": "Mirror Knight League",
     "mysteryprix": "Glitch Mini-Prix",
     "protracks": "Pro-Tracks",
     "queen": "Queen League",
     "teambattle": "Team Battle",
 }
 
+# We're building a serious bot and never use this
+event_jokey_names = {
+    "classic": "Classic",
+    "classicprix": "Classic Mini-Egg",
+    "glitch99": "Mystery Egg ???",
+    "king": "GX99 Ruby Cup",
+    "knight": "GX99 Emerald Cup",
+    "miniprix": "MV99 Pawn Mini-Prix",
+    "mknight": "Mirror Knight League",
+    "mysteryprix": "MV99 Bishop League",
+    "protracks": "Pro-Tracks",
+    "queen": "GX99 Diamond Cup",
+    "teambattle": "Egghunt Battle",
+}
+
 # These are FZD Custom emoji codes to beautify the schedule printout
 event_custom_emoji = {
+    "classicprix": "<:MPMini:1195076264294363187>",
     "king": "<:GPKing:1195076258002899024>",
     "knight": "<:GPKnight:1195076261232525332>",
     "miniprix": "<:MPMini:1195076264294363187>",
+    "mknight": "<:GPKnight:1195076261232525332>",
+    "mysteryprix": "<:WhatQuestionmarksthree:1217243922418368734>",
+    "queen": "<:GPQueen:1195076266311811233>",
+}
+
+event_jokey_emoji = {
+    "classicprix": "<:MPMini:1195076264294363187>",
+    "king": "<:GPKing:1195076258002899024>",
+    "knight": "<:GPKnight:1195076261232525332>",
+    "miniprix": "<:MPMini:1195076264294363187>",
+    "mknight": "<::GPKnight:1195076261232525332>",
     "mysteryprix": "<:WhatQuestionmarksthree:1217243922418368734>",
     "queen": "<:GPQueen:1195076266311811233>",
 }
@@ -82,15 +111,18 @@ event_custom_emoji = {
 # Internal event names to look up upon user selection
 event_choices = {
     "Classic": ["classic"],
+    "Classic Mini-Prix": ["classicprix"],
     "Glitch 99": ["glitch99"],
     "Glitch Mini-Prix": ["mysteryprix"],
-    "Grand Prix": ["knight", "queen", "king"],
-    "King League": ["king"],
-    "Knight League": ["knight"],
-    "Mini-Prix": ["miniprix", "mysteryprix"],
+    "Grand Prix": ["knight", "mknight", "queen", "mqueen", "king", "mking"],
+    "King League": ["king", "mking"],
+    "Knight League": ["knight", "mknight"],
+    "Knight League (no mirror)": ["knight"],
+    "Mirror Knight League": ["mknight"],
+    "Mini-Prix": ["classicprix", "miniprix", "mysteryprix"],
     "Private Glitch Mini-Prix": ["mysteryprix"],
     "Pro-Tracks": ["protracks"],
-    "Queen League": ["queen"],
+    "Queen League": ["queen", "mqueen"],
     "Retro": ["classic"],
     "Team Battle": ["teambattle"],
 }
@@ -218,6 +250,8 @@ async def when(
     response = _when(event_type)
     if response:
         await ctx.respond(response)
+    else:
+        await ctx.respond("POWER DOWN! No result for '{0}' :(".format(event_type))
 
 
 # command option help tips
@@ -246,6 +280,8 @@ async def utc_when(
     response = _when(event_type, from_time, count)
     if response:
         await ctx.respond(response)
+    else:
+        await ctx.respond("POWER DOWN! No result for '{0}' :(".format(event_type))
 
 
 @tasks.loop(seconds=3600)
