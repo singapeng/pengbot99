@@ -100,12 +100,13 @@ event_custom_emoji = {
 
 event_jokey_emoji = {
     "classicprix": "<:MPMini:1195076264294363187>",
-    "king": "<:GPKing:1195076258002899024>",
+    "glitch99": "<:penguinspin:1222378931093635094>",
+    "king": "<:gx_ruby_cup:1222655252025839738>",
     "knight": "<:GPKnight:1195076261232525332>",
     "miniprix": "<:MPMini:1195076264294363187>",
-    "mknight": "<::GPKnight:1195076261232525332>",
+    "mknight": "<:gx_emerald_cup:1222655313493364809>",
     "mysteryprix": "<:WhatQuestionmarksthree:1217243922418368734>",
-    "queen": "<:GPQueen:1195076266311811233>",
+    "queen": "<:gx_diamond_cup:1223297468049920170>",
 }
 
 # Internal event names to look up upon user selection
@@ -130,8 +131,13 @@ event_choices = {
 def format_event_name(internal_name):
     """ Adds custom emojis to event name
     """
-    name = event_display_names.get(internal_name)
-    emoji = event_custom_emoji.get(internal_name)
+    now = datetime.now(timezone.utc)
+    if not (now.month == 4 and now.day == 1):
+        name = event_display_names.get(internal_name)
+        emoji = event_custom_emoji.get(internal_name)
+    else:
+        name = event_jokey_names.get(internal_name)
+        emoji = event_jokey_emoji.get(internal_name)
     if emoji:
         name = '{0} {1}'.format(emoji, name)
     return name
