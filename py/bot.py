@@ -138,6 +138,8 @@ def format_event_name(internal_name):
     else:
         name = event_jokey_names.get(internal_name)
         emoji = event_jokey_emoji.get(internal_name)
+    if not name:
+        name = internal_name
     if emoji:
         name = '{0} {1}'.format(emoji, name)
     return name
@@ -193,8 +195,8 @@ async def showevents(ctx):
         print("Could not fetch any event :(")
         return None
     response = ["F-Zero 99 Upcoming events in your local time:"]
-    ongoing_evt = evts[0][1]
-    ongoing_evt_end = evts[1][0]
+    ongoing_evt = evts[0].name
+    ongoing_evt_end = evts[0].end_time
     response.append(format_current_event(ongoing_evt, ongoing_evt_end))
     for evt in evts[1:]:
         response.append(format_future_event(evt))
@@ -301,12 +303,12 @@ async def announce_schedule():
         return None
     response = ["F-Zero 99 Upcoming events in your local time:"]
     has_king_gp = False
-    ongoing_evt = evts[0][1]
-    ongoing_evt_end = evts[1][0]
+    ongoing_evt = evts[0].name
+    ongoing_evt_end = evts[0].end_time
     response.append(format_current_event(ongoing_evt, ongoing_evt_end))
     for evt in evts[1:]:
         response.append(format_future_event(evt))
-        if evt[1] == "king":
+        if evt.name == "king":
             has_king_gp = True
     if glitches:
         response.append("\nNext Glitch Races:")

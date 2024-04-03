@@ -3,6 +3,9 @@ from datetime import datetime, timedelta, timezone
 import abc
 import csv
 
+# local imports
+import events
+
 
 # This should mark a cycle origin in UTC time
 # UTC 2024-02-06, 00:00:00
@@ -77,8 +80,8 @@ class CycleInfo(object):
         self.minute = minute
         self.schedule = sched
 
-    def get(self, events):
-        return self._data.get(tuple(events)) or self.id
+    def get(self, evts):
+        return self._data.get(tuple(evts)) or self.id
 
 
 def build_rotation_data(timetables):
@@ -118,6 +121,7 @@ class TimeTable(object):
         for row in self._data:
             if row[0] > minute:
                 next_row = row[:]
+                break
         return next_row
 
     def get_event(self, cycle_info):
@@ -126,10 +130,21 @@ class TimeTable(object):
         active_row = self._get_active_row(cycle_info.minute)
         if active_row:
             # trim time entry
+            start_minute = active_row[0]
             active_row = active_row[1:]
             cycle = cycle_info.get(active_row)
             rotation_index = cycle % len(active_row)
-            return active_row[rotation_index]
+            name = active_row[rotation_index]
+            next_row = self._get_next_row(cycle_info.minute)
+            if next_row:
+                end_minute = next_row[0]
+            else:
+                # likely not needed
+                end_minute = start_minute
+            return events.Event(
+                    name=name, cycle=cycle, cycle_minute=cycle_info.minute,
+                    start_minute=start_minute, end_minute=end_minute,
+                    rotation=active_row, rotation_offset=rotation_index)
         else:
             return ''
 
@@ -151,15 +166,28 @@ class TimeTable(object):
         if all:
             # ignore the cycle minute to return every event
             minute = -1
-        events = []
-        for row in self._data:
+        idx = 0
+        evts = []
+        while idx < len(self._data):
+            row = self._data[idx]
             if row[0] > minute:
-                cycle = cycle_info.get(row[1:])
-                rotation_index = cycle % (len(row) - 1)
+                start_minute = row[0]
+                rotation = row[1:]
+                cycle = cycle_info.get(rotation)
+                rotation_index = cycle % len(rotation)
                 current = row[1:][rotation_index]
                 if not filter or current in filter or current == 'next':
-                    events.append((row[0], current))
-        return events
+                    if current != "next":
+                        end_minute = self._data[idx + 1][0]
+                    else:
+                        end_minute = start_minute
+                    evts.append(events.Event(
+                            name = current, cycle=cycle, cycle_minute=cycle_info.minute,
+                            start_minute=start_minute, end_minute=end_minute,
+                            rotation=rotation, rotation_offset=rotation_index
+                            ))
+            idx += 1
+        return evts
 
     def get_rotations(self):
         """ Returns a dict of rotations with their count.
@@ -201,19 +229,24 @@ class BaseScheduleManager(metaclass=abc.ABCMeta):
         """ Returns the name of the event occuring at given timestamp.
         """
         cycle_info = self.get_cycle_info(timestamp)
-        return cycle_info.schedule.get_event(cycle_info)
+        event = cycle_info.schedule.get_event(cycle_info)
+        minutes_in = event.cycle_minute - event.start_minute
+        new_ts = cptime(timestamp) - timedelta(minutes=minutes_in)
+        event.set_start_time(new_ts)
+        return event
 
     def get_remaining_events(self, timestamp, all=False, filter=None):
         """ Events left in the current cycle.
         """
         cycle_info = self.get_cycle_info(timestamp)
-        events = cycle_info.schedule.get_remaining_events(cycle_info, all, filter)
+        remaining_events = cycle_info.schedule.get_remaining_events(cycle_info, all, filter)
         # convert events relative times to datetimes
         ts_events = []
-        for event in events:
-            minutes_in = event[0] - cycle_info.minute
+        for event in remaining_events:
+            minutes_in = event.start_minute - cycle_info.minute
             event_start = cptime(timestamp) + timedelta(minutes=minutes_in)
-            ts_events.append((event_start, event[1]))
+            event.set_start_time(event_start)
+            ts_events.append(event)
         return ts_events
 
     def get_current_event(self):
@@ -235,7 +268,7 @@ class BaseScheduleManager(metaclass=abc.ABCMeta):
                    minutes in the future. Defaults to 7 days.
         """
         timestamp = timestamp or datetime.now(timezone.utc)
-        events = []
+        evts = []
         ts_limit = timestamp + timedelta(minutes=limit)
         all = False
         # events left in current cycle
@@ -243,20 +276,20 @@ class BaseScheduleManager(metaclass=abc.ABCMeta):
         while cycle_start is not None:
             next_events = self.get_remaining_events(cycle_start, all=all, filter=names)
             for event in next_events:
-                if event[0] <= ts_limit:
-                    if event[1] == 'next':
+                if event.start_time <= ts_limit:
+                    if event.name == 'next':
                         # we need to query the next cycle
-                        cycle_start = event[0]
+                        cycle_start = event.start_time
                         all = True
                     else:
-                        events.append((event[0], event[1]))
-                        if count and len(events) >= count:
+                        evts.append(event)
+                        if count and len(evts) >= count:
                             # we reached the specified count of events
-                            return events
+                            return evts
                 else:
                     # the next event is outside the timeframe
                     cycle_start = None
-        return events
+        return evts
 
     def list_events(self, timestamp=None, next=60):
         """ Get a list of all events and their start time
@@ -265,10 +298,10 @@ class BaseScheduleManager(metaclass=abc.ABCMeta):
             fetches current, and sets a short minutes lookahead.
         """
         timestamp = timestamp or datetime.now(timezone.utc)
-        events = self.get_events(timestamp=timestamp, limit=next)
+        evts = self.get_events(timestamp=timestamp, limit=next)
         # the event happening now
         start_event = self.get_event(timestamp)
-        return [(timestamp, start_event)] + events
+        return [start_event] + evts
 
     def when_event(self, names, count=1, timestamp=None, limit=10080):
         """ When is the next instance of an event.
