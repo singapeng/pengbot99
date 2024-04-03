@@ -8,6 +8,7 @@ from discord.ext import tasks
 
 
 # local imports
+import miniprix
 import schedule
 
 
@@ -45,12 +46,15 @@ r99sched = schedule.load_schedule(env['CONFIG_PATH'], 'slot1_schedule')
 wdsched = schedule.load_schedule(env['CONFIG_PATH'], 'slot2_schedule')
 # load the weekend schedule for slot 2 (Prix and special events)
 wesched = schedule.load_schedule(env['CONFIG_PATH'], 'slot2_schedule_weekend')
-# load the schedule for Private Lobbies Mini-Prix
+# load the Classic Mini Prix track schedule
+cmpsched = schedule.load_schedule(env['CONFIG_PATH'], 'classic_mp_schedule')
+# OBSOLETE: load the schedule for Private Lobbies Mini-Prix
 pmpsched = schedule.load_schedule(env['CONFIG_PATH'], 'pl_miniprix')
 
 # Create the schedule managers
 slot1mgr = schedule.Slot1ScheduleManager(schedule.glitch_origin, r99sched)
 slot2mgr = schedule.Slot2ScheduleManager(schedule.origin, wdsched, wesched)
+cmp_mgr = miniprix.MiniPrixManager("classicprix", slot2mgr, cmpsched)
 plmp_mgr = schedule.Slot1ScheduleManager(schedule.plmp_origin, pmpsched)
 
 bot = discord.Bot()
@@ -128,6 +132,20 @@ event_choices = {
 }
 
 
+# Internal mini-prix types to look up upon user selection
+mp_event_choices = {
+    "Classic Mini-Prix": ["classicprix"],
+    "Mini-Prix": ["miniprix"],
+}
+
+
+track_choices = {
+    "Mute City I": "Mute_City_I",
+    "Mute City II": "Mute_City_II",
+    "Mute City III": "Mute_City_III",
+}
+
+
 def format_event_name(internal_name):
     """ Adds custom emojis to event name
     """
@@ -158,26 +176,58 @@ def format_current_event(event_name, event_end):
     return discord_text.format(evt_name, end)
 
 
-def format_future_event(event_row):
-    """ Nice display for events in the future
+def format_discord_timestamp(dt):
+    """ Flexible timestamp builder.
+        If the event is not in the next few hours, it will use
+        a different format automatically
     """
-    if event_row[0] - datetime.now(timezone.utc) > timedelta(hours=20):
+    if dt - datetime.now(timezone.utc) > timedelta(hours=20):
         # Discord long date with short time
         t_format = 'f'
         particle = ''
     else:
         t_format = 't'
-        particle = 'At '
-    discord_text = '{0}<t:{1}:{2}>: {3} (<t:{4}:R>)'
-    evt_time = int(event_row[0].timestamp())
-    evt_name = format_event_name(event_row[1])
-    return discord_text.format(particle, evt_time, t_format, evt_name, evt_time)
+        particle = "At "
+    text = "{0}<t:{1}:{2}>"
+    return text.format(particle, int(dt.timestamp()), t_format)
+
+
+def format_future_event(evt):
+    """ Nice display for events in the future
+    """
+    ts = format_discord_timestamp(evt.start_time)
+    discord_text = "{0}: {1} (<t:{2}:R>)"
+    evt_time = int(evt.start_time.timestamp())
+    evt_name = format_event_name(evt.name)
+    return discord_text.format(ts, evt_name, evt_time)
+
+
+def format_track_selection(evt, verbose=False):
+    """ Nice display for Mini-Prix track selection
+    """
+    ts = format_discord_timestamp(evt.start_time)
+    name = evt.name.replace('_', ' ')
+    if not verbose:
+        name = name.split('(')[0]
+    return "{0}: {1}".format(ts, name)
 
 
 async def get_event_types(ctx: discord.AutocompleteContext):
     """ 
     """
     return list(event_choices.keys())
+
+
+async def get_mp_types(ctx: discord.AutocompleteContext):
+    """ 
+    """
+    return list(mp_event_choices.keys())
+
+
+async def get_tracks(ctx: discord.AutocompleteContext):
+    """ 
+    """
+    return list(track_choices.keys())
 
 
 @bot.event
@@ -267,6 +317,17 @@ TIP_WHEN_FROM_TIME = "The UTC time from which to display events as YYYY-MM-DD HH
 TIP_WHEN_COUNT = "How many events to display - must be from 1 to 20 (default 5)"
 
 
+def _validate_utc_time(str_time):
+    if not str_time:
+        return None, None
+    try:
+        utc_time = datetime.strptime(str_time, "%Y-%m-%d %H:%M").replace(tzinfo=timezone.utc)
+    except ValueError:
+        msg = "Disqualified! Invalid 'from_time' value '{0}'. Need 'YYYY-MM-DD HH:MM'."
+        return msg, None
+    return None, utc_time
+
+
 @bot.slash_command(name="utc_when", description="List time for events starting from UTC time")
 async def utc_when(
         ctx: discord.ApplicationContext,
@@ -275,21 +336,38 @@ async def utc_when(
         count: discord.Option(int, required=False, default=5, description=TIP_WHEN_COUNT),
         ):
     log(f"{ctx.author.name} used {ctx.command}.")
+    err, response = None, None
     if not 0 < count < 13:
-        await ctx.respond("Disqualified! Invalid 'count' value {0}. Must be between 1 and 12.".format(count))
-        return
-    if from_time:
-        try:
-            from_time = datetime.strptime(from_time, "%Y-%m-%d %H:%M").replace(tzinfo=timezone.utc)
-        except ValueError:
-            msg = "Disqualified! Invalid 'from_time' value '{0}'. Need 'YYYY-MM-DD HH:MM'."
-            await ctx.respond(msg.format(from_time))
-            return
-    response = _when(event_type, from_time, count)
-    if response:
-        await ctx.respond(response)
+        err = "Disqualified! Invalid 'count' value {0}. Must be between 1 and 12.".format(count)
     else:
-        await ctx.respond("POWER DOWN! No result for '{0}' :(".format(event_type))
+        err, from_time = _validate_utc_time(from_time)
+    if not err:
+        response = _when(event_type, from_time, count)
+        if not response:
+            err = "POWER DOWN! No result for '{0}' :(".format(event_type)
+    await ctx.respond(err or response)
+
+
+@bot.slash_command(name="miniprix", description="List the track selection for the ongoing or next Mini-Prix", guild_ids=[945747217522753587])
+async def miniprix(
+        ctx: discord.ApplicationContext,
+        event_type: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_mp_types)),
+        track_filter: discord.Option(str, required=False, autocomplete=discord.utils.basic_autocomplete(get_tracks)),
+        utc_time: discord.Option(str, required=False, description=TIP_WHEN_FROM_TIME),
+        ):
+    log(f"{ctx.author.name} used {ctx.command}.")
+    err, response = None, None
+    err, from_time = _validate_utc_time(utc_time)
+    if not err:
+        evts = cmp_mgr.get_miniprix(timestamp=from_time)
+        if evts:
+            start = int(evts[0].start_time.timestamp())
+            header = "Track selection for {0} scheduled at <t:{1}:R>".format(event_type, start)
+            response = [header]
+            for evt in evts:
+                response.append(format_track_selection(evt))
+            response = '\n'.join(response)
+    await ctx.respond(err or response)
 
 
 @tasks.loop(seconds=3600)
@@ -322,7 +400,7 @@ async def announce_schedule():
     await channel.send('\n'.join(response))
 
 
-@bot.slash_command(name="ping", description="Sends the bot's latency.")
+@bot.slash_command(name="ping", description="Sends the bot's latency.", guild_ids=[945747217522753587])
 async def ping(ctx): # a slash command will be created with the name "ping"
     log(f"{ctx.author.name} used {ctx.command}.")
     await ctx.respond(f"Pong! Latency is {bot.latency}")
