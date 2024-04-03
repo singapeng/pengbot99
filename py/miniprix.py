@@ -4,6 +4,17 @@ from datetime import datetime, timedelta, timezone
 import events
 
 
+# 10 miniprix selection cycles per individual mp cycle
+# (one each minute)
+MP_CYCLES = 10
+
+# Magic number to cause the cycle to line up with known data
+# points. In this case, we know mp rotation 959, was a classic
+# prix 003.
+CLASSIC_LINE_UP_OFFSET = 14
+MINIPRIX_LINE_UP_OFFSET = 0
+
+
 def print_miniprix_rows(rows):
     minute = 0
     format = "x:3%d %s (ClassicMiniPrix%03d)"
@@ -24,18 +35,16 @@ class MiniPrixManager(object):
             self.schedule = mp_schedule[:-1]
         else:
             self.schedule = mp_schedule
-        # 10 miniprix selection cycles per individual mp cycle
-        # (one each minute)
-        self.MP_CYCLES = 10
-        # Magic number to cause the cycle to line up with known data
-        # points. In this case, we know mp rotation 959, was a classic
-        # prix 003.
-        self.LINEUP_OFFSET = 14
+        self.mp_cycles = MP_CYCLES
+        if self.name == "classicprix":
+            self.lineup_offset = CLASSIC_LINE_UP_OFFSET
+        else:
+            self.lineup_offset = MINIPRIX_LINE_UP_OFFSET
 
     def _get_start_mp_row(self, cycle):
         """ 
         """
-        return (cycle * self.MP_CYCLES - self.LINEUP_OFFSET) % len(self.schedule)
+        return (cycle * self.mp_cycles - self.lineup_offset) % len(self.schedule)
 
     def get_miniprix(self, timestamp=None):
         next_cmp = self.mgr.when_event(names=[self.name], timestamp=timestamp)
@@ -69,8 +78,12 @@ class MiniPrixManager(object):
 
     def eventify_rows(self, start_time, rows):
         res = []
+        if self.name == "classicprix":
+            code = "ClassicMiniPrix"
+        else:
+            code = "MiniPrix"
         for idx, row in enumerate(rows):
-            name = "{:s} (ClassicMiniPrix{:03d})".format(row[1], row[0])
+            name = "{:s} ({:s}{:03d})".format(row[1], code, row[0])
             evt = events.Event(name, start_minute=idx, end_minute=idx + 1)
             evt.set_start_time(start_time + timedelta(minutes=idx))
             res.append(evt)

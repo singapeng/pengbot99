@@ -48,6 +48,8 @@ wdsched = schedule.load_schedule(env['CONFIG_PATH'], 'slot2_schedule')
 wesched = schedule.load_schedule(env['CONFIG_PATH'], 'slot2_schedule_weekend')
 # load the Classic Mini Prix track schedule
 cmpsched = schedule.load_schedule(env['CONFIG_PATH'], 'classic_mp_schedule')
+# load the Classic Mini Prix track schedule
+mpsched = schedule.load_schedule(env['CONFIG_PATH'], 'miniprix_schedule')
 # OBSOLETE: load the schedule for Private Lobbies Mini-Prix
 pmpsched = schedule.load_schedule(env['CONFIG_PATH'], 'pl_miniprix')
 
@@ -55,6 +57,7 @@ pmpsched = schedule.load_schedule(env['CONFIG_PATH'], 'pl_miniprix')
 slot1mgr = schedule.Slot1ScheduleManager(schedule.glitch_origin, r99sched)
 slot2mgr = schedule.Slot2ScheduleManager(schedule.origin, wdsched, wesched)
 cmp_mgr = miniprix.MiniPrixManager("classicprix", slot2mgr, cmpsched)
+mp_mgr = miniprix.MiniPrixManager("miniprix", slot2mgr, mpsched)
 plmp_mgr = schedule.Slot1ScheduleManager(schedule.plmp_origin, pmpsched)
 
 bot = discord.Bot()
@@ -139,10 +142,40 @@ mp_event_choices = {
 }
 
 
-track_choices = {
+mp_track_choices = {
+    "Big Blue": "Big_Blue",
+    "Death Wind I": "Death_Wind_I",
+    "Death Wind II": "Death_Wind_II",
+    "Death Wind White Land": "Mystery_4",
+    "Fire City": "Mystery_3",
     "Mute City I": "Mute_City_I",
     "Mute City II": "Mute_City_II",
     "Mute City III": "Mute_City_III",
+    "Port Town I": "Port_Town_I",
+    "Port Town II": "Port_Town_II",
+    "Red Canyon I": "Red_Canyon_I",
+    "Red Canyon II": "Red_Canyon_II",
+    "Sand Ocean": "Sand_Ocean",
+    "White Land I": "White_Land_I",
+}
+
+
+cmp_track_choices = {
+    "Big Blue": "Big_Blue",
+    "Death Wind I": "Death_Wind_I",
+    "Death Wind II": "Death_Wind_II",
+    "Fire Field": "Fire_Field",
+    "Mute City I": "Mute_City_I",
+    "Mute City II": "Mute_City_II",
+    "Mute City III": "Mute_City_III",
+    "Port Town I": "Port_Town_I",
+    "Port Town II": "Port_Town_II",
+    "Red Canyon I": "Red_Canyon_I",
+    "Red Canyon II": "Red_Canyon_II",
+    "Sand Ocean": "Sand_Ocean",
+    "Silence": "Silence",
+    "White Land I": "White_Land_I",
+    "White Land II": "White_Land_II",
 }
 
 
@@ -202,11 +235,25 @@ def format_future_event(evt):
     return discord_text.format(ts, evt_name, evt_time)
 
 
+def format_track_names(text):
+    """ Nice display for track names
+    """
+    replacements = {}
+    for key, value in mp_track_choices.items():
+        replacements[value] = key
+    for key, value in cmp_track_choices.items():
+        replacements[value] = key
+    # we reverse-sort to avoid replacing "Mute_City_I" in "Mute_City_III"
+    for key in sorted(list(replacements.keys()))[::-1]:
+        text = text.replace(key, replacements[key])
+    return text
+
+
 def format_track_selection(evt, verbose=False):
     """ Nice display for Mini-Prix track selection
     """
     ts = format_discord_timestamp(evt.start_time)
-    name = evt.name.replace('_', ' ')
+    name = format_track_names(evt.name)
     if not verbose:
         name = name.split('(')[0]
     return "{0}: {1}".format(ts, name)
@@ -227,7 +274,10 @@ async def get_mp_types(ctx: discord.AutocompleteContext):
 async def get_tracks(ctx: discord.AutocompleteContext):
     """ 
     """
-    return list(track_choices.keys())
+    if ctx.options.get("event_type") == "Classic Mini-Prix":
+        return list(cmp_track_choices.keys())
+    else:
+        return list(mp_track_choices.keys())
 
 
 @bot.event
@@ -348,24 +398,41 @@ async def utc_when(
     await ctx.respond(err or response)
 
 
+# command option help tips
+TIP_MINIPRIX_VERBOSE = "Set True to display the track selection internal code name."
+TIP_MINIPRIX_TRACK_FILTER = "Only show track selections that include this track."
+
 @bot.slash_command(name="miniprix", description="List the track selection for the ongoing or next Mini-Prix", guild_ids=[945747217522753587])
 async def miniprix(
         ctx: discord.ApplicationContext,
         event_type: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_mp_types)),
-        track_filter: discord.Option(str, required=False, autocomplete=discord.utils.basic_autocomplete(get_tracks)),
+        track_filter: discord.Option(str, required=False, autocomplete=discord.utils.basic_autocomplete(get_tracks),
+                            description=TIP_MINIPRIX_TRACK_FILTER),
         utc_time: discord.Option(str, required=False, description=TIP_WHEN_FROM_TIME),
+        verbose: discord.Option(bool, required=False, default=False, description=TIP_MINIPRIX_VERBOSE),
         ):
     log(f"{ctx.author.name} used {ctx.command}.")
     err, response = None, None
     err, from_time = _validate_utc_time(utc_time)
+
+    if event_type == "Classic Mini-Prix":
+        mgr = cmp_mgr
+        track = cmp_track_choices.get(track_filter)
+    else:
+        mgr = mp_mgr
+        track = mp_track_choices.get(track_filter)
+
     if not err:
-        evts = cmp_mgr.get_miniprix(timestamp=from_time)
+        evts = mgr.get_miniprix(timestamp=from_time)
         if evts:
             start = int(evts[0].start_time.timestamp())
             header = "Track selection for {0} scheduled at <t:{1}:R>".format(event_type, start)
             response = [header]
             for evt in evts:
-                response.append(format_track_selection(evt))
+                if not track_filter or track in evt.name:
+                    response.append(format_track_selection(evt, verbose))
+            if len(response) == 1:
+                response.append("No results :(")
             response = '\n'.join(response)
     await ctx.respond(err or response)
 
