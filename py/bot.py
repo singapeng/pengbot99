@@ -402,7 +402,7 @@ async def utc_when(
 TIP_MINIPRIX_VERBOSE = "Set True to display the track selection internal code name."
 TIP_MINIPRIX_TRACK_FILTER = "Only show track selections that include this track."
 
-@bot.slash_command(name="miniprix", description="List the track selection for the ongoing or next Mini-Prix", guild_ids=[945747217522753587])
+@bot.slash_command(name="miniprix", description="List the track selection for the ongoing or next Mini-Prix")
 async def miniprix(
         ctx: discord.ApplicationContext,
         event_type: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_mp_types)),
