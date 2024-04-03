@@ -77,6 +77,8 @@ event_display_names = {
     "protracks": "Pro-Tracks",
     "queen": "Queen League",
     "teambattle": "Team Battle",
+    "Mystery_3": "Mystery Track ??? ||:skull:DWWL||",
+    "Mystery_4": "Mystery Track ??? ||:fire:FC:fire:||",
 }
 
 # We're building a serious bot and never use this
@@ -92,6 +94,8 @@ event_jokey_names = {
     "protracks": "Chocolate Rabbit-Tracks",
     "queen": "GX99 Diamond Cup",
     "teambattle": "Egghunt Battle",
+    "Mystery_3": "Mystery Egg ??? ||DWWL||",
+    "Mystery_4": "Mystery Egg ??? || FC ||",
 }
 
 # These are FZD Custom emoji codes to beautify the schedule printout
@@ -120,7 +124,7 @@ event_jokey_emoji = {
 event_choices = {
     "Classic": ["classic"],
     "Classic Mini-Prix": ["classicprix"],
-    "Glitch 99": ["glitch99"],
+    "Glitch 99": ["glitch99", "Mystery_3", "Mystery_4"],
     "Glitch Mini-Prix": ["mysteryprix"],
     "Grand Prix": ["knight", "mknight", "queen", "mqueen", "king", "mking"],
     "King League": ["king", "mking"],
@@ -426,7 +430,7 @@ async def miniprix(
         evts = mgr.get_miniprix(timestamp=from_time)
         if evts:
             start = int(evts[0].start_time.timestamp())
-            header = "Track selection for {0} scheduled at <t:{1}:R>".format(event_type, start)
+            header = "Track selection for {0} scheduled <t:{1}:R>".format(event_type, start)
             response = [header]
             for evt in evts:
                 if not track_filter or track in evt.name:
@@ -441,8 +445,9 @@ async def miniprix(
 async def announce_schedule():
     await bot.wait_until_ready()
     channel = bot.get_channel(int(env["ANNOUNCE_CHANNEL"]))
+    glitch_evts = event_choices.get("Glitch 99")
     evts = slot2mgr.list_events(next=120)
-    glitches = slot1mgr.when_event(names=["glitch99"], count=5, limit=120)
+    glitches = slot1mgr.when_event(names=glitch_evts, count=5, limit=120)
     if not evts:
         print("Could not fetch any event :(")
         return None
