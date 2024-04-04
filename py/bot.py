@@ -213,18 +213,27 @@ def format_current_event(event_name, event_end):
     return discord_text.format(evt_name, end)
 
 
-def format_discord_timestamp(dt):
+def format_discord_timestamp(dt, inline=False):
     """ Flexible timestamp builder.
         If the event is not in the next few hours, it will use
-        a different format automatically
+        a different format automatically.
+        Set inline to True if the timestamp appears in a
+        started sentence.
     """
-    if dt - datetime.now(timezone.utc) > timedelta(hours=20):
+    delta = dt - datetime.now(timezone.utc)
+    if abs(delta.total_seconds()) > timedelta(hours=20).total_seconds():
         # Discord long date with short time
         t_format = 'f'
-        particle = ''
+        if inline:
+            particle = 'on '
+        else:
+            particle = ''
     else:
         t_format = 't'
-        particle = "At "
+        if inline:
+            particle = "at "
+        else:
+            particle = "At "
     text = "{0}<t:{1}:{2}>"
     return text.format(particle, int(dt.timestamp()), t_format)
 
@@ -263,6 +272,17 @@ def format_track_selection(evt, verbose=False):
     return "{0}: {1}".format(ts, name)
 
 
+def _validate_utc_time(str_time):
+    if not str_time:
+        return None, None
+    try:
+        utc_time = datetime.strptime(str_time, "%Y-%m-%d %H:%M").replace(tzinfo=timezone.utc)
+    except ValueError:
+        msg = "Disqualified! Invalid 'from_time' value '{0}'. Need 'YYYY-MM-DD HH:MM'."
+        return msg.format(str_time), None
+    return None, utc_time
+
+
 async def get_event_types(ctx: discord.AutocompleteContext):
     """ 
     """
@@ -291,18 +311,34 @@ async def on_ready():
     announce_schedule.start()
 
 
+# command option help tips
+TIP_SHOWEVENTS_FROM_TIME = "The UTC time from which to display events as YYYY-MM-DD HH:MM"
+
+
 @bot.slash_command(name = "showevents", description = "Shows upcoming events")
-async def showevents(ctx):
+async def showevents(
+        ctx: discord.ApplicationContext,
+        utc_time: discord.Option(str, required=False, description=TIP_SHOWEVENTS_FROM_TIME),
+        ):
     log(f"{ctx.author.name} used {ctx.command}.")
-    evts = slot2mgr.list_events()
-    if not evts:
-        print("Could not fetch any event :(")
+    err, from_time = _validate_utc_time(utc_time)
+    if err:
+        await ctx.respond(err)
         return None
-    response = ["F-Zero 99 Upcoming events in your local time:"]
-    ongoing_evt = evts[0].name
-    ongoing_evt_end = evts[0].end_time
-    response.append(format_current_event(ongoing_evt, ongoing_evt_end))
-    for evt in evts[1:]:
+    evts = slot2mgr.list_events(timestamp=from_time, next=90)
+    if not evts:
+        await ctx.respond("Could not fetch any event :(")
+        return None
+    if from_time:
+        header = "F-Zero 99 events {0} local time:"
+        response = [header.format(format_discord_timestamp(from_time, inline=True))]
+    else:
+        response = ["F-Zero 99 Upcoming events in your local time:"]
+        ongoing_evt = evts[0].name
+        ongoing_evt_end = evts[0].end_time
+        response.append(format_current_event(ongoing_evt, ongoing_evt_end))
+        evts = evts[1:]
+    for evt in evts:
         response.append(format_future_event(evt))
     await ctx.respond('\n'.join(response))
 
@@ -347,7 +383,12 @@ def _when(event_type, from_time=None, count=5):
     if not evts:
         print("Could not fetch any event :(")
         return None
-    response = ["Next {0} events in your local time:".format(event_type)]
+    if from_time:
+        header = "{0} events {1} local time:"
+        header.format(event_type, format_discord_timestamp(from_time, inline=True))
+        response = [header]
+    else:
+        response = ["Next {0} events in your local time:".format(event_type)]
     for evt in evts:
         response.append(format_future_event(evt))
     return '\n'.join(response)
@@ -369,17 +410,6 @@ async def when(
 # command option help tips
 TIP_WHEN_FROM_TIME = "The UTC time from which to display events as YYYY-MM-DD HH:MM"
 TIP_WHEN_COUNT = "How many events to display - must be from 1 to 20 (default 5)"
-
-
-def _validate_utc_time(str_time):
-    if not str_time:
-        return None, None
-    try:
-        utc_time = datetime.strptime(str_time, "%Y-%m-%d %H:%M").replace(tzinfo=timezone.utc)
-    except ValueError:
-        msg = "Disqualified! Invalid 'from_time' value '{0}'. Need 'YYYY-MM-DD HH:MM'."
-        return msg, None
-    return None, utc_time
 
 
 @bot.slash_command(name="utc_when", description="List time for events starting from UTC time")
