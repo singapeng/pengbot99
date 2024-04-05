@@ -9,6 +9,7 @@ from discord.ext import tasks
 
 # local imports
 import miniprix
+import misa
 import schedule
 
 
@@ -59,6 +60,10 @@ slot2mgr = schedule.Slot2ScheduleManager(schedule.origin, wdsched, wesched)
 cmp_mgr = miniprix.MiniPrixManager("classicprix", slot2mgr, cmpsched)
 mp_mgr = miniprix.MiniPrixManager("miniprix", slot2mgr, mpsched)
 plmp_mgr = schedule.Slot1ScheduleManager(schedule.plmp_origin, pmpsched)
+
+# Create the quotes manager
+quotes = misa.Quotes(env['CONFIG_PATH'])
+
 
 bot = discord.Bot()
 
@@ -502,7 +507,13 @@ async def announce_schedule():
     await channel.send('\n'.join(response))
 
 
-@bot.slash_command(name="ping", description="Sends the bot's latency.", guild_ids=[945747217522753587])
+@bot.slash_command(name="misa", description="Provide a pearl of wisdom from The One Ahead Of Us.")
+async def misa(ctx): # a slash command will be created with the name "ping"
+    log(f"{ctx.author.name} used {ctx.command}.")
+    await ctx.respond(quotes.misa())
+
+
+@bot.slash_command(name="ping", description="Sends the bot's latency.", guild_ids=[env['TEST_GUILD_ID']])
 async def ping(ctx): # a slash command will be created with the name "ping"
     log(f"{ctx.author.name} used {ctx.command}.")
     await ctx.respond(f"Pong! Latency is {bot.latency}")
