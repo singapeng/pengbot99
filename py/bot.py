@@ -51,6 +51,7 @@ wesched = schedule.load_schedule(env['CONFIG_PATH'], 'slot2_schedule_weekend')
 cmpsched = schedule.load_schedule(env['CONFIG_PATH'], 'classic_mp_schedule')
 # load the Classic Mini Prix track schedule
 mpsched = schedule.load_schedule(env['CONFIG_PATH'], 'miniprix_schedule')
+mirrorsc = schedule.load_schedule(env['CONFIG_PATH'], 'miniprix_mirroring_schedule')
 # OBSOLETE: load the schedule for Private Lobbies Mini-Prix
 pmpsched = schedule.load_schedule(env['CONFIG_PATH'], 'pl_miniprix')
 
@@ -58,7 +59,7 @@ pmpsched = schedule.load_schedule(env['CONFIG_PATH'], 'pl_miniprix')
 slot1mgr = schedule.Slot1ScheduleManager(schedule.glitch_origin, r99sched)
 slot2mgr = schedule.Slot2ScheduleManager(schedule.origin, wdsched, wesched)
 cmp_mgr = miniprix.MiniPrixManager("classicprix", slot2mgr, cmpsched)
-mp_mgr = miniprix.MiniPrixManager("miniprix", slot2mgr, mpsched)
+mp_mgr = miniprix.MiniPrixManager("miniprix", slot2mgr, mpsched, mirrorsc)
 plmp_mgr = schedule.Slot1ScheduleManager(schedule.plmp_origin, pmpsched)
 
 # Create the quotes manager
@@ -105,7 +106,7 @@ event_jokey_names = {
 
 # These are FZD Custom emoji codes to beautify the schedule printout
 event_custom_emoji = {
-    "classicprix": "<:MPMini:1195076264294363187>",
+    "classicprix": "<:MPClassicMini:1222897226880123022>",
     "king": "<:GPKing:1195076258002899024>",
     "knight": "<:GPKnight:1195076261232525332>",
     "miniprix": "<:MPMini:1195076264294363187>",
@@ -188,6 +189,52 @@ cmp_track_choices = {
 }
 
 
+track_display_names = {
+    "Big_Blue": "Big Blue",
+    "Death_Wind_I": "Death Wind I",
+    "Death_Wind_II": "Death Wind II",
+    "Fire_Field": "Fire Field",
+    "Mute_City_I": "Mute City I",
+    "Mute_City_II": "Mute City II",
+    "Mute_City_III": "Mute City III",
+    "Mystery_1": "1CM",
+    "Mystery_2": "BBB",
+    "Mystery_3": "Death Wind White Land",
+    "Mystery_4": "Fire City",
+    "Port_Town_I": "Port Town I",
+    "Port_Town_II": "Port Town II",
+    "Red_Canyon_I": "Red Canyon I",
+    "Red_Canyon_II": "Red Canyon II",
+    "Sand_Ocean": "Sand Ocean",
+    "Silence": "Silence",
+    "White_Land_I": "White Land I",
+    "White_Land_II": "White Land II",
+}
+
+
+track_mirroring_enabled = {
+    "Big_Blue": True,
+    "Death_Wind_I": True,
+    "Death_Wind_II": False,
+    "Fire_Field": False,
+    "Mute_City_I": True,
+    "Mute_City_II": False,
+    "Mute_City_III": False,
+    "Mystery_1": False,
+    "Mystery_2": False,
+    "Mystery_3": False,
+    "Mystery_4": False,
+    "Port_Town_I": False,
+    "Port_Town_II": False,
+    "Red_Canyon_I": False,
+    "Red_Canyon_II": False,
+    "Sand_Ocean": True,
+    "Silence": True,
+    "White_Land_I": False,
+    "White_Land_II": False,
+}
+
+
 def format_event_name(internal_name):
     """ Adds custom emojis to event name
     """
@@ -253,27 +300,30 @@ def format_future_event(evt):
     return discord_text.format(ts, evt_name, evt_time)
 
 
-def format_track_names(text):
+def format_track_names(race1, race2, race3, verbose=True):
     """ Nice display for track names
     """
-    replacements = {}
-    for key, value in mp_track_choices.items():
-        replacements[value] = key
-    for key, value in cmp_track_choices.items():
-        replacements[value] = key
-    # we reverse-sort to avoid replacing "Mute_City_I" in "Mute_City_III"
-    for key in sorted(list(replacements.keys()))[::-1]:
-        text = text.replace(key, replacements[key])
-    return text
+    names = []
+    for race in (race1, race2, race3):
+        if race[0] == 'm':
+            name = track_display_names.get(race[1:]) or race[1:]
+            if track_mirroring_enabled.get(race[1:]):
+                # Mirror mode on
+                names.append("_Mirror {0}_".format(name))
+            else:
+                names.append(name)
+        else:
+            names.append(track_display_names.get(race)) or race
+    return ' > '.join(names)
 
 
 def format_track_selection(evt, verbose=False):
     """ Nice display for Mini-Prix track selection
     """
     ts = format_discord_timestamp(evt.start_time)
-    name = format_track_names(evt.name)
-    if not verbose:
-        name = name.split('(')[0]
+    name = format_track_names(evt.race1, evt.race2, evt.race3)
+    if verbose:
+        name = "{0} ({1})".format(name, evt.mpid)
     return "{0}: {1}".format(ts, name)
 
 
@@ -468,7 +518,7 @@ async def miniprix(
             header = "Track selection for {0} scheduled <t:{1}:R>".format(event_type, start)
             response = [header]
             for evt in evts:
-                if not track_filter or track in evt.name:
+                if not track_filter or evt.has_track(track):
                     response.append(format_track_selection(evt, verbose))
             if len(response) == 1:
                 response.append("No results :(")

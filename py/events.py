@@ -66,6 +66,7 @@ class MiniPrixEvent(Event):
         self._race2 = race2
         self._race3 = race3
         self._mirrored = mirrored
+        self._mpid = miniprix_id
 
     @property
     def name(self):
@@ -89,3 +90,12 @@ class MiniPrixEvent(Event):
         if self._mirrored[2] == '1':
             return 'm' + self._race3
         return self._race3
+
+    @property
+    def mpid(self):
+        return self._mpid
+
+    def has_track(self, track_name):
+        if track_name in (self._race1, self._race2, self._race3):
+            return True
+        return False
