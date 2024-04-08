@@ -359,11 +359,33 @@ async def get_tracks(ctx: discord.AutocompleteContext):
         return list(mp_track_choices.keys())
 
 
+async def configure_schedule_edit():
+    """
+    """
+    # local time for the bot
+    now = datetime.now(timezone.utc)
+    # round minutes to the tens
+    minute = now.minute // 10 * 10
+    # add 10 minutes delta
+    delta = timedelta(minutes=10)
+    kickoff_time = datetime(now.year, now.month, now.day, now.hour, minute, tzinfo=timezone.utc) + delta
+
+    @tasks.loop(time=kickoff_time.time(), count=1)
+    async def start_schedule_edit():
+        log("Starting the schedule editing loop!")
+        edit_schedule_message.start()
+
+    log("Schedule edit will start at {0}.".format(kickoff_time.strftime("%H:%M")))
+    start_schedule_edit.start()
+
+
 @bot.event
 async def on_ready():
     log(f"{bot.user} is ready and online!")
+    # configure schedule edit task
+    await configure_schedule_edit()
     # Kick-off the automatic announce
-    announce_schedule.start()
+    # announce_schedule.start()
 
 
 # command option help tips
@@ -524,6 +546,59 @@ async def miniprix(
                 response.append("No results :(")
             response = '\n'.join(response)
     await ctx.respond(err or response)
+
+
+def get_missing_event_types(evts):
+    """ Print the next occurence of events of a type
+        missing from the must-have list
+    """
+    must_have_evts = ["mknight", "queen", "king", "miniprix", "classicprix"]
+    present_evts = list(set([evt.name for evt in evts]))
+    missing_evts = [evt for evt in must_have_evts if evt not in present_evts]
+    results = []
+    for name in missing_evts:
+        extra = slot2mgr.when_event(names=[name], count=1)
+        if extra:
+            results.append(extra[0])
+    # make sure results are ordered from next to last
+    results = sorted(results, key=lambda item:item.start_time)
+    return results
+
+
+@tasks.loop(seconds=600)
+async def edit_schedule_message():
+    log("Editing schedule...")
+    channel = bot.get_channel(int(env["SCHEDULE_EDIT_CHANNEL"]))
+    msg_id = int(env["ANNOUNCE_MSG_ID"])
+    msg = await channel.fetch_message(msg_id)
+
+    # Announce copied
+    glitch_evts = event_choices.get("Glitch 99")
+    evts = slot2mgr.list_events(next=120)
+    glitches = slot1mgr.when_event(names=glitch_evts, count=5, limit=120)
+    if not evts:
+        print("Could not fetch any event :(")
+        return None
+    response = ["F-Zero 99 Upcoming events in your local time:"]
+    ongoing_evt = evts[0].name
+    ongoing_evt_end = evts[0].end_time
+    response.append(format_current_event(ongoing_evt, ongoing_evt_end))
+    for evt in evts[1:]:
+        response.append(format_future_event(evt))
+    if glitches:
+        response.append("\nNext Glitch Races:")
+        for glitch in glitches:
+            response.append(format_future_event(glitch))
+
+    # Also show events of desired types that aren't occuring soon
+    missing_evts = get_missing_event_types(evts)
+    if missing_evts:
+        response.append("\nFuture events:")
+        for evt in missing_evts:
+            response.append(format_future_event(evt))
+
+    # Edit message in place
+    await msg.edit('\n'.join(response))
 
 
 @tasks.loop(seconds=3600)
