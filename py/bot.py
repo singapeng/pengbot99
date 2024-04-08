@@ -11,35 +11,10 @@ from discord.ext import tasks
 import miniprix
 import misa
 import schedule
+import utils
 
 
-def load_env():
-    """ Reads the .env file and returns a dict
-    """
-    env = {}
-    with open(".env") as fd:
-        lines = fd.readlines()
-    for line in lines:
-        line = line.strip()
-        if line.startswith('#'):
-            # ignore comments
-            continue
-        var_name, var_value = line.split('=', 1)
-        env[var_name] = var_value
-    return env
-
-
-def log(text):
-    """ Log to stdout with timestamp.
-    TODO: replace with logging
-    """
-    stamp = datetime.now()
-    ymd = "%04d-%02d-%02d" % (stamp.year, stamp.month, stamp.day)
-    hms = "%02d:%02d:%02d" % (stamp.hour, stamp.minute, stamp.second)
-    print("{0} {1} {2}".format(ymd, hms, text))
-
-
-env = load_env()
+env = utils.load_env()
 
 # load the schedule for slot 1 (99 races)
 r99sched = schedule.load_schedule(env['CONFIG_PATH'], 'slot1_schedule')
@@ -359,9 +334,29 @@ async def get_tracks(ctx: discord.AutocompleteContext):
         return list(mp_track_choices.keys())
 
 
+async def create_schedule_messages():
+    main_id = await post_schedule_message()
+    mp_msg_id = await post_miniprix_thread("miniprix")
+    cmp_msg_id = await post_miniprix_thread("classicprix")
+    msg_env = {
+            "ANNOUNCE_MSG_ID": main_id,
+            "MINIPRIX_MSG_ID": mp_msg_id,
+            "CLASSICPRIX_MSG_ID": cmp_msg_id,
+        }
+    return msg_env
+
+
 async def configure_schedule_edit():
     """
     """
+    msg_env = utils.read_msg_struct()
+    if not msg_env:
+        utils.log("Creating message structure...")
+        msg_env = await create_schedule_messages()
+        utils.write_msg_struct(msg_env)
+        utils.log("Configuration updated.")
+    env.update(msg_env)
+
     # local time for the bot
     now = datetime.now(timezone.utc)
     # round minutes to the tens
@@ -372,16 +367,16 @@ async def configure_schedule_edit():
 
     @tasks.loop(time=kickoff_time.time(), count=1)
     async def start_schedule_edit():
-        log("Starting the schedule editing loop!")
+        utils.log("Starting the schedule editing loop!")
         edit_schedule_message.start()
 
-    log("Schedule edit will start at {0}.".format(kickoff_time.strftime("%H:%M")))
+    utils.log("Schedule edit will start at {0}.".format(kickoff_time.strftime("%H:%M")))
     start_schedule_edit.start()
 
 
 @bot.event
 async def on_ready():
-    log(f"{bot.user} is ready and online!")
+    utils.log(f"{bot.user} is ready and online!")
     # configure schedule edit task
     await configure_schedule_edit()
     # Kick-off the automatic announce
@@ -397,7 +392,7 @@ async def showevents(
         ctx: discord.ApplicationContext,
         utc_time: discord.Option(str, required=False, description=TIP_SHOWEVENTS_FROM_TIME),
         ):
-    log(f"{ctx.author.name} used {ctx.command}.")
+    utils.log(f"{ctx.author.name} used {ctx.command}.")
     err, from_time = _validate_utc_time(utc_time)
     if err:
         await ctx.respond(err)
@@ -476,7 +471,7 @@ async def when(
         ctx: discord.ApplicationContext,
         event_type: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_event_types)),
         ):
-    log(f"{ctx.author.name} used {ctx.command}.")
+    utils.log(f"{ctx.author.name} used {ctx.command}.")
     response = _when(event_type)
     if response:
         await ctx.respond(response)
@@ -496,7 +491,7 @@ async def utc_when(
         from_time: discord.Option(str, description=TIP_WHEN_FROM_TIME),
         count: discord.Option(int, required=False, default=5, description=TIP_WHEN_COUNT),
         ):
-    log(f"{ctx.author.name} used {ctx.command}.")
+    utils.log(f"{ctx.author.name} used {ctx.command}.")
     err, response = None, None
     if not 0 < count < 13:
         err = "Disqualified! Invalid 'count' value {0}. Must be between 1 and 12.".format(count)
@@ -513,16 +508,10 @@ async def utc_when(
 TIP_MINIPRIX_VERBOSE = "Set True to display the track selection internal code name."
 TIP_MINIPRIX_TRACK_FILTER = "Only show track selections that include this track."
 
-@bot.slash_command(name="miniprix", description="List the track selection for the ongoing or next Mini-Prix")
-async def miniprix(
-        ctx: discord.ApplicationContext,
-        event_type: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_mp_types)),
-        track_filter: discord.Option(str, required=False, autocomplete=discord.utils.basic_autocomplete(get_tracks),
-                            description=TIP_MINIPRIX_TRACK_FILTER),
-        utc_time: discord.Option(str, required=False, description=TIP_WHEN_FROM_TIME),
-        verbose: discord.Option(bool, required=False, default=False, description=TIP_MINIPRIX_VERBOSE),
-        ):
-    log(f"{ctx.author.name} used {ctx.command}.")
+
+def _create_miniprix_message(event_type, track_filter, utc_time, verbose):
+    """
+    """
     err, response = None, None
     err, from_time = _validate_utc_time(utc_time)
 
@@ -545,6 +534,36 @@ async def miniprix(
             if len(response) == 1:
                 response.append("No results :(")
             response = '\n'.join(response)
+    return err, response
+
+
+async def post_miniprix_thread(event_type):
+    channel = bot.get_channel(int(env["SCHEDULE_EDIT_CHANNEL"]))
+
+    err, response = _create_miniprix_message(event_type, None, None, False)
+    if not response:
+        return
+
+    msg = await channel.send(response)
+
+    thread_name = event_display_names.get(event_type)
+    await msg.create_thread(name=thread_name, auto_archive_duration=10080)
+    return msg.id
+
+
+@bot.slash_command(name="miniprix", description="List the track selection for the ongoing or next Mini-Prix")
+async def miniprix(
+        ctx: discord.ApplicationContext,
+        event_type: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_mp_types)),
+        track_filter: discord.Option(str, required=False, autocomplete=discord.utils.basic_autocomplete(get_tracks),
+                            description=TIP_MINIPRIX_TRACK_FILTER),
+        utc_time: discord.Option(str, required=False, description=TIP_WHEN_FROM_TIME),
+        verbose: discord.Option(bool, required=False, default=False, description=TIP_MINIPRIX_VERBOSE),
+        ):
+    """
+    """
+    utils.log(f"{ctx.author.name} used {ctx.command}.")
+    err, response = _create_miniprix_message(event_type, track_filter, utc_time, verbose)
     await ctx.respond(err or response)
 
 
@@ -565,20 +584,13 @@ def get_missing_event_types(evts):
     return results
 
 
-@tasks.loop(seconds=600)
-async def edit_schedule_message():
-    log("Editing schedule...")
-    channel = bot.get_channel(int(env["SCHEDULE_EDIT_CHANNEL"]))
-    msg_id = int(env["ANNOUNCE_MSG_ID"])
-    msg = await channel.fetch_message(msg_id)
-
-    # Announce copied
+def _create_schedule_message():
     glitch_evts = event_choices.get("Glitch 99")
     evts = slot2mgr.list_events(next=120)
     glitches = slot1mgr.when_event(names=glitch_evts, count=5, limit=120)
     if not evts:
-        print("Could not fetch any event :(")
-        return None
+        utils.log("Could not fetch any event :(")
+        return []
     response = ["F-Zero 99 Upcoming events in your local time:"]
     ongoing_evt = evts[0].name
     ongoing_evt_end = evts[0].end_time
@@ -596,6 +608,29 @@ async def edit_schedule_message():
         response.append("\nFuture events:")
         for evt in missing_evts:
             response.append(format_future_event(evt))
+    return response
+
+
+async def post_schedule_message():
+    channel = bot.get_channel(int(env["SCHEDULE_EDIT_CHANNEL"]))
+
+    response = _create_schedule_message()
+    if not response:
+        return
+
+    msg = await channel.send('\n'.join(response))
+    return msg.id
+
+
+@tasks.loop(seconds=600)
+async def edit_schedule_message():
+    channel = bot.get_channel(int(env["SCHEDULE_EDIT_CHANNEL"]))
+    msg_id = int(env["ANNOUNCE_MSG_ID"])
+    msg = await channel.fetch_message(msg_id)
+
+    response = _create_schedule_message()
+    if not response:
+        return
 
     # Edit message in place
     await msg.edit('\n'.join(response))
@@ -634,13 +669,13 @@ async def announce_schedule():
 
 @bot.slash_command(name="misa", description="Provide a pearl of wisdom from The One Ahead Of Us.")
 async def misa(ctx): # a slash command will be created with the name "ping"
-    log(f"{ctx.author.name} used {ctx.command}.")
+    utils.log(f"{ctx.author.name} used {ctx.command}.")
     await ctx.respond(quotes.misa())
 
 
 @bot.slash_command(name="ping", description="Sends the bot's latency.", guild_ids=[env['TEST_GUILD_ID']])
 async def ping(ctx): # a slash command will be created with the name "ping"
-    log(f"{ctx.author.name} used {ctx.command}.")
+    utils.log(f"{ctx.author.name} used {ctx.command}.")
     await ctx.respond(f"Pong! Latency is {bot.latency}")
 
 
