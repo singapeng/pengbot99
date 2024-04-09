@@ -122,8 +122,8 @@ event_choices = {
 
 # Internal mini-prix types to look up upon user selection
 mp_event_choices = {
-    "Classic Mini-Prix": ["classicprix"],
-    "Mini-Prix": ["miniprix"],
+    "Classic Mini-Prix": "classicprix",
+    "Mini-Prix": "miniprix",
 }
 
 
@@ -335,14 +335,19 @@ async def get_tracks(ctx: discord.AutocompleteContext):
 
 
 async def create_schedule_messages():
-    main_id = await post_schedule_message()
-    mp_msg_id = await post_miniprix_thread("miniprix")
-    cmp_msg_id = await post_miniprix_thread("classicprix")
+    mp_thread_id, mp_msg_id = await post_miniprix_thread("miniprix")
+    cmp_thread_id, cmp_msg_id = await post_miniprix_thread("classicprix")
     msg_env = {
-            "ANNOUNCE_MSG_ID": main_id,
             "MINIPRIX_MSG_ID": mp_msg_id,
+            "MINIPRIX_THREAD_ID": mp_thread_id,
             "CLASSICPRIX_MSG_ID": cmp_msg_id,
+            "CLASSICPRIX_THREAD_ID": cmp_thread_id,
         }
+    env.update(msg_env)
+    main_id = await post_schedule_message()
+    msg_env["ANNOUNCE_MSG_ID"] = main_id
+    env.update(msg_env)
+
     return msg_env
 
 
@@ -355,7 +360,10 @@ async def configure_schedule_edit():
         msg_env = await create_schedule_messages()
         utils.write_msg_struct(msg_env)
         utils.log("Configuration updated.")
-    env.update(msg_env)
+    else:
+        env.update(msg_env)
+        for mp_type in ("miniprix", "classicprix"):
+            await _edit_miniprix_message(mp_type)
 
     # local time for the bot
     now = datetime.now(timezone.utc)
@@ -380,7 +388,7 @@ async def on_ready():
     # configure schedule edit task
     await configure_schedule_edit()
     # Kick-off the automatic announce
-    # announce_schedule.start()
+    announce_schedule.start()
 
 
 # command option help tips
@@ -515,7 +523,7 @@ def _create_miniprix_message(event_type, track_filter, utc_time, verbose):
     err, response = None, None
     err, from_time = _validate_utc_time(utc_time)
 
-    if event_type == "Classic Mini-Prix":
+    if event_type == "classicprix":
         mgr = cmp_mgr
         track = cmp_track_choices.get(track_filter)
     else:
@@ -526,7 +534,8 @@ def _create_miniprix_message(event_type, track_filter, utc_time, verbose):
         evts = mgr.get_miniprix(timestamp=from_time)
         if evts:
             start = int(evts[0].start_time.timestamp())
-            header = "Track selection for {0} scheduled <t:{1}:R>".format(event_type, start)
+            evt_name = event_display_names.get(event_type)
+            header = "Track selection for {0} scheduled <t:{1}:R>".format(evt_name, start)
             response = [header]
             for evt in evts:
                 if not track_filter or evt.has_track(track):
@@ -539,16 +548,47 @@ def _create_miniprix_message(event_type, track_filter, utc_time, verbose):
 
 async def post_miniprix_thread(event_type):
     channel = bot.get_channel(int(env["SCHEDULE_EDIT_CHANNEL"]))
+    thread_name = "See {0} schedule".format(event_display_names.get(event_type))
+    thread = await channel.create_thread(name=thread_name, message=None, auto_archive_duration=10080)
 
     err, response = _create_miniprix_message(event_type, None, None, False)
     if not response:
         return
 
-    msg = await channel.send(response)
+    msg = await thread.send(response)
+    if event_type == "miniprix":
+        env["MINIPRIX_MSG_URL"] = msg.jump_url
+    else:
+        env["CLASSICPRIX_MSG_URL"] = msg.jump_url
 
-    thread_name = event_display_names.get(event_type)
-    await msg.create_thread(name=thread_name, auto_archive_duration=10080)
-    return msg.id
+    return thread.id, msg.id
+
+
+async def _edit_miniprix_message(mp_type):
+    if mp_type == "miniprix":
+        msg_id_key = "MINIPRIX_MSG_ID"
+        thread_id_key = "MINIPRIX_THREAD_ID"
+        msg_url_key = "MINIPRIX_MSG_URL"
+    else:
+        msg_id_key = "CLASSICPRIX_MSG_ID"
+        thread_id_key = "CLASSICPRIX_THREAD_ID"
+        msg_url_key = "CLASSICPRIX_MSG_URL"
+
+    channel = bot.get_channel(int(env["SCHEDULE_EDIT_CHANNEL"]))
+
+    msg_id = int(env[msg_id_key])
+    thread_id = int(env[thread_id_key])
+    thread = channel.get_thread(thread_id)
+    msg = await thread.fetch_message(msg_id)
+
+    if not env.get(msg_url_key):
+        env[msg_url_key] = msg.jump_url
+
+    utils.log("Updating {0} thread...".format(mp_type))
+    err, response = _create_miniprix_message(mp_type, None, None, False)
+    if not err and response:
+        await msg.edit(response)
+    utils.log("Update complete.")
 
 
 @bot.slash_command(name="miniprix", description="List the track selection for the ongoing or next Mini-Prix")
@@ -563,6 +603,7 @@ async def miniprix(
     """
     """
     utils.log(f"{ctx.author.name} used {ctx.command}.")
+    event_type = mp_event_choices.get(event_type)
     err, response = _create_miniprix_message(event_type, track_filter, utc_time, verbose)
     await ctx.respond(err or response)
 
@@ -584,19 +625,42 @@ def get_missing_event_types(evts):
     return results
 
 
+def format_schedule_edit(event_type, message):
+    if event_type == "classicprix":
+        return "{0} {1}".format(message, env.get("CLASSICPRIX_MSG_URL"))
+    elif event_type == "miniprix":
+        return "{0} {1}".format(message, env.get("MINIPRIX_MSG_URL"))
+    return message
+
+
+def kick_off_mp_update(mp_evt):
+    kickoff_time = mp_evt.end_time
+
+    @tasks.loop(time=kickoff_time.time(), count=1)
+    async def start_mp_edit():
+        await _edit_miniprix_message(mp_evt.name)
+
+    utils.log("{0} will be edited at {1}.".format(mp_evt.name, kickoff_time.strftime("%H:%M")))
+    start_mp_edit.start()
+
+
 def _create_schedule_message():
     glitch_evts = event_choices.get("Glitch 99")
-    evts = slot2mgr.list_events(next=120)
-    glitches = slot1mgr.when_event(names=glitch_evts, count=5, limit=120)
+    evts = slot2mgr.list_events(next=119)
+    glitches = slot1mgr.when_event(names=glitch_evts, count=5, limit=119)
     if not evts:
         utils.log("Could not fetch any event :(")
         return []
     response = ["F-Zero 99 Upcoming events in your local time:"]
     ongoing_evt = evts[0].name
+    if ongoing_evt in ("miniprix", "classicprix"):
+        kick_off_mp_update(evts[0])
     ongoing_evt_end = evts[0].end_time
-    response.append(format_current_event(ongoing_evt, ongoing_evt_end))
+    ongoing_str = format_current_event(ongoing_evt, ongoing_evt_end)
+    response.append(format_schedule_edit(ongoing_evt, ongoing_str))
     for evt in evts[1:]:
-        response.append(format_future_event(evt))
+        future_str = format_future_event(evt)
+        response.append(format_schedule_edit(evt.name, future_str))
     if glitches:
         response.append("\nNext Glitch Races:")
         for glitch in glitches:
@@ -607,7 +671,8 @@ def _create_schedule_message():
     if missing_evts:
         response.append("\nFuture events:")
         for evt in missing_evts:
-            response.append(format_future_event(evt))
+            future_str = format_future_event(evt)
+            response.append(format_schedule_edit(evt.name, future_str))
     return response
 
 
