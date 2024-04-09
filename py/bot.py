@@ -549,8 +549,7 @@ def _create_miniprix_message(event_type, track_filter, utc_time, verbose):
 async def post_miniprix_thread(event_type):
     channel = bot.get_channel(int(env["SCHEDULE_EDIT_CHANNEL"]))
     thread_name = "See {0} schedule".format(event_display_names.get(event_type))
-    # 11 refers to public threads
-    thread = await channel.create_thread(name=thread_name, message=None, auto_archive_duration=10080, type=11)
+    thread = await channel.create_thread(name=thread_name, message=None, auto_archive_duration=10080)
 
     err, response = _create_miniprix_message(event_type, None, None, False)
     if not response:
