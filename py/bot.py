@@ -465,8 +465,8 @@ def _when(event_type, from_time=None, count=5):
         return None
     if from_time:
         header = "{0} events {1} local time:"
-        header.format(event_type, format_discord_timestamp(from_time, inline=True))
-        response = [header]
+        time_str = format_discord_timestamp(from_time, inline=True)
+        response = [header.format(event_type, time_str)]
     else:
         response = ["Next {0} events in your local time:".format(event_type)]
     for evt in evts:
