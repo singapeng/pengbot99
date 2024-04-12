@@ -114,7 +114,7 @@ event_choices = {
     "King League": ["king", "mking"],
     "Knight League": ["knight", "mknight"],
     "Knight League (no mirror)": ["knight"],
-    "Queen League (no mirror)": ["mqueen"],
+    "Queen League (no mirror)": ["queen"],
     "Mirror Knight League": ["mknight"],
     "Mirror Queen League": ["mqueen"],
     "Mini-Prix": ["classicprix", "miniprix", "mysteryprix"],
