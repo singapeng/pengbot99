@@ -14,8 +14,6 @@ MP_CYCLES = 10
 CLASSIC_LINE_UP_OFFSET = 14
 MINIPRIX_LINE_UP_OFFSET = 0
 MIRROR_LINE_UP_OFFSET = 6
-PRIVATE_MP_LINE_UP_OFFSET = 0
-PRIVATE_MP_MIRROR_LINE_UP_OFFSET = 0
 
 
 def print_miniprix_rows(rows):
@@ -140,11 +138,6 @@ class PrivateMPManager(object):
     def __init__(self, event_name, cycle_manager, public_mp_manager, mirror_manager=None):
         super().__init__()
         self.name = event_name
-        self.mirror_lineup_offset = PRIVATE_MP_MIRROR_LINE_UP_OFFSET
-        if self.name == "classicprix":
-            self.lineup_offset = PRIVATE_MP_LINE_UP_OFFSET
-        else:
-            self.lineup_offset = PRIVATE_MP_LINE_UP_OFFSET
         self.mgr = cycle_manager
         self.pmp_mgr = public_mp_manager
         self.mirror_mgr = mirror_manager
@@ -154,12 +147,15 @@ class PrivateMPManager(object):
     def _get_rows_from_event(self, evts):
         if evts:
             return [(evt.start_minute, evt.name) for evt in evts]
-        return [(0, "000")] * self._lookup_count
+        return [(0, "000")] * (self._lookup_count + 1)
 
     def get_miniprix(self, timestamp=None):
         # get private mp schedule data
         evts = self.mgr.list_events(timestamp, next=self._lookup_count)
-        mirror_evts = self.mirror_mgr.list_events(timestamp, next=self._lookup_count)
+        if self.mirror_mgr:
+            mirror_evts = self.mirror_mgr.list_events(timestamp, next=self._lookup_count)
+        else:
+            mirror_evts = []
 
         # prepare private mp events
         start_time = evts[0].start_time

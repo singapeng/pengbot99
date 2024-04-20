@@ -29,6 +29,7 @@ mpsched = schedule.load_schedule(env['CONFIG_PATH'], 'miniprix_schedule')
 mirrorsc = schedule.load_schedule(env['CONFIG_PATH'], 'miniprix_mirroring_schedule')
 # load the schedule for Private Lobbies Mini-Prix
 plmpsched = schedule.load_schedule(env["CONFIG_PATH"], "private_miniprix_schedule")
+plcmpsched = schedule.load_schedule(env["CONFIG_PATH"], "private_classic_mp_schedule")
 
 # Create the Public schedule managers
 slot1mgr = schedule.Slot1ScheduleManager(schedule.glitch_origin, r99sched)
@@ -40,6 +41,8 @@ mp_mgr = miniprix.MiniPrixManager("miniprix", slot2mgr, mpsched, mirrorsc)
 pl_slot1 = schedule.Slot1ScheduleManager(schedule.origin, plmpsched)
 mirror_slot1 = schedule.Slot1ScheduleManager(schedule.origin, mirrorsc)
 pmp_mgr = miniprix.PrivateMPManager("miniprix", pl_slot1, mp_mgr, mirror_slot1)
+plcmp_slot1 = schedule.Slot1ScheduleManager(schedule.pl_origin, plcmpsched)
+pcmp_mgr = miniprix.PrivateMPManager("classicprix", plcmp_slot1, cmp_mgr)
 
 # Create the quotes manager
 quotes = misa.Quotes(env['CONFIG_PATH'])
