@@ -27,15 +27,19 @@ cmpsched = schedule.load_schedule(env['CONFIG_PATH'], 'classic_mp_schedule')
 # load the Classic Mini Prix track schedule
 mpsched = schedule.load_schedule(env['CONFIG_PATH'], 'miniprix_schedule')
 mirrorsc = schedule.load_schedule(env['CONFIG_PATH'], 'miniprix_mirroring_schedule')
-# OBSOLETE: load the schedule for Private Lobbies Mini-Prix
-pmpsched = schedule.load_schedule(env['CONFIG_PATH'], 'pl_miniprix')
+# load the schedule for Private Lobbies Mini-Prix
+plmpsched = schedule.load_schedule(env["CONFIG_PATH"], "private_miniprix_schedule")
 
-# Create the schedule managers
+# Create the Public schedule managers
 slot1mgr = schedule.Slot1ScheduleManager(schedule.glitch_origin, r99sched)
 slot2mgr = schedule.Slot2ScheduleManager(schedule.origin, wdsched, wesched)
 cmp_mgr = miniprix.MiniPrixManager("classicprix", slot2mgr, cmpsched)
 mp_mgr = miniprix.MiniPrixManager("miniprix", slot2mgr, mpsched, mirrorsc)
-plmp_mgr = schedule.Slot1ScheduleManager(schedule.plmp_origin, pmpsched)
+
+# Create Private Lobby schedule managers
+pl_slot1 = schedule.Slot1ScheduleManager(schedule.origin, plmpsched)
+mirror_slot1 = schedule.Slot1ScheduleManager(schedule.origin, mirrorsc)
+pmp_mgr = miniprix.PrivateMPManager("miniprix", pl_slot1, mp_mgr, mirror_slot1)
 
 # Create the quotes manager
 quotes = misa.Quotes(env['CONFIG_PATH'])
@@ -129,6 +133,8 @@ event_choices = {
 mp_event_choices = {
     "Classic Mini-Prix": "classicprix",
     "Mini-Prix": "miniprix",
+    "Private Classic Mini-Prix": "classicprix",
+    "Private Mini-Prix": "miniprix",
 }
 
 
@@ -428,32 +434,6 @@ async def showevents(
     await ctx.respond('\n'.join(response))
 
 
-def _private_mini_when(names, from_time, count):
-    """ When the Private Lobby Mini-Prix time coincides with a Public
-        Mini-Prix, the private lobby type is overridden by the public
-        type, i.e. if the public lobby is a regular MP, then there
-        won't be a glitch in Private MP lobbies.
-        This function looks up both MP schedules and will discard or
-        add times accordingly.
-        Research credits: SpringyRubber (FZD)
-    """
-    # we look up more events than necessary because we may have to discard some
-    evts = plmp_mgr.when_event(names=names, count=count * 2, timestamp=from_time)
-    # it seems unlikely we'd have to look up very far along the MP schedule
-    # based on current timing - this isn't a very scientific way.
-    pubmp = slot2mgr.when_event(names=event_choices.get("Mini-Prix"), count=count, timestamp=from_time)
-    # we're using timestamps as dict keys and taking advantage of 'update'
-    evts_dict = dict(evts)
-    evts_dict.update(dict(pubmp))
-    merged_evts = []
-    for key in sorted(evts_dict.keys()):
-        if evts_dict[key] == "mysteryprix":
-            merged_evts.append((key, evts_dict[key]))
-        if len(merged_evts) >= count:
-            break
-    return merged_evts
-
-
 def _when(event_type, from_time=None, count=5):
     names = event_choices.get(event_type)
     if event_type == "Private Glitch Mini-Prix":
@@ -492,9 +472,11 @@ async def when(
         await ctx.respond("POWER DOWN! No result for '{0}' :(".format(event_type))
 
 
+# limit count to avoid tripping Discord message length limit
+MAX_COUNT_VALUE = 12
 # command option help tips
 TIP_WHEN_FROM_TIME = "The UTC time from which to display events as YYYY-MM-DD HH:MM"
-TIP_WHEN_COUNT = "How many events to display - must be from 1 to 20 (default 5)"
+TIP_WHEN_COUNT = "How many events to display - must be from 1 to {0} (default 5)".format(MAX_COUNT_VALUE)
 
 
 @bot.slash_command(name="utc_when", description="List time for events starting from UTC time")
@@ -506,7 +488,7 @@ async def utc_when(
         ):
     utils.log(f"{ctx.author.name} used {ctx.command}.")
     err, response = None, None
-    if not 0 < count < 13:
+    if not 0 < count <= MAX_COUNT_VALUE:
         err = "Disqualified! Invalid 'count' value {0}. Must be between 1 and 12.".format(count)
     else:
         err, from_time = _validate_utc_time(from_time)
@@ -522,17 +504,23 @@ TIP_MINIPRIX_VERBOSE = "Set True to display the track selection internal code na
 TIP_MINIPRIX_TRACK_FILTER = "Only show track selections that include this track."
 
 
-def _create_miniprix_message(event_type, track_filter, utc_time, verbose):
+def _create_miniprix_message(event_type, track_filter, utc_time, verbose, private=False):
     """
     """
     err, response = None, None
     err, from_time = _validate_utc_time(utc_time)
 
     if event_type == "classicprix":
-        mgr = cmp_mgr
+        if private:
+            mgr = pcmp_mgr
+        else:
+            mgr = cmp_mgr
         track = cmp_track_choices.get(track_filter)
     else:
-        mgr = mp_mgr
+        if private:
+            mgr = pmp_mgr
+        else:
+            mgr = mp_mgr
         track = mp_track_choices.get(track_filter)
 
     if not err:
@@ -609,8 +597,9 @@ async def miniprix(
     """
     """
     utils.log(f"{ctx.author.name} used {ctx.command}.")
+    private = "Private" in event_type
     event_type = mp_event_choices.get(event_type)
-    err, response = _create_miniprix_message(event_type, track_filter, utc_time, verbose)
+    err, response = _create_miniprix_message(event_type, track_filter, utc_time, verbose, private)
     await ctx.respond(err or response)
 
 

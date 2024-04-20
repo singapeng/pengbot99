@@ -13,8 +13,6 @@ import events
 origin = datetime(2024, 2, 6, 0, 0, 0, 0, tzinfo=timezone.utc)
 # A point observed to be a glitch sequence origin.
 glitch_origin = datetime(2024, 2, 13, 0, 59, tzinfo=timezone.utc)
-# A point observed to be a private lobby miniprix sequence origin.
-plmp_origin = datetime(2024, 3, 9, 19, 50, tzinfo=timezone.utc)
 
 
 def load_schedule(path, name):

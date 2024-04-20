@@ -14,6 +14,8 @@ MP_CYCLES = 10
 CLASSIC_LINE_UP_OFFSET = 14
 MINIPRIX_LINE_UP_OFFSET = 0
 MIRROR_LINE_UP_OFFSET = 6
+PRIVATE_MP_LINE_UP_OFFSET = 0
+PRIVATE_MP_MIRROR_LINE_UP_OFFSET = 0
 
 
 def print_miniprix_rows(rows):
@@ -32,7 +34,10 @@ def _trim_schedule(sched):
 
 
 class MiniPrixManager(object):
-    """
+    """ For Public MiniPrix (Classic and Regular).
+        Predicts the track selection line up for individual MiniPrix.
+        Uses a Slot2Mgr as the cycle manager to read when the next MP event occurs.
+        Optionally uses a mirroring schedule (for regular MP as of fz99 1.3)
     """
     def __init__(self, event_name, cycle_manager, mp_schedule, mirror=None):
         super().__init__()
@@ -118,6 +123,64 @@ class MiniPrixManager(object):
         for idx, row in enumerate(rows):
             name = self.name
             mpid = "{:03d}.{:s}".format(int(row[0]), str(mirror_rows[idx][0]))
+            mirror = mirror_rows[idx][1]
+            r1, r2, r3 = row[1].split(' > ')
+            evt = events.MiniPrixEvent(name, mpid, r1, r2, r3, start_minute=idx, end_minute=idx + 1, mirrored=mirror)
+            evt.set_start_time(start_time + timedelta(minutes=idx))
+            res.append(evt)
+        return res
+
+
+class PrivateMPManager(object):
+    """ For Private MiniPrix track selection schedule.
+        Supplied with a public MP manager, since the public MP selection will
+        override Private MP if it is running concurrently.
+        Therefore a public MP manager must be initialized first.
+    """
+    def __init__(self, event_name, cycle_manager, public_mp_manager, mirror_manager=None):
+        super().__init__()
+        self.name = event_name
+        self.mirror_lineup_offset = PRIVATE_MP_MIRROR_LINE_UP_OFFSET
+        if self.name == "classicprix":
+            self.lineup_offset = PRIVATE_MP_LINE_UP_OFFSET
+        else:
+            self.lineup_offset = PRIVATE_MP_LINE_UP_OFFSET
+        self.mgr = cycle_manager
+        self.pmp_mgr = public_mp_manager
+        self.mirror_mgr = mirror_manager
+        # how many result rows (or minutes) to look up
+        self._lookup_count = MP_CYCLES
+
+    def _get_rows_from_event(self, evts):
+        if evts:
+            return [(evt.start_minute, evt.name) for evt in evts]
+        return [(0, "000")] * self._lookup_count
+
+    def get_miniprix(self, timestamp=None):
+        # get private mp schedule data
+        evts = self.mgr.list_events(timestamp, next=self._lookup_count)
+        mirror_evts = self.mirror_mgr.list_events(timestamp, next=self._lookup_count)
+
+        # prepare private mp events
+        start_time = evts[0].start_time
+        rows = self._get_rows_from_event(evts)
+        mirror_rows = self._get_rows_from_event(mirror_evts)
+        mps = self.eventify_rows(start_time, rows, mirror_rows)
+
+        # look up any clashing public mp
+        pub_mp = self.pmp_mgr.get_miniprix(timestamp)
+        start_times = dict([(evt.start_time, evt) for evt in pub_mp])
+        for idx in range(len(mps)):
+            if mps[idx].start_time in start_times:
+                # replace this mp event with the public event track selection for that time.
+                mps[idx] = start_times[mps[idx].start_time]
+        return mps
+
+    def eventify_rows(self, start_time, rows, mirror_rows):
+        res = []
+        for idx, row in enumerate(rows):
+            name = self.name
+            mpid = "{:03d}.{:s}".format(int(row[0]) + 1, str(mirror_rows[idx][0]))
             mirror = mirror_rows[idx][1]
             r1, r2, r3 = row[1].split(' > ')
             evt = events.MiniPrixEvent(name, mpid, r1, r2, r3, start_minute=idx, end_minute=idx + 1, mirrored=mirror)
