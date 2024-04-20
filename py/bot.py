@@ -531,6 +531,8 @@ def _create_miniprix_message(event_type, track_filter, utc_time, verbose, privat
         if evts:
             start = int(evts[0].start_time.timestamp())
             evt_name = event_display_names.get(event_type)
+            if private:
+                evt_name = "Private {0}".format(evt_name)
             header = "Track selection for {0} scheduled <t:{1}:R>".format(evt_name, start)
             response = [header]
             for evt in evts:
