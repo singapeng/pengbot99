@@ -411,6 +411,11 @@ async def on_ready():
 
 # command option help tips
 TIP_SHOWEVENTS_FROM_TIME = "The UTC time from which to display events as YYYY-MM-DD HH:MM"
+# limit count to avoid tripping Discord message length limit
+MAX_COUNT_VALUE = 12
+# command option help tips
+TIP_WHEN_FROM_TIME = "The UTC time from which to display events as YYYY-MM-DD HH:MM"
+TIP_WHEN_COUNT = "How many events to display - must be from 1 to {0} (default 5)".format(MAX_COUNT_VALUE)
 
 
 @bot.slash_command(name = "showevents", description = "Shows upcoming events")
@@ -470,20 +475,17 @@ def _when(event_type, from_time=None, count=5):
 async def when(
         ctx: discord.ApplicationContext,
         event_type: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_event_types)),
+        count: discord.Option(int, required=False, default=5, description=TIP_WHEN_COUNT),
         ):
     utils.log(f"{ctx.author.name} used {ctx.command}.")
-    response = _when(event_type)
+    if not 0 < count <= MAX_COUNT_VALUE:
+        response = "Disqualified! Invalid 'count' value {0}. Must be between 1 and 12.".format(count)
+    else:
+        response = _when(event_type, count=count)
     if response:
         await ctx.respond(response)
     else:
         await ctx.respond("POWER DOWN! No result for '{0}' :(".format(event_type))
-
-
-# limit count to avoid tripping Discord message length limit
-MAX_COUNT_VALUE = 12
-# command option help tips
-TIP_WHEN_FROM_TIME = "The UTC time from which to display events as YYYY-MM-DD HH:MM"
-TIP_WHEN_COUNT = "How many events to display - must be from 1 to {0} (default 5)".format(MAX_COUNT_VALUE)
 
 
 @bot.slash_command(name="utc_when", description="List time for events starting from UTC time")
