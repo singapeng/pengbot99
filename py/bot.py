@@ -618,7 +618,7 @@ def get_missing_event_types(evts):
     """ Print the next occurence of events of a type
         missing from the must-have list
     """
-    must_have_evts = ["mknight", "queen", "king", "miniprix", "classicprix"]
+    must_have_evts = ["queen", "mqueen", "king", "mking", "miniprix", "classicprix"]
     present_evts = list(set([evt.name for evt in evts]))
     missing_evts = [evt for evt in must_have_evts if evt not in present_evts]
     results = []
