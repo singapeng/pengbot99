@@ -584,6 +584,18 @@ async def _edit_miniprix_message(mp_type):
     msg_id = int(env[msg_id_key])
     thread_id = int(env[thread_id_key])
     thread = channel.get_thread(thread_id)
+    if not thread:
+        utils.log("Looking for {0} thread in archive...".format(mp_type))
+        counter = 0
+        async for thread in channel.archived_threads():
+            counter += 1
+            if thread.id == thread_id:
+                await thread.unarchive()
+                utils.log("Successfully unarchived thread {0}.".format(thread.id))
+                counter = -1
+                break
+        if counter >= 0:
+            utils.log("Did not find thread amongst {0} in archive.".format(counter))
     msg = await thread.fetch_message(msg_id)
 
     if not env.get(msg_url_key):
