@@ -100,7 +100,8 @@ event_custom_emoji = {
     "mknight": "<:GPMirrorKnight:1222897223054921832>",
     "mqueen": "<:GPMirrorQueen:1227803769950048296>",
     "mysteryprix": "<:WhatQuestionmarksthree:1217243922418368734>",
-    "queen": "<:GPQueen:1195076266311811233>",
+    "queen": "<:FestivalQueen:1258539368600047728>",
+#    "queen": "<:GPQueen:1195076266311811233>",
 }
 
 event_jokey_emoji = {
