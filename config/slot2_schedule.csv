@@ -1,5 +1,5 @@
-0,mknight,queen,mking,knight,mqueen,king
-10,protracks
+0,queen,mknight,queen,king,mqueen,knight,queen,mking
+10,teambattle
 30,miniprix,classicprix
-40,classic,teambattle
+40,classic,protracks
 60,next
