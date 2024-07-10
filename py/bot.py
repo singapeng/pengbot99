@@ -169,6 +169,8 @@ async def create_schedule_messages():
     env.update(msg_env)
     main_id = await post_schedule_message()
     msg_env["ANNOUNCE_MSG_ID"] = main_id
+    tracks_id = await post_track_selection_message()
+    msg_env["TRACK_SELECTION_MSG_ID"] = tracks_id
     env.update(msg_env)
 
     return msg_env
@@ -200,6 +202,8 @@ async def configure_schedule_edit():
     async def start_schedule_edit():
         utils.log("Starting the schedule editing loop!")
         edit_schedule_message.start()
+        # Festival League special message
+        edit_track_selection_message.start()
 
     utils.log("Schedule edit will start at {0}.".format(kickoff_time.strftime("%H:%M")))
     start_schedule_edit.start()
@@ -522,6 +526,40 @@ async def edit_schedule_message():
     msg = await channel.fetch_message(msg_id)
 
     response = _create_schedule_message()
+    if not response:
+        return
+
+    # Edit message in place
+    await msg.edit('\n'.join(response))
+
+
+def _create_track_selection_message():
+    response = r99_mgr.get_formatted_events()
+    if not response:
+        utils.log("Could not fetch track selection :(")
+        return []
+    response.append(" *(Refreshes every 10 minutes)*")
+    return response
+
+
+async def post_track_selection_message():
+    channel = bot.get_channel(int(env["SCHEDULE_EDIT_CHANNEL"]))
+
+    response = _create_track_selection_message()
+    if not response:
+        return
+
+    msg = await channel.send('\n'.join(response))
+    return msg.id
+
+
+@tasks.loop(seconds=600)
+async def edit_track_selection_message():
+    channel = bot.get_channel(int(env["SCHEDULE_EDIT_CHANNEL"]))
+    msg_id = int(env["TRACK_SELECTION_MSG_ID"])
+    msg = await channel.fetch_message(msg_id)
+
+    response = _create_track_selection_message()
     if not response:
         return
 

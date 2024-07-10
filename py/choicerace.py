@@ -42,7 +42,7 @@ class ChoiceRaceManager(object):
             header = "{} events {} local time:"
             response = [header.format(self.name, time_str)]
         elif evts:
-            response = ["{} events in your local time:".format(self.name)]
+            response = ["{} upcoming track selection:\n".format(self.name)]
         for evt in evts:
             response.append(formatters.format_track_choice(evt))
         return response
