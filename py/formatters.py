@@ -119,11 +119,11 @@ track_separators = {
 
 
 track_custom_emoji = {
-    "Mute_City_II": "<:Festival:1258440074513874944>",
-    "Port_Town_I": "<:Festival:1258440074513874944>",
-    "Red_Canyon_I": "<:Festival:1258440074513874944>",
-    "White_Land_I": "<:Festival:1258440074513874944>",
-    "White_Land_II": "<:Festival:1258440074513874944>",
+    "Mute_City_II": "<:Festival:1260649041952378930>",
+    "Port_Town_I": "<:Festival:1260649041952378930>",
+    "Red_Canyon_I": "<:Festival:1260649041952378930>",
+    "White_Land_I": "<:Festival:1260649041952378930>",
+    "White_Land_II": "<:Festival:1260649041952378930>",
     }
 
 
