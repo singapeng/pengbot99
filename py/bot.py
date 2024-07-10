@@ -9,6 +9,7 @@ from discord.ext import tasks
 
 # local imports
 import apiadapter
+import choicerace
 import formatters
 import miniprix
 import misa
@@ -38,6 +39,7 @@ slot1mgr = schedule.Slot1ScheduleManager(schedule.glitch_origin, r99sched)
 slot2mgr = schedule.Slot2ScheduleManager(schedule.origin, wdsched, wesched)
 cmp_mgr = miniprix.MiniPrixManager("classicprix", slot2mgr, cmpsched)
 mp_mgr = miniprix.MiniPrixManager("miniprix", slot2mgr, mpsched, mirrorsc)
+r99_mgr = choicerace.init_99_manager(name=None, glitch_mgr=slot1mgr)
 
 # Create Private Lobby schedule managers
 pl_slot1 = schedule.Slot1ScheduleManager(schedule.origin, plmpsched)
@@ -415,6 +417,23 @@ async def miniprix(
     event_type = mp_event_choices.get(event_type)
     err, response = _create_miniprix_message(event_type, track_filter, utc_time, verbose, private)
     await ctx.respond(err or response)
+
+
+def _ninetynine():
+    """
+    """
+    return '\n'.join(r99_mgr.get_formatted_events())
+
+
+@bot.slash_command(name="ninetynine", description="List the track selection for the upcoming 99 races", guild_ids=[env['TEST_GUILD_ID']])
+async def ninetynine(
+        ctx: discord.ApplicationContext,
+        ):
+    """
+    """
+    utils.log(f"{ctx.author.name} used {ctx.command}.")
+    response = _ninetynine()
+    await ctx.respond(response)
 
 
 def get_missing_event_types(evts):

@@ -62,6 +62,7 @@ class MiniPrixEvent(Event):
         miniprix_id = "{:s}{:s}".format(code, mp_id)
         name = "{0} > {1} > {2} ({3})".format(race1, race2, race3, miniprix_id)
         super().__init__(name=miniprix_id, start_minute=start_minute, end_minute=end_minute)
+        self._mode = mp_type
         self._race1 = race1
         self._race2 = race2
         self._race3 = race3
@@ -94,6 +95,10 @@ class MiniPrixEvent(Event):
     @property
     def mpid(self):
         return self._mpid
+
+    @property
+    def mode(self):
+        return self._mode
 
     def has_track(self, track_name):
         if track_name in (self._race1, self._race2, self._race3):
