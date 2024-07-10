@@ -9,6 +9,7 @@ from discord.ext import tasks
 
 # local imports
 import apiadapter
+import formatters
 import miniprix
 import misa
 import schedule
@@ -51,69 +52,6 @@ quotes = misa.Quotes(env['CONFIG_PATH'])
 
 bot = discord.Bot()
 
-
-## UI lookup data
-# Nice names for event selection dropdown/auto-complete
-event_display_names = {
-    "classic": "Classic",
-    "classicprix": "Classic Mini-Prix",
-    "glitch99": "Mystery Track ???",
-    "king": "King League",
-    "knight": "Knight League",
-    "miniprix": "Mini-Prix",
-    "mking": "Mirror King League",
-    "mknight": "Mirror Knight League",
-    "mqueen": "Mirror Queen League",
-    "mysteryprix": "Glitch Mini-Prix",
-    "protracks": "Pro-Tracks",
-    "queen": "Festival Queen League",
-    "teambattle": "Team Battle",
-    "Mystery_3": "Mystery Track ??? ||:skull:DWWL||",
-    "Mystery_4": "Mystery Track ??? ||:fire:FC:fire:||",
-}
-
-# We're building a serious bot and never use this
-event_jokey_names = {
-    "classic": "Bunny Classic",
-    "classicprix": "MV99 Bishop League",
-    "glitch99": "Mystery Egg ???",
-    "king": "GX99 Ruby Cup",
-    "knight": "GX99 Emerald Cup",
-    "miniprix": "MV99 Pawn Mini-Prix",
-    "mknight": "Mirror Knight League",
-    "mqueen": "Mirror Queen League",
-    "mysteryprix": "Glitch Mini-Egg",
-    "protracks": "Chocolate Rabbit-Tracks",
-    "queen": "GX99 Diamond Cup",
-    "teambattle": "Egghunt Battle",
-    "Mystery_3": "Mystery Egg ??? ||DWWL||",
-    "Mystery_4": "Mystery Egg ??? || FC ||",
-}
-
-# These are FZD Custom emoji codes to beautify the schedule printout
-event_custom_emoji = {
-    "classicprix": "<:MPClassicMini:1222897226880123022>",
-    "king": "<:GPKing:1195076258002899024>",
-    "knight": "<:GPKnight:1195076261232525332>",
-    "miniprix": "<:MPMini:1195076264294363187>",
-    "mking": "<:GPMirrorKing:1232859986405756968>",
-    "mknight": "<:GPMirrorKnight:1222897223054921832>",
-    "mqueen": "<:GPMirrorQueen:1227803769950048296>",
-    "mysteryprix": "<:WhatQuestionmarksthree:1217243922418368734>",
-    "queen": "<:FestivalQueen:1258539368600047728>",
-#    "queen": "<:GPQueen:1195076266311811233>",
-}
-
-event_jokey_emoji = {
-    "classicprix": "<a:MVBishop:1222655476874084454>",
-    "glitch99": "<a:penguinspin:1222378931093635094>",
-    "king": "<:gx_ruby_cup:1222655252025839738>",
-    "knight": "<:GPKnight:1195076261232525332>",
-    "miniprix": "<a:MVPawn:1222655377418621008>",
-    "mknight": "<:gx_emerald_cup:1222655313493364809>",
-    "mysteryprix": "<:WhatQuestionmarksthree:1217243922418368734>",
-    "queen": "<:gx_diamond_cup:1223297468049920170>",
-}
 
 # Internal event names to look up upon user selection
 event_choices = {
@@ -183,144 +121,6 @@ cmp_track_choices = {
     "White Land I": "White_Land_I",
     "White Land II": "White_Land_II",
 }
-
-
-track_display_names = {
-    "Big_Blue": "Big Blue",
-    "Death_Wind_I": "Death Wind I",
-    "Death_Wind_II": "Death Wind II",
-    "Fire_Field": "Fire Field",
-    "Mute_City_I": "Mute City I",
-    "Mute_City_II": "Mute City II",
-    "Mute_City_III": "Mute City III",
-    "Mystery_1": "1CM",
-    "Mystery_2": "BBB",
-    "Mystery_3": "Death Wind White Land",
-    "Mystery_4": "Fire City",
-    "Port_Town_I": "Port Town I",
-    "Port_Town_II": "Port Town II",
-    "Red_Canyon_I": "Red Canyon I",
-    "Red_Canyon_II": "Red Canyon II",
-    "Sand_Ocean": "Sand Ocean",
-    "Silence": "Silence",
-    "White_Land_I": "White Land I",
-    "White_Land_II": "White Land II",
-}
-
-
-track_mirroring_enabled = {
-    "Big_Blue": True,
-    "Death_Wind_I": True,
-    "Death_Wind_II": True,
-    "Fire_Field": True,
-    "Mute_City_I": True,
-    "Mute_City_II": True,
-    "Mute_City_III": True,
-    "Mystery_1": False,
-    "Mystery_2": False,
-    "Mystery_3": False,
-    "Mystery_4": False,
-    "Port_Town_I": True,
-    "Port_Town_II": True,
-    "Red_Canyon_I": True,
-    "Red_Canyon_II": True,
-    "Sand_Ocean": True,
-    "Silence": True,
-    "White_Land_I": True,
-    "White_Land_II": True,
-}
-
-
-def format_event_name(internal_name):
-    """ Adds custom emojis to event name
-    """
-    now = datetime.now(timezone.utc)
-    if not (now.month == 4 and now.day == 1):
-        name = event_display_names.get(internal_name)
-        emoji = event_custom_emoji.get(internal_name)
-    else:
-        name = event_jokey_names.get(internal_name)
-        emoji = event_jokey_emoji.get(internal_name)
-    if not name:
-        name = internal_name
-    if emoji:
-        name = '{0} {1}'.format(emoji, name)
-    return name
-
-
-def format_current_event(event_name, event_end):
-    """ Nice display for current event
-        Note 2024/3/7: this does not properly deal with the
-        Mystery Prix/Regular Prix slot at the moment,
-        i.e. it doesn't know that Mystery Prix only
-        run first 3 minutes of the 10 minutes slot.
-    """
-    discord_text = 'Ongoing: {0} (ends <t:{1}:R>)'
-    end = int(event_end.timestamp())
-    evt_name = format_event_name(event_name)
-    return discord_text.format(evt_name, end)
-
-
-def format_discord_timestamp(dt, inline=False):
-    """ Flexible timestamp builder.
-        If the event is not in the next few hours, it will use
-        a different format automatically.
-        Set inline to True if the timestamp appears in a
-        started sentence.
-    """
-    delta = dt - datetime.now(timezone.utc)
-    if abs(delta.total_seconds()) > timedelta(hours=20).total_seconds():
-        # Discord long date with short time
-        t_format = 'f'
-        if inline:
-            particle = 'on '
-        else:
-            particle = ''
-    else:
-        t_format = 't'
-        if inline:
-            particle = "at "
-        else:
-            particle = "At "
-    text = "{0}<t:{1}:{2}>"
-    return text.format(particle, int(dt.timestamp()), t_format)
-
-
-def format_future_event(evt):
-    """ Nice display for events in the future
-    """
-    ts = format_discord_timestamp(evt.start_time)
-    discord_text = "{0}: {1} (<t:{2}:R>)"
-    evt_time = int(evt.start_time.timestamp())
-    evt_name = format_event_name(evt.name)
-    return discord_text.format(ts, evt_name, evt_time)
-
-
-def format_track_names(race1, race2, race3, verbose=True):
-    """ Nice display for track names
-    """
-    names = []
-    for race in (race1, race2, race3):
-        if race[0] == 'm':
-            name = track_display_names.get(race[1:]) or race[1:]
-            if track_mirroring_enabled.get(race[1:]):
-                # Mirror mode on
-                names.append("_Mirror {0}_".format(name))
-            else:
-                names.append(name)
-        else:
-            names.append(track_display_names.get(race)) or race
-    return ' > '.join(names)
-
-
-def format_track_selection(evt, verbose=False):
-    """ Nice display for Mini-Prix track selection
-    """
-    ts = format_discord_timestamp(evt.start_time)
-    name = format_track_names(evt.race1, evt.race2, evt.race3)
-    if verbose:
-        name = "{0} ({1})".format(name, evt.mpid)
-    return "{0}: {1}".format(ts, name)
 
 
 def _validate_utc_time(str_time):
@@ -437,15 +237,15 @@ async def showevents(
         return None
     if from_time:
         header = "F-Zero 99 events {0} local time:"
-        response = [header.format(format_discord_timestamp(from_time, inline=True))]
+        response = [header.format(formatters.format_discord_timestamp(from_time, inline=True))]
     else:
         response = ["F-Zero 99 Upcoming events in your local time:"]
         ongoing_evt = evts[0].name
         ongoing_evt_end = evts[0].end_time
-        response.append(format_current_event(ongoing_evt, ongoing_evt_end))
+        response.append(formatters.format_current_event(ongoing_evt, ongoing_evt_end))
         evts = evts[1:]
     for evt in evts:
-        response.append(format_future_event(evt))
+        response.append(formatters.format_future_event(evt))
     await ctx.respond('\n'.join(response))
 
 
@@ -465,12 +265,12 @@ def _when(event_type, from_time=None, count=5):
         return None
     if from_time:
         header = "{0} events {1} local time:"
-        time_str = format_discord_timestamp(from_time, inline=True)
+        time_str = formatters.format_discord_timestamp(from_time, inline=True)
         response = [header.format(event_type, time_str)]
     else:
         response = ["Next {0} events in your local time:".format(event_type)]
     for evt in evts:
-        response.append(format_future_event(evt))
+        response.append(formatters.format_future_event(evt))
     return '\n'.join(response)
 
 
@@ -539,14 +339,14 @@ def _create_miniprix_message(event_type, track_filter, utc_time, verbose, privat
         evts = mgr.get_miniprix(timestamp=from_time)
         if evts:
             start = int(evts[0].start_time.timestamp())
-            evt_name = event_display_names.get(event_type)
+            evt_name = formatters.event_display_names.get(event_type)
             if private:
                 evt_name = "Private {0}".format(evt_name)
             header = "Track selection for {0} scheduled <t:{1}:R>".format(evt_name, start)
             response = [header]
             for evt in evts:
                 if not track_filter or evt.has_track(track):
-                    response.append(format_track_selection(evt, verbose))
+                    response.append(formatters.format_track_selection(evt, verbose))
             if len(response) == 1:
                 response.append("No results :(")
             response = '\n'.join(response)
@@ -556,7 +356,7 @@ def _create_miniprix_message(event_type, track_filter, utc_time, verbose, privat
 async def post_miniprix_thread(event_type):
     channel = bot.get_channel(int(env["SCHEDULE_EDIT_CHANNEL"]))
     ctype = discord.ChannelType.public_thread
-    thread_name = "See {0} schedule".format(event_display_names.get(event_type))
+    thread_name = "See {0} schedule".format(formatters.event_display_names.get(event_type))
     thread = await channel.create_thread(name=thread_name, message=None, auto_archive_duration=10080, type=ctype)
 
     err, response = _create_miniprix_message(event_type, None, None, False)
@@ -665,22 +465,22 @@ def _create_schedule_message():
     if ongoing_evt in ("miniprix", "classicprix"):
         kick_off_mp_update(evts[0])
     ongoing_evt_end = evts[0].end_time
-    ongoing_str = format_current_event(ongoing_evt, ongoing_evt_end)
+    ongoing_str = formatters.format_current_event(ongoing_evt, ongoing_evt_end)
     response.append(format_schedule_edit(ongoing_evt, ongoing_str))
     for evt in evts[1:]:
-        future_str = format_future_event(evt)
+        future_str = formatters.format_future_event(evt)
         response.append(format_schedule_edit(evt.name, future_str))
     if glitches:
         response.append("\nNext Glitch Races:")
         for glitch in glitches:
-            response.append(format_future_event(glitch))
+            response.append(formatters.format_future_event(glitch))
 
     # Also show events of desired types that aren't occuring soon
     missing_evts = get_missing_event_types(evts)
     if missing_evts:
         response.append("\nFuture events:")
         for evt in missing_evts:
-            future_str = format_future_event(evt)
+            future_str = formatters.format_future_event(evt)
             response.append(format_schedule_edit(evt.name, future_str))
     return response
 
@@ -724,20 +524,20 @@ async def announce_schedule():
     has_king_gp = False
     ongoing_evt = evts[0].name
     ongoing_evt_end = evts[0].end_time
-    response.append(format_current_event(ongoing_evt, ongoing_evt_end))
+    response.append(formatters.format_current_event(ongoing_evt, ongoing_evt_end))
     for evt in evts[1:]:
-        response.append(format_future_event(evt))
+        response.append(formatters.format_future_event(evt))
         if evt.name == "king":
             has_king_gp = True
     if glitches:
         response.append("\nNext Glitch Races:")
         for glitch in glitches:
-            response.append(format_future_event(glitch))
+            response.append(formatters.format_future_event(glitch))
     if not has_king_gp:
         king_evt = slot2mgr.when_event(names=["king"], count=1)
         if king_evt:
             response.append("\nNext King League:")
-            response.append(format_future_event(king_evt[0]))
+            response.append(formatters.format_future_event(king_evt[0]))
     await channel.send('\n'.join(response))
 
 
