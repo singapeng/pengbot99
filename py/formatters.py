@@ -16,7 +16,7 @@ event_display_names = {
     "mqueen": "Mirror Queen League",
     "mysteryprix": "Glitch Mini-Prix",
     "protracks": "Pro-Tracks",
-    "queen": "Festival Queen League",
+    "queen": "Queen League",
     "teambattle": "Team Battle",
     "Mystery_3": "Mystery Track ??? ||:skull:DWWL||",
     "Mystery_4": "Mystery Track ??? ||:fire:FC:fire:||",
