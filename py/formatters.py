@@ -50,8 +50,7 @@ event_custom_emoji = {
     "mknight": "<:GPMirrorKnight:1222897223054921832>",
     "mqueen": "<:GPMirrorQueen:1227803769950048296>",
     "mysteryprix": "<:WhatQuestionmarksthree:1217243922418368734>",
-    "queen": "<:FestivalQueen:1258539368600047728>",
-#    "queen": "<:GPQueen:1195076266311811233>",
+    "queen": "<:GPQueen:1195076266311811233>",
 }
 
 event_jokey_emoji = {
@@ -119,11 +118,7 @@ track_separators = {
 
 
 track_custom_emoji = {
-    "Mute_City_II": "<:Festival:1260649041952378930>",
-    "Port_Town_I": "<:Festival:1260649041952378930>",
-    "Red_Canyon_I": "<:Festival:1260649041952378930>",
-    "White_Land_I": "<:Festival:1260649041952378930>",
-    "White_Land_II": "<:Festival:1260649041952378930>",
+    #"Mute_City_II": "<:Festival:1260649041952378930>",
     }
 
 

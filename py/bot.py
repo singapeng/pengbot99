@@ -59,7 +59,6 @@ bot = discord.Bot()
 event_choices = {
     "Classic": ["classic"],
     "Classic Mini-Prix": ["classicprix"],
-    "Festival Queen League": ["queen"],
     "Glitch 99": ["glitch99", "Mystery_3", "Mystery_4"],
     "Glitch Mini-Prix": ["mysteryprix"],
     "Grand Prix": ["knight", "mknight", "queen", "mqueen", "king", "mking"],
@@ -67,7 +66,7 @@ event_choices = {
     "King League (no mirror)": ["king"],
     "Knight League": ["knight", "mknight"],
     "Knight League (no mirror)": ["knight"],
-    #"Queen League (no mirror)": ["queen"],
+    "Queen League (no mirror)": ["queen"],
     "Mirror King League": ["mking"],
     "Mirror Knight League": ["mknight"],
     "Mirror Queen League": ["mqueen"],
@@ -169,8 +168,6 @@ async def create_schedule_messages():
     env.update(msg_env)
     main_id = await post_schedule_message()
     msg_env["ANNOUNCE_MSG_ID"] = main_id
-    tracks_id = await post_track_selection_message()
-    msg_env["TRACK_SELECTION_MSG_ID"] = tracks_id
     env.update(msg_env)
 
     return msg_env
@@ -202,8 +199,6 @@ async def configure_schedule_edit():
     async def start_schedule_edit():
         utils.log("Starting the schedule editing loop!")
         edit_schedule_message.start()
-        # Festival League special message
-        edit_track_selection_message.start()
 
     utils.log("Schedule edit will start at {0}.".format(kickoff_time.strftime("%H:%M")))
     start_schedule_edit.start()
