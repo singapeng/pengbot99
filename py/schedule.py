@@ -60,7 +60,8 @@ class CycleInfo(object):
         super().__init__()
         # A counter for the total number of any cycle
         cycle_id = 0
-        self._data = {}
+        self._rotations = {}
+        self._events = {}
         # Iterate over time tables
         for tt_key in data:
             # Look up how many times this timetable cycled
@@ -70,17 +71,52 @@ class CycleInfo(object):
             for rot_key in data[tt_key]:
                 # How many times the rotation occurs
                 key_count = data[tt_key][rot_key]
-                if self._data.get(rot_key):
+                if self._rotations.get(rot_key):
                     # This rotation appears in other timetables
-                    self._data[rot_key] += tt_cycles * key_count
+                    self._rotations[rot_key] += tt_cycles * key_count
                 else:
-                    self._data[rot_key] = tt_cycles * key_count
+                    self._rotations[rot_key] = tt_cycles * key_count
         self.id = cycle_id
         self.minute = minute
         self.schedule = sched
+        self._build_event_count()
 
-    def get(self, evts):
-        return self._data.get(tuple(evts)) or self.id
+    def _build_event_count(self):
+        """ How many of each known event already occured.
+        """
+        for rotation in self._rotations:
+            # how many complete rotations happened
+            full_rots = self._rotations[rotation] // len(rotation)
+            # if we are part-way through a rotation, at which index are we?
+            cur_rot = self._rotations[rotation] % len(rotation)
+            # the list of unique events in this rotation
+            unique_evts = list(set(rotation))
+            for evt_name in unique_evts:
+                # how many of this event in a full rotation
+                full_count = rotation.count(evt_name)
+                if cur_rot:
+                    # how many events have happened as part of the current rotation
+                    cur_count = rotation[:cur_rot].count(evt_name)
+                else:
+                    cur_count = 0
+                # tally this event's occurences from this rotation
+                evt_count = full_rots * full_count + cur_count
+                if evt_name in self._events:
+                    # we have seen this event in another rotation
+                    self._events[evt_name] += evt_count
+                else:
+                    # we have not seen this event yet
+                    self._events[evt_name] = evt_count
+
+    def get_rotation(self, evts):
+        """ Returns the number of occurences of this rotation of events
+        """
+        return self._rotations.get(tuple(evts)) or self.id
+
+    def get_event(self, evt):
+        """ Returns the number of occurences of this event across all rotations
+        """
+        return self._events.get(str(evt)) or 0
 
 
 def build_rotation_data(timetables):
@@ -131,7 +167,7 @@ class TimeTable(object):
             # trim time entry
             start_minute = active_row[0]
             active_row = active_row[1:]
-            cycle = cycle_info.get(active_row)
+            cycle = cycle_info.get_rotation(active_row)
             rotation_index = cycle % len(active_row)
             name = active_row[rotation_index]
             next_row = self._get_next_row(cycle_info.minute)
@@ -172,7 +208,7 @@ class TimeTable(object):
             if row[0] > minute:
                 start_minute = row[0]
                 rotation = row[1:]
-                cycle = cycle_info.get(rotation)
+                cycle = cycle_info.get_rotation(rotation)
                 rotation_index = cycle % len(rotation)
                 current = row[1:][rotation_index]
                 if not filter or current in filter or current == 'next':
