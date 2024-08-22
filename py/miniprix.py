@@ -90,11 +90,29 @@ class MiniPrixManager(object):
             return self._build_rows_from_rotation(self._get_start_mirror_row, self.mirror_schedule, cycle)
         return [(0, "000")] * self.mp_cycles
 
+    def _get_mp_cycle(self, next_mp):
+        """ Deal with the case where multiple miniprix appear
+            in the cycle, hence we can't just rely on the mp count
+            from the CycleInfo object. We also need to find if any
+            miniprix already occured in the present cycle.
+        """
+        info = self.mgr.get_cycle_info(next_mp.start_time)
+        # get the current MP count.
+        mp_count = info.get_event(self.name)
+        # list all MPs in the current cycle
+        all_cycle_mps = self.mgr.get_remaining_events(next_mp.start_time, all=True, filter=self.name)
+        for mp in all_cycle_mps:
+            if mp.start_time < next_mp.start_time:
+                # this MP is in this cycle, but it started earlier
+                # so it isn't the next one, it's a past one.
+                mp_count += 1
+        return mp_count
+
     def get_miniprix(self, timestamp=None):
         next_mp = self.mgr.when_event(names=[self.name], timestamp=timestamp)
         if not next_mp:
             return None
-        cycle = next_mp[0].cycle // (len(next_mp[0].rotation) or 1)
+        cycle = self._get_mp_cycle(next_mp[0])
         start_time = None
         if not timestamp:
             current = self.mgr.get_current_event()
