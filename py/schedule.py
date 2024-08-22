@@ -188,12 +188,16 @@ class TimeTable(object):
             idx += 1
         return evts
 
-    def get_rotations(self):
+    def get_rotations(self, name=None):
         """ Returns a dict of rotations with their count.
+            Optionally, rotations can be filtered on a specific event name.
+            In this case, only rotations including the event will be returned.
         """
         rotations = {}
         for row in self._data[:-1]:
             t_row = tuple(row[1:])
+            if name and name not in t_row:
+                continue
             if t_row in rotations:
                 rotations[t_row] += 1
             else:
@@ -437,3 +441,31 @@ class Slot2ScheduleManager(BaseScheduleManager):
         day_minutes = timestamp.hour * 60 + timestamp.minute
         cycle_minute = day_minutes % sched.duration
         return CycleInfo(sched, tt_count, self.rotation_data, cycle_minute)
+
+    def _get_daily_event_count(self, day_type, name):
+        """ How many times an event occurs in a given day.
+            Will raise if cannot be accurately estimated.
+        """
+        if day_type == "weekday":
+            tt = self.weekday
+            daily_cycles = self.daily_weekday_cycles
+        else:
+            tt = self.weekend
+            daily_cycles = self.daily_weekend_cycles
+
+        rotations = tt.get_rotations(name)
+        if not rotations:
+            return 0
+
+        occurences = 0
+        for rot in rotations:
+            if daily_cycles % len(rot) != 0:
+                raise ValueError("Cannot estimate daily occurences of %s." % name)
+            occurences += daily_cycles // len(rot) * rot.count(name) * rotations[rot]
+        return occurences
+
+    def get_daily_weekday_event_count(self, name):
+        return self._get_daily_event_count("weekday", name)
+
+    def get_daily_weekend_event_count(self, name):
+        return self._get_daily_event_count("weekend", name)
