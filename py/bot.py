@@ -38,13 +38,16 @@ plcmpsched = schedule.load_schedule(env["CONFIG_PATH"], "private_classic_mp_sche
 slot1mgr = schedule.Slot1ScheduleManager(schedule.glitch_origin, r99sched)
 slot2mgr = schedule.Slot2ScheduleManager(schedule.origin, wdsched, wesched)
 cmp_mgr = miniprix.MiniPrixManager("classicprix", slot2mgr, cmpsched)
-mp_mgr = miniprix.MiniPrixManager("miniprix", slot2mgr, mpsched, mirrorsc)
+#mp_mgr = miniprix.MiniPrixManager("miniprix", slot2mgr, mpsched, mirrorsc)
+mp_mgr = miniprix.MiniPrixManager("miniprix", slot2mgr, mpsched, None)
 r99_mgr = choicerace.init_99_manager(name=None, glitch_mgr=slot1mgr)
 
 # Create Private Lobby schedule managers
-pl_slot1 = schedule.Slot1ScheduleManager(schedule.origin, plmpsched)
+plmp_origin = schedule.origin - timedelta(minutes=5)
+pl_slot1 = schedule.Slot1ScheduleManager(plmp_origin, plmpsched)
 mirror_slot1 = schedule.Slot1ScheduleManager(schedule.origin, mirrorsc)
-pmp_mgr = miniprix.PrivateMPManager("miniprix", pl_slot1, mp_mgr, mirror_slot1)
+#pmp_mgr = miniprix.PrivateMPManager("miniprix", pl_slot1, mp_mgr, mirror_slot1)
+pmp_mgr = miniprix.PrivateMPManager("miniprix", pl_slot1, mp_mgr, None)
 plcmp_slot1 = schedule.Slot1ScheduleManager(schedule.pl_origin, plcmpsched)
 pcmp_mgr = miniprix.PrivateMPManager("classicprix", plcmp_slot1, cmp_mgr)
 
