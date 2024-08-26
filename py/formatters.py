@@ -87,6 +87,42 @@ track_display_names = {
 }
 
 
+track_lookup_names = {
+    'Big Blue': 'Big_Blue',
+    'Death Wind I': 'Death_Wind_I',
+    'Death Wind II': 'Death_Wind_II',
+    'Death Wind White Land': 'Mystery_3',
+    'Fire City': 'Mystery_4',
+    'Fire Field': 'Fire_Field',
+    'Mirror Big Blue': 'mBig_Blue',
+    'Mirror Death Wind I': 'mDeath_Wind_I',
+    'Mirror Death Wind II': 'mDeath_Wind_II',
+    'Mirror Fire Field': 'mFire_Field',
+    'Mirror Mute City I': 'mMute_City_I',
+    'Mirror Mute City II': 'mMute_City_II',
+    'Mirror Mute City III': 'mMute_City_III',
+    'Mirror Port Town I': 'mPort_Town_I',
+    'Mirror Port Town II': 'mPort_Town_II',
+    'Mirror Red Canyon I': 'mRed_Canyon_I',
+    'Mirror Red Canyon II': 'mRed_Canyon_II',
+    'Mirror Sand Ocean': 'mSand_Ocean',
+    'Mirror Silence': 'mSilence',
+    'Mirror White Land I': 'mWhite_Land_I',
+    'Mirror White Land II': 'mWhite_Land_II',
+    'Mute City I': 'Mute_City_I',
+    'Mute City II': 'Mute_City_II',
+    'Mute City III': 'Mute_City_III',
+    'Port Town I': 'Port_Town_I',
+    'Port Town II': 'Port_Town_II',
+    'Red Canyon I': 'Red_Canyon_I',
+    'Red Canyon II': 'Red_Canyon_II',
+    'Sand Ocean': 'Sand_Ocean',
+    'Silence': 'Silence',
+    'White Land I': 'White_Land_I',
+    'White Land II': 'White_Land_II'
+}
+
+
 track_mirroring_enabled = {
     "Big_Blue": True,
     "Death_Wind_I": True,

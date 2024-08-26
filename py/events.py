@@ -46,6 +46,15 @@ class Event(object):
             return None
         return self.start_time + timedelta(minutes=self.duration)
 
+    def has(self, trackname):
+        """ Checks if this track name is contained in the event name.
+            Note this uses track internal names (not display names),
+            e.g. 'mMute_City_II'
+        """
+        if trackname in self.name.split():
+            return True
+        return False
+
     def __str__(self):
         """
         """
