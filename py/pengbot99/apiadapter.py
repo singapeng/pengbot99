@@ -1,4 +1,4 @@
-import utils
+from pengbot99 import utils
 
 
 async def get_thread(channel, thread_id):

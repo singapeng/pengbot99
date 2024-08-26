@@ -8,13 +8,13 @@ from discord.ext import tasks
 
 
 # local imports
-import apiadapter
-import choicerace
-import formatters
-import miniprix
-import misa
-import schedule
-import utils
+from pengbot99 import apiadapter
+from pengbot99 import choicerace
+from pengbot99 import formatters
+from pengbot99 import miniprix
+from pengbot99 import misa
+from pengbot99 import schedule
+from pengbot99 import utils
 
 
 env = utils.load_env()

@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 
 # local imports
-import events
+from pengbot99 import events
 
 
 # 10 miniprix selection cycles per individual mp cycle
