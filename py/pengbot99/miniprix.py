@@ -12,7 +12,7 @@ MP_CYCLES = 10
 # points. In this case, we know mp rotation 959, was a classic
 # prix 003.
 CLASSIC_LINE_UP_OFFSET = 14
-MINIPRIX_LINE_UP_OFFSET = 24
+MINIPRIX_LINE_UP_OFFSET = 0
 MIRROR_LINE_UP_OFFSET = 6
 
 

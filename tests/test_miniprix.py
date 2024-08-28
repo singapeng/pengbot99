@@ -8,8 +8,18 @@ from pengbot99 import schedule
 from pengbot99 import miniprix
 
 
-class TestMiniprixManager(unittest.TestCase):
+class TestMiniprixManagerMachineShuffle(unittest.TestCase):
+    """ These test cases cover a scenario where the Miniprix occurs multiple times
+        during the weekend rotation, as part of a single schedule.
+        The relevant schedule is contained in 'slot2_schedule_weekend'.
+        We test that the first miniprix in each of the first two schedule runs is
+        iterating as expected.
+        In the real event, mirror was disabled. Enabling it here to further test
+        the mirror rotation.
+    """
     def create_manager(self):
+        """ Utility returning a built-up Miniprix Manager object.
+        """
         wdsched = schedule.load_schedule(self.env['CONFIG_PATH'], 'slot2_schedule')
         wesched = schedule.load_schedule(self.env['CONFIG_PATH'], 'slot2_schedule_weekend')
         mpsched = schedule.load_schedule(self.env['CONFIG_PATH'], 'miniprix_schedule')
@@ -18,6 +28,8 @@ class TestMiniprixManager(unittest.TestCase):
         return miniprix.MiniPrixManager("miniprix", slot2mgr, mpsched, mirrorsc)
 
     def setUp(self):
+        # This .env file only needs CONFIG_PATH declared.
+        # .env is covered by .gitignore to avoid secrets accidentally pushed to server
         env_path = "fixtures/.env"
         self.env = utils.load_env("fixtures/.env")
         self.origin = datetime(2024, 2, 6, 0, 0, 0, 0, tzinfo=timezone.utc)
