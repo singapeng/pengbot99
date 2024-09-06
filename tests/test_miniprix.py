@@ -25,7 +25,10 @@ class TestMiniprixManagerMachineShuffle(unittest.TestCase):
         mpsched = schedule.load_schedule(self.env['CONFIG_PATH'], 'miniprix_schedule')
         mirrorsc = schedule.load_schedule(self.env['CONFIG_PATH'], 'miniprix_mirroring_schedule')
         slot2mgr = schedule.Slot2ScheduleManager(self.origin, wdsched, wesched)
-        return miniprix.MiniPrixManager("miniprix", slot2mgr, mpsched, mirrorsc)
+
+        mp_offset = 24
+        mirror_offset=6
+        return miniprix.MiniPrixManager("miniprix", slot2mgr, mpsched, mirrorsc, mp_offset, mirror_offset)
 
     def setUp(self):
         # This .env file only needs CONFIG_PATH declared.
@@ -52,7 +55,6 @@ class TestMiniprixManagerMachineShuffle(unittest.TestCase):
         evts = self.mgr.get_miniprix(mmstart)
         self.assertEqual(evts[0].name, "mMute_City_III > Sand_Ocean > Port_Town_II (MiniPrix007.6)")
         self.assertEqual(evts[0].start_time, datetime(2024, 8, 24, 2, 30, 0, 0, tzinfo=timezone.utc))
-
 
 
 if __name__ == "__main__":

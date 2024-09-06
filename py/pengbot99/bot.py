@@ -18,6 +18,10 @@ from pengbot99 import utils
 
 
 env = utils.load_env()
+# all env values are str, convert schedule offsets to int now
+mp_offset = int(env["MINIPRIX_LINE_UP_OFFSET"])
+cmp_offset = int(env["CLASSIC_LINE_UP_OFFSET"])
+mirror_offset = int(env["MIRROR_LINE_UP_OFFSET"])
 
 # load the schedule for slot 1 (99 races)
 r99sched = schedule.load_schedule(env['CONFIG_PATH'], 'slot1_schedule')
@@ -37,8 +41,9 @@ plcmpsched = schedule.load_schedule(env["CONFIG_PATH"], "private_classic_mp_sche
 # Create the Public schedule managers
 slot1mgr = schedule.Slot1ScheduleManager(schedule.glitch_origin, r99sched)
 slot2mgr = schedule.Slot2ScheduleManager(schedule.origin, wdsched, wesched)
-cmp_mgr = miniprix.MiniPrixManager("classicprix", slot2mgr, cmpsched)
-mp_mgr = miniprix.MiniPrixManager("miniprix", slot2mgr, mpsched, mirrorsc)
+cmp_mgr = miniprix.MiniPrixManager("classicprix", slot2mgr, cmpsched, offset=cmp_offset)
+mp_mgr = miniprix.MiniPrixManager("miniprix", slot2mgr, mpsched, mirrorsc,
+        mp_offset, mirror_offset)
 r99_mgr = choicerace.init_99_manager(name=None, glitch_mgr=slot1mgr)
 
 # Create Private Lobby schedule managers

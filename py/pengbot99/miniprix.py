@@ -8,13 +8,6 @@ from pengbot99 import events
 # (one each minute)
 MP_CYCLES = 10
 
-# Magic number to cause the cycle to line up with known data
-# points. In this case, we know mp rotation 959, was a classic
-# prix 003.
-CLASSIC_LINE_UP_OFFSET = 7
-MINIPRIX_LINE_UP_OFFSET = 24
-MIRROR_LINE_UP_OFFSET = 3
-
 
 def print_miniprix_rows(rows):
     minute = 0
@@ -37,18 +30,15 @@ class MiniPrixManager(object):
         Uses a Slot2Mgr as the cycle manager to read when the next MP event occurs.
         Optionally uses a mirroring schedule (for regular MP as of fz99 1.3)
     """
-    def __init__(self, event_name, cycle_manager, mp_schedule, mirror=None):
+    def __init__(self, event_name, cycle_manager, mp_schedule, mirror=None, offset=0, mirror_offset=0):
         super().__init__()
         self.name = event_name
         self.mgr = cycle_manager
         self._mp_schedule = mp_schedule
         self._mirror_schedule = mirror
-        self.mirror_lineup_offset = MIRROR_LINE_UP_OFFSET
+        self.mirror_lineup_offset = mirror_offset
         self.mp_cycles = MP_CYCLES
-        if self.name == "classicprix":
-            self.lineup_offset = CLASSIC_LINE_UP_OFFSET
-        else:
-            self.lineup_offset = MINIPRIX_LINE_UP_OFFSET
+        self.lineup_offset = offset
 
     @property
     def schedule(self):
