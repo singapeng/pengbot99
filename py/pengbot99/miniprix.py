@@ -11,7 +11,7 @@ MP_CYCLES = 10
 # Magic number to cause the cycle to line up with known data
 # points. In this case, we know mp rotation 959, was a classic
 # prix 003.
-CLASSIC_LINE_UP_OFFSET = 14
+CLASSIC_LINE_UP_OFFSET = 7
 MINIPRIX_LINE_UP_OFFSET = 24
 MIRROR_LINE_UP_OFFSET = 3
 
