@@ -1,4 +1,5 @@
 # Python imports
+import os
 from datetime import datetime, timedelta, timezone
 
 
@@ -17,11 +18,17 @@ from pengbot99 import schedule
 from pengbot99 import utils
 
 
+# load tokens, ids, etc from an unversioned env file
 env = utils.load_env()
+
+# load schedule constants from a versioned config file
+csts_path = os.path.join(env['CONFIG_PATH'], env['CONSTANTS_FILE'])
+csts = utils.load_env(path=csts_path)
+
 # all env values are str, convert schedule offsets to int now
-mp_offset = int(env["MINIPRIX_LINE_UP_OFFSET"])
-cmp_offset = int(env["CLASSIC_LINE_UP_OFFSET"])
-mirror_offset = int(env["MIRROR_LINE_UP_OFFSET"])
+mp_offset = int(csts["MINIPRIX_LINE_UP_OFFSET"])
+cmp_offset = int(csts["CLASSIC_LINE_UP_OFFSET"])
+mirror_offset = int(csts["MIRROR_LINE_UP_OFFSET"])
 
 # load the schedule for slot 1 (99 races)
 r99sched = schedule.load_schedule(env['CONFIG_PATH'], 'slot1_schedule')

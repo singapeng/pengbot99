@@ -1,0 +1,7 @@
+# Magic numbers to cause the cycle to line up with known data
+# Used for Public Classic Miniprix
+CLASSIC_LINE_UP_OFFSET=29
+# Used for Public Mini-Prix (standard)
+MINIPRIX_LINE_UP_OFFSET=24
+# Used to line mirror track occurence in Public Mini-Prix
+MIRROR_LINE_UP_OFFSET=3
