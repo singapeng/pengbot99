@@ -14,6 +14,18 @@ You may then import the module in your Python environment.
 >>> import pengbot99
 ```
 
+You may want to use a virtual environment since pengbot99 has dependencies on third-party libraries (namely py-cord).
+To create a virtual environment in a `venv` folder under the code location:
+
+```
+python -m venv venv
+source venv/bin/activate
+pip install .
+```
+
+Following this, you should be able to run a bot and/or import modules as above.
+
+
 ## Running the application
 
 The application can be started through the `bot.py` module.
