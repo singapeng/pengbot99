@@ -68,12 +68,14 @@ event_jokey_emoji = {
 
 track_display_names = {
     "Big_Blue": "Big Blue",
+    "Big_Blue_II": "Big Blue II",
     "Death_Wind_I": "Death Wind I",
     "Death_Wind_II": "Death Wind II",
     "Fire_Field": "Fire Field",
     "Mute_City_I": "Mute City I",
     "Mute_City_II": "Mute City II",
     "Mute_City_III": "Mute City III",
+    "Mute_City_IV": "Mute City IV",
     "Mystery_1": "1CM",
     "Mystery_2": "BBB",
     "Mystery_3": "Death Wind White Land",
@@ -83,7 +85,10 @@ track_display_names = {
     "Red_Canyon_I": "Red Canyon I",
     "Red_Canyon_II": "Red Canyon II",
     "Sand_Ocean": "Sand Ocean",
+    "Sand_Storm_I": "Sand Storm I",
+    "Sand_Storm_II": "Sand Storm II",
     "Silence": "Silence",
+    "Silence_II": "Silence_II",
     "White_Land_I": "White Land I",
     "White_Land_II": "White Land II",
 }
@@ -91,6 +96,7 @@ track_display_names = {
 
 track_lookup_names = {
     'Big Blue': 'Big_Blue',
+    'Big Blue': 'Big_Blue_II',
     'Death Wind I': 'Death_Wind_I',
     'Death Wind II': 'Death_Wind_II',
     'Death Wind White Land': 'Mystery_3',
@@ -114,12 +120,16 @@ track_lookup_names = {
     'Mute City I': 'Mute_City_I',
     'Mute City II': 'Mute_City_II',
     'Mute City III': 'Mute_City_III',
+    'Mute City IV': 'Mute_City_IV',
     'Port Town I': 'Port_Town_I',
     'Port Town II': 'Port_Town_II',
     'Red Canyon I': 'Red_Canyon_I',
     'Red Canyon II': 'Red_Canyon_II',
     'Sand Ocean': 'Sand_Ocean',
+    'Sand Storm I': 'Sand_Storm_I',
+    'Sand Storm II': 'Sand_Storm_II',
     'Silence': 'Silence',
+    'Silence II': 'Silence_II',
     'White Land I': 'White_Land_I',
     'White Land II': 'White_Land_II'
 }
@@ -127,12 +137,14 @@ track_lookup_names = {
 
 track_mirroring_enabled = {
     "Big_Blue": True,
+    "Big_Blue_II": False,
     "Death_Wind_I": True,
     "Death_Wind_II": True,
     "Fire_Field": True,
     "Mute_City_I": True,
     "Mute_City_II": True,
     "Mute_City_III": True,
+    "Mute_City_IV": False,
     "Mystery_1": False,
     "Mystery_2": False,
     "Mystery_3": False,
@@ -142,7 +154,10 @@ track_mirroring_enabled = {
     "Red_Canyon_I": True,
     "Red_Canyon_II": True,
     "Sand_Ocean": True,
+    "Sand_Storm_I": False,
+    "Sand_Storm_II": False,
     "Silence": True,
+    "Silence_II": False,
     "White_Land_I": True,
     "White_Land_II": True,
 }

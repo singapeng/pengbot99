@@ -30,6 +30,7 @@ mp_offset = int(csts["MINIPRIX_LINE_UP_OFFSET"])
 cmp_offset = int(csts["CLASSIC_LINE_UP_OFFSET"])
 mirror_offset = int(csts["MIRROR_LINE_UP_OFFSET"])
 
+
 # load the schedule for slot 1 (99 races)
 r99sched = schedule.load_schedule(env['CONFIG_PATH'], 'slot1_schedule')
 # load the weekday schedule for slot 2 (Prix and special events)
@@ -38,7 +39,7 @@ wdsched = schedule.load_schedule(env['CONFIG_PATH'], 'slot2_schedule')
 wesched = schedule.load_schedule(env['CONFIG_PATH'], 'slot2_schedule_weekend')
 # load the Classic Mini Prix track schedule
 cmpsched = schedule.load_schedule(env['CONFIG_PATH'], 'classic_mp_schedule')
-# load the Classic Mini Prix track schedule
+# load the Mini Prix track schedule
 mpsched = schedule.load_schedule(env['CONFIG_PATH'], 'miniprix_schedule')
 mirrorsc = schedule.load_schedule(env['CONFIG_PATH'], 'miniprix_mirroring_schedule')
 # load the schedule for Private Lobbies Mini-Prix
