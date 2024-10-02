@@ -47,12 +47,15 @@ plmpsched = schedule.load_schedule(env["CONFIG_PATH"], "private_miniprix_schedul
 plcmpsched = schedule.load_schedule(env["CONFIG_PATH"], "private_classic_mp_schedule")
 
 # Create the Public schedule managers
+r99_offset = int(csts["NINETYNINE_MINUTE_OFFSET"])
+
 slot1mgr = schedule.Slot1ScheduleManager(schedule.glitch_origin, r99sched)
 slot2mgr = schedule.Slot2ScheduleManager(schedule.origin, wdsched, wesched)
 cmp_mgr = miniprix.MiniPrixManager("classicprix", slot2mgr, cmpsched, offset=cmp_offset)
 mp_mgr = miniprix.MiniPrixManager("miniprix", slot2mgr, mpsched, mirrorsc,
         mp_offset, mirror_offset)
-r99_mgr = choicerace.init_99_manager(name=None, glitch_mgr=slot1mgr)
+r99_mgr = choicerace.init_99_manager(name=None, glitch_mgr=slot1mgr, env=env,
+        minutes_offset=r99_offset)
 
 # Create Private Lobby schedule managers
 pmp_origin = schedule.origin + timedelta(minutes=int(csts["PRIVATE_MP_MINUTE_OFFSET"]))
@@ -229,7 +232,7 @@ async def on_ready():
     # configure schedule edit task
     await configure_schedule_edit()
     # Kick-off the automatic announce
-    announce_schedule.start()
+    #announce_schedule.start()
 
 
 # command option help tips

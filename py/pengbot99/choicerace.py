@@ -7,14 +7,13 @@ from pengbot99 import schedule
 from pengbot99 import utils
 
 
-env = utils.load_env()
-
-
-def init_99_manager(name=None, glitch_mgr=None):
+def init_99_manager(name=None, glitch_mgr=None, env=None, minutes_offset=0):
     if not name:
         name = FZ99Manager.NAME
-    # Release date of patch 1.4.0 plus 2 minutes
-    r99_origin = datetime(2024, 7, 4, 0, 2, 0, 0, tzinfo=timezone.utc)
+    if not env:
+        env = utils.load_env()
+    # Common origin plus constant offset
+    r99_origin = schedule.origin + timedelta(minutes=minutes_offset)
     nnsched = schedule.load_schedule(env['CONFIG_PATH'], 'ninetynine_schedule')
     r99mgr = schedule.Slot1ScheduleManager(r99_origin, nnsched)
     if glitch_mgr:
