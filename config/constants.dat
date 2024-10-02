@@ -1,7 +1,13 @@
 # Magic numbers to cause the cycle to line up with known data
 # Used for Public Classic Miniprix
-CLASSIC_LINE_UP_OFFSET=14
+CLASSIC_LINE_UP_OFFSET=20
 # Used for Public Mini-Prix (standard)
-MINIPRIX_LINE_UP_OFFSET=0
+MINIPRIX_LINE_UP_OFFSET=3
 # Used to line mirror track occurence in Public Mini-Prix
-MIRROR_LINE_UP_OFFSET=6
+MIRROR_LINE_UP_OFFSET=5
+# Used for Private Mini-Prix timing
+PRIVATE_MP_MINUTE_OFFSET=-11
+# Used for Private Mini-Prix mirror timing
+PRIVATE_MP_MIRROR_MINUTE_OFFSET=-4
+# Used for Private Classic Mini-Prix timing
+PRIVATE_CMP_MINUTE_OFFSET=8

@@ -11,7 +11,6 @@ from pengbot99 import events
 # UTC 2024-02-06, 00:00:00
 # First Knight league after a King.
 origin = datetime(2024, 10, 2, 2, 0, 0, 0, tzinfo=timezone.utc)
-pl_origin = datetime(2024, 2, 5, 0, 0, 0, 0, tzinfo=timezone.utc)
 # A point observed to be a glitch sequence origin.
 glitch_origin = datetime(2024, 2, 13, 0, 59, tzinfo=timezone.utc)
 

@@ -55,10 +55,14 @@ mp_mgr = miniprix.MiniPrixManager("miniprix", slot2mgr, mpsched, mirrorsc,
 r99_mgr = choicerace.init_99_manager(name=None, glitch_mgr=slot1mgr)
 
 # Create Private Lobby schedule managers
-pl_slot1 = schedule.Slot1ScheduleManager(schedule.origin, plmpsched)
-mirror_slot1 = schedule.Slot1ScheduleManager(schedule.origin, mirrorsc)
+pmp_origin = schedule.origin + timedelta(minutes=int(csts["PRIVATE_MP_MINUTE_OFFSET"]))
+pmp_mirror_origin = schedule.origin + timedelta(minutes=int(csts["PRIVATE_MP_MIRROR_MINUTE_OFFSET"]))
+pcmp_origin = schedule.origin + timedelta(minutes=int(csts["PRIVATE_CMP_MINUTE_OFFSET"]))
+
+pl_slot1 = schedule.Slot1ScheduleManager(pmp_origin, plmpsched)
+mirror_slot1 = schedule.Slot1ScheduleManager(pmp_mirror_origin, mirrorsc)
 pmp_mgr = miniprix.PrivateMPManager("miniprix", pl_slot1, mp_mgr, mirror_slot1)
-plcmp_slot1 = schedule.Slot1ScheduleManager(schedule.pl_origin, plcmpsched)
+plcmp_slot1 = schedule.Slot1ScheduleManager(pcmp_origin, plcmpsched)
 pcmp_mgr = miniprix.PrivateMPManager("classicprix", plcmp_slot1, cmp_mgr)
 
 # Create the quotes manager
