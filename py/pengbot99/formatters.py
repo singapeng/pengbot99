@@ -5,6 +5,7 @@ from datetime import datetime, timedelta, timezone
 ## UI lookup data
 # Nice names for event selection dropdown/auto-complete
 event_display_names = {
+    "ace": "Ace League",
     "classic": "Classic",
     "classicprix": "Classic Mini-Prix",
     "glitch99": "Mystery Track ???",
@@ -15,7 +16,7 @@ event_display_names = {
     "mknight": "Mirror Knight League",
     "mqueen": "Mirror Queen League",
     "mysteryprix": "Glitch Mini-Prix",
-    "protracks": "Pro-Tracks",
+    "protracks": "Hard Tracks",
     "queen": "Queen League",
     "teambattle": "Team Battle",
     "Mystery_3": "Mystery Track ??? ||:skull:DWWL||",
@@ -42,6 +43,7 @@ event_jokey_names = {
 
 # These are FZD Custom emoji codes to beautify the schedule printout
 event_custom_emoji = {
+    "ace": ":heart:",
     "classicprix": "<:MPClassicMini:1222897226880123022>",
     "king": "<:GPKing:1195076258002899024>",
     "knight": "<:GPKnight:1195076261232525332>",

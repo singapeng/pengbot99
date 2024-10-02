@@ -69,11 +69,13 @@ bot = discord.Bot()
 
 # Internal event names to look up upon user selection
 event_choices = {
+    "Ace League": ["ace"],
     "Classic": ["classic"],
     "Classic Mini-Prix": ["classicprix"],
     "Glitch 99": ["glitch99", "Mystery_3", "Mystery_4"],
     "Glitch Mini-Prix": ["mysteryprix"],
-    "Grand Prix": ["knight", "mknight", "queen", "mqueen", "king", "mking"],
+    "Grand Prix": ["ace", "knight", "mknight", "queen", "mqueen", "king", "mking"],
+    "Hard Tracks": ["protracks"],
     "King League": ["king", "mking"],
     "King League (no mirror)": ["king"],
     "Knight League": ["knight", "mknight"],
