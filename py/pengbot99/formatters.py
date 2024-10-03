@@ -43,7 +43,7 @@ event_jokey_names = {
 
 # These are FZD Custom emoji codes to beautify the schedule printout
 event_custom_emoji = {
-    "ace": ":heart:",
+    "ace": "<:GPAce:1291196458233630760>",
     "classicprix": "<:MPClassicMini:1222897226880123022>",
     "king": "<:GPKing:1195076258002899024>",
     "knight": "<:GPKnight:1195076261232525332>",
