@@ -53,6 +53,9 @@ OK
 
 - Refactor schedule manager to more elegantly manage rotations
 - Bot Cogs
+- Migrate tests to Pytest and automate with Github Actions, add coverage report
+- Add verbose mode to /when queries to describe the rotation
+- Support for protracks/team battle as an upgrade to current /ninetynine command
 
 
 # References
