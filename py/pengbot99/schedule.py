@@ -395,15 +395,46 @@ class Slot2ScheduleManager(BaseScheduleManager):
         self.weekend = TimeTable(weekend_sched, "weekend")
         # Rotation Data
         self.rotation_data = build_rotation_data([self.weekday, self.weekend])
+        # Since 1.5.0, slot2mgr has been updated to support GP rotations
+        # that do not start at 0:00 on the first day
+        # This caches some data in relation to this.
+        self._set_alt_origin()
+
+    def _set_alt_origin(self):
+        """ We may cache the next day from origin and the number of
+            minutes between origin and this next day.
+            This is to facilitate rotation offset calculations when
+            the origin is not at 0:00 on day 1.
+        """
+        if self.origin.hour or self.origin.minute:
+            tmr = self.origin + timedelta(days=1)
+            self._alt_origin = datetime(tmr.year, tmr.month, tmr.day, 0, 0,
+                    tzinfo=timezone.utc)
+            day1mins = (24 - self.origin.hour) * 60 + self.origin.minute
+            if self.origin.weekday() < 5:
+                self._day1mins = (day1mins, 0)
+            else:
+                self._day1mins = (0, day1mins)
+        else:
+            self._alt_origin = None
+            self._day1mins = (0, 0)
 
     def time_types_since_origin(self, until=None):
         """ Utility for breaking down the current time (or the optional
-            timestamp) into weekdays, weekend days, and left-over
-            minutes since origin.
-            The result is returned as a tuple of 3 ints.
+            timestamp) into weekday minutes, and weekend minutes since
+            origin.
+            The result is returned as a tuple of 2 ints.
         """
         now = until or datetime.now(timezone.utc)
-        delta = now - self.origin
+        if now.date() != self.origin.date() and self._alt_origin:
+            origin = self._alt_origin
+            wd_minutes = self._day1mins[0]
+            we_minutes = self._day1mins[1]
+        else:
+            origin = self.origin
+            wd_minutes = 0
+            we_minutes = 0
+        delta = now - origin
         # count full weeks
         weeks = delta.days // 7
         week_days = weeks * 5
@@ -421,7 +452,14 @@ class Slot2ScheduleManager(BaseScheduleManager):
                 week_days += 1
             else:
                 weekend_days += 1
-        return (week_days, weekend_days, minutes_today)
+        # convert to minutes
+        wd_minutes += week_days * 24 * 60
+        we_minutes += weekend_days * 24 * 60
+        if now.weekday() < 5:
+            wd_minutes += minutes_today
+        else:
+            we_minutes += minutes_today
+        return (wd_minutes, we_minutes)
 
     @property
     def daily_weekday_cycles(self):
@@ -452,15 +490,9 @@ class Slot2ScheduleManager(BaseScheduleManager):
             and there's a weekday/weekend change.
             It will not work for Mystery Tracks.
         """
-        fwds, fweds, mins = self.time_types_since_origin(timestamp)
-        weekday_cycles = fwds * self.daily_weekday_cycles
-        weekend_cycles = fweds * self.daily_weekend_cycles
-        if self.is_weekday(timestamp):
-            today_cycles = mins // self.weekday.duration
-            weekday_cycles += today_cycles
-        else:
-            today_cycles = mins // self.weekend.duration
-            weekend_cycles += today_cycles
+        wd_mins, we_mins = self.time_types_since_origin(timestamp)
+        weekday_cycles = wd_mins // self.weekday.duration
+        weekend_cycles = we_mins // self.weekend.duration
         return weekday_cycles, weekend_cycles
 
     def get_cycle_info(self, timestamp=None):
