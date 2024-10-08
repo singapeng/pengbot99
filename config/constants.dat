@@ -8,7 +8,7 @@ MIRROR_LINE_UP_OFFSET=5
 # Used for Private Mini-Prix timing
 PRIVATE_MP_MINUTE_OFFSET=-11
 # Used for Private Mini-Prix mirror timing
-PRIVATE_MP_MIRROR_MINUTE_OFFSET=-4
+PRIVATE_MP_MIRROR_MINUTE_OFFSET=-3
 # Used for Private Classic Mini-Prix timing
 PRIVATE_CMP_MINUTE_OFFSET=8
 # Used for 99 races timing (public/private)
