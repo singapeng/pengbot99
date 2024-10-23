@@ -16,7 +16,7 @@ event_display_names = {
     "mknight": "Mirror Knight League",
     "mqueen": "Mirror Queen League",
     "mysteryprix": "Glitch Mini-Prix",
-    "protracks": "Hard Tracks",
+    "protracks": "Pro-Tracks",
     "queen": "Queen League",
     "teambattle": "Team Battle",
     "Mystery_3": "Mystery Track ??? ||:skull:DWWL||",
