@@ -461,12 +461,20 @@ def get_missing_event_types(evts):
     """ Print the next occurence of events of a type
         missing from the must-have list
     """
-    must_have_evts = ["queen", "mqueen", "king", "mking", "miniprix", "classicprix"]
     present_evts = list(set([evt.name for evt in evts]))
-    missing_evts = [evt for evt in must_have_evts if evt not in present_evts]
+    missing_evts = []
+    # we should show one of each standard/mirror prix pair
+    for mprix in [["knight", "mknight"], ["queen", "mqueen"], ["king", "mking"]]:
+        if mprix[0] not in present_evts and mprix[1] not in present_evts:
+            missing_evts.append(mprix)
+    # now add events that don't have a mirror version
+    for name in ["ace", "miniprix", "classicprix"]:
+        if name not in present_evts:
+            missing_evts.append([name])
     results = []
-    for name in missing_evts:
-        extra = slot2mgr.when_event(names=[name], count=1)
+    for item in missing_evts:
+        # for mirrored prix, we query both names but will only get the closest
+        extra = slot2mgr.when_event(names=item, count=1)
         if extra:
             results.append(extra[0])
     # make sure results are ordered from next to last
