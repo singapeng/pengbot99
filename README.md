@@ -30,6 +30,33 @@ Following this, you should be able to run a bot and/or import modules as above.
 
 The application can be started through the `bot.py` module.
 No assumption is made as to the target environment, therefore no shell script or similar is provided.
+
+The bot requires some configuration so that it can start. 
+Base configuration is not provided in the repository and will need to be created alongside a fresh install.
+By default, the bot will attempt to load a `.env` file from its working directory.
+Here is a sample content for such a file with example (bogus) values.
+
+```
+# .env
+# Discord Application Token (THIS IS A SECRET)
+DISCORD_BOT_TOKEN=Al0ngAlph4numericT0k3nSuppliedByD1scord
+# ID for the bot's announce channel (legacy method/commented out)
+ANNOUNCE_CHANNEL=1234567890
+# ID for the bot's schedule channel
+SCHEDULE_EDIT_CHANNEL=9876543210
+# Config files folder
+CONFIG_PATH=C:/Path/to/schedule/files
+# Schedule constants file name (in config folder)
+CONSTANTS_FILE=constants.dat
+```
+
+Note that because this file contains secrets, it is not under version control, per the repository's `.gitignore` file.
+Therefore, once you have created one, you are responsible for tracking changes to it and keeping it safe.
+
+The remaining configuration resides in the `CONFIG_PATH` folder defines above.
+It consists of schedule data (csv files) and the `CONSTANTS_FILE` file that exists to facilitate fine-tuning the schedule.
+Files matching the bot's setup are supplied in the repository.
+
 The main module implements a `__main__` function so it may be started using a Python 3.11+ executable.
 ```
 python py/bot.py
