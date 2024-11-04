@@ -10,6 +10,7 @@ from discord.ext import tasks
 # local imports
 from pengbot99 import apiadapter
 from pengbot99 import choicerace
+from pengbot99 import explain_cmd
 from pengbot99 import formatters
 from pengbot99 import miniprix
 from pengbot99 import misa
@@ -173,6 +174,12 @@ async def get_tracks(ctx: discord.AutocompleteContext):
         return list(cmp_track_choices.keys())
     else:
         return list(mp_track_choices.keys())
+
+
+async def get_topics(ctx: discord.AutocompleteContext):
+    """ explain command options
+    """
+    return list(explain_cmd.TOPICS.keys())
 
 
 async def create_schedule_messages():
@@ -618,6 +625,16 @@ async def announce_schedule():
             response.append("\nNext King League:")
             response.append(formatters.format_future_event(king_evt[0]))
     await channel.send('\n'.join(response))
+
+
+@bot.slash_command(name="explain", description="Explain a thing.")
+async def explain(
+        ctx: discord.ApplicationContext,
+        topic: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_topics)),
+        ):
+    utils.log(f"{ctx.author.name} used {ctx.command}.")
+    gps = event_choices.get("Grand Prix")
+    await ctx.respond(explain_cmd.explain(topic, slot2mgr, gps))
 
 
 @bot.slash_command(name="misa", description="Provide a pearl of wisdom from The One Ahead Of Us.")

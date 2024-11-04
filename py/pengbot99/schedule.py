@@ -117,6 +117,17 @@ class CycleInfo(object):
         """
         return self._events.get(str(evt)) or 0
 
+    def find_rotation(self, evts):
+        """ Given a list of event name, returns the first rotation that
+            contains any event with such name. Only one name in 'evt' needs to
+            match.
+        """
+        for rot in self._rotations:
+            for name in evts:
+                if name in rot:
+                    return rot
+        return None
+
 
 def build_rotation_data(timetables):
     res = {}
