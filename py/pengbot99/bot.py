@@ -1,5 +1,4 @@
 # Python imports
-import os
 from datetime import datetime, timedelta, timezone
 
 
@@ -18,12 +17,10 @@ from pengbot99 import schedule
 from pengbot99 import utils
 
 
-# load tokens, ids, etc from an unversioned env file
-env = utils.load_env()
+# Load tokens, ids, etc from an unversioned env file
+# Load schedule constants from a env-defined versioned config file
+env, csts = utils.load_config()
 
-# load schedule constants from a versioned config file
-csts_path = os.path.join(env['CONFIG_PATH'], env['CONSTANTS_FILE'])
-csts = utils.load_env(path=csts_path)
 
 # all env values are str, convert schedule offsets to int now
 mp_offset = int(csts["MINIPRIX_LINE_UP_OFFSET"])
