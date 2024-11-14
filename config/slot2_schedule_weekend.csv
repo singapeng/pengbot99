@@ -1,3 +1,5 @@
-0,ace,knight,mqueen,king,ace,mknight,queen,mking,ace,knight,mqueen,king,mknight,queen,mking,ace,knight,mqueen,king,ace,mknight,queen,mking
-10,teambattle,protracks,teambattle,classic
-30,next
+0,queen,mking,ace,knight,mqueen,king,mknight,queen,mking,ace,knight,mqueen,king,ace,mknight,queen,mking,ace,knight,mqueen,king,ace,mknight
+10,teambattle
+30,miniprix,classicprix
+40,teambattle
+60,next
