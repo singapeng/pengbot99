@@ -637,7 +637,8 @@ async def explain(
     await ctx.respond(explain_cmd.explain(topic, slot2mgr, gps))
 
 
-@bot.slash_command(name="misa", description="Provide a pearl of wisdom from The One Ahead Of Us.")
+@bot.slash_command(name="misa", description="Provide a pearl of wisdom from The One Ahead Of Us.",
+                    guild_ids=[env['TEST_GUILD_ID']])
 async def misa(ctx): # a slash command will be created with the name "ping"
     utils.log(f"{ctx.author.name} used {ctx.command}.")
     await ctx.respond(quotes.misa())
