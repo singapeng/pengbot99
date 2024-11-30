@@ -50,8 +50,10 @@ r99_offset = int(csts["NINETYNINE_MINUTE_OFFSET"])
 slot1mgr = schedule.Slot1ScheduleManager(schedule.glitch_origin, r99sched)
 slot2mgr = schedule.Slot2ScheduleManager(schedule.origin, wdsched, wesched)
 cmp_mgr = miniprix.MiniPrixManager("classicprix", slot2mgr, cmpsched, offset=cmp_offset)
-mp_mgr = miniprix.MiniPrixManager("miniprix", slot2mgr, mpsched, mirrorsc,
-        mp_offset, mirror_offset)
+#mp_mgr = miniprix.MiniPrixManager("miniprix", slot2mgr, mpsched, mirrorsc,
+#        mp_offset, mirror_offset)
+mp_mgr = miniprix.MiniPrixManager("miniprix", slot2mgr, mpsched, None,
+        mp_offset, 0)
 r99_mgr = choicerace.init_99_manager(name=None, glitch_mgr=slot1mgr, env=env,
         minutes_offset=r99_offset)
 
@@ -62,7 +64,8 @@ pcmp_origin = schedule.origin + timedelta(minutes=int(csts["PRIVATE_CMP_MINUTE_O
 
 pl_slot1 = schedule.Slot1ScheduleManager(pmp_origin, plmpsched)
 mirror_slot1 = schedule.Slot1ScheduleManager(pmp_mirror_origin, mirrorsc)
-pmp_mgr = miniprix.PrivateMPManager("miniprix", pl_slot1, mp_mgr, mirror_slot1)
+#pmp_mgr = miniprix.PrivateMPManager("miniprix", pl_slot1, mp_mgr, mirror_slot1)
+pmp_mgr = miniprix.PrivateMPManager("miniprix", pl_slot1, mp_mgr, None)
 plcmp_slot1 = schedule.Slot1ScheduleManager(pcmp_origin, plcmpsched)
 pcmp_mgr = miniprix.PrivateMPManager("classicprix", plcmp_slot1, cmp_mgr)
 
