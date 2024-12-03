@@ -20,7 +20,7 @@ from pengbot99 import utils
 
 # Load tokens, ids, etc from an unversioned env file
 # Load schedule constants from a env-defined versioned config file
-env, csts = utils.load_config()
+env, csts, xpln = utils.load_config()
 
 
 # all env values are str, convert schedule offsets to int now
@@ -66,7 +66,7 @@ pmp_mgr = miniprix.PrivateMPManager("miniprix", pl_slot1, mp_mgr, mirror_slot1)
 plcmp_slot1 = schedule.Slot1ScheduleManager(pcmp_origin, plcmpsched)
 pcmp_mgr = miniprix.PrivateMPManager("classicprix", plcmp_slot1, cmp_mgr)
 
-explainer = explain_cmd.Explainer(None, slot2mgr)
+explainer = explain_cmd.Explainer(xpln, slot2mgr)
 
 bot = discord.Bot()
 

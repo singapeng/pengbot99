@@ -1,6 +1,14 @@
 from pengbot99 import utils
 
 
+async def get_msg_url(client, channel_id, message_id):
+    """ Returns the URL for a given message ID on a given channel.
+    """
+    channel = client.get_channel(int(channel_id))
+    message = await channel.fetch_message(int(message_id))
+    return message.jump_url
+
+
 async def get_thread(channel, thread_id):
     """ Get a Thread object for the requested thread.
         If the thread was archived, unarchive it.

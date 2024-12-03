@@ -2,6 +2,7 @@ from datetime import datetime
 
 from pengbot99 import formatters
 from pengbot99 import ui
+from pengbot99 import utils
 
 
 ### GRAND PRIX ROTATION METHODS ###
@@ -71,8 +72,13 @@ TOPICS_BASE = {
 class Explainer(object):
     def __init__(self, config, mgr):
         self._topics = TOPICS_BASE
+        self._initialize_topics(config)
         # a slot2mgr instance used by GP rotation explainer
         self._mgr = mgr
+
+    def _initialize_topics(self, config):
+        if config:
+            self._topics.update(config)
 
     @property
     def topics(self):
@@ -101,3 +107,6 @@ class Explainer(object):
             return "Sorry, I cannot explain '%s'." % topic
         if self._topics.get(topic) == 'explain_gp_rotation':
             return self.explain_gp_rotation()
+        else:
+            # definition entry
+            return self._topics.get(topic)

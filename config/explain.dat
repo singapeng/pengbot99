@@ -1,0 +1,4 @@
+# Explain command data
+# To insert a link in the text, use a string format positional, and add channel ID/message ID after the text, separated with semicolons.
+# Title=Example text replacement {0} {1};12345/67890;54321/09876
+Herbpin=A cornering technique for Fire Field and Mirror Fire Field. It was pioneered by @fsfreturns and perfected by @b.____.b . It was first mentioned here: {0};1185690454658912397/1295809815150334012

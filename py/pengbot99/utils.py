@@ -20,6 +20,15 @@ def load_env(path=None):
     return env
 
 
+def _sideload_data(env, data_name):
+    if 'CONFIG_PATH' in env and data_name in env:
+        cfg_path = os.path.join(env['CONFIG_PATH'], env[data_name])
+        values = load_env(path=cfg_path)
+    else:
+        values = None
+    return values
+
+
 def load_config(path=None):
     """ Reads the .env file and returns a dict.
         If the .env defines a constants file path, load that too.
@@ -28,12 +37,10 @@ def load_config(path=None):
     env = load_env(path)
 
     # load schedule constants from a versioned config file
-    if 'CONFIG_PATH' in env and 'CONSTANTS_FILE' in env:
-        csts_path = os.path.join(env['CONFIG_PATH'], env['CONSTANTS_FILE'])
-        csts = load_env(path=csts_path)
-    else:
-        csts = None
-    return env, csts
+    csts = _sideload_data(env, 'CONSTANTS_FILE')
+    # load explainer data from its config file
+    xpln = _sideload_data(env, 'EXPLAIN_FILE')
+    return env, csts, xpln
 
 
 def log(text):
