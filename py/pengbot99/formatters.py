@@ -96,7 +96,7 @@ track_display_names = {
 
 track_lookup_names = {
     'Big Blue': 'Big_Blue',
-    'Big Blue': 'Big_Blue_II',
+    'Big Blue II': 'Big_Blue_II',
     'Death Wind I': 'Death_Wind_I',
     'Death Wind II': 'Death_Wind_II',
     'Death Wind White Land': 'Mystery_3',
