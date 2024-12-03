@@ -1,7 +1,10 @@
 from datetime import datetime
 
 from pengbot99 import formatters
+from pengbot99 import ui
 
+
+### GRAND PRIX ROTATION METHODS ###
 
 def _gp_rotation_split(evts):
     """ Create a split between events so that some are displayed ahead
@@ -58,30 +61,43 @@ def _display_gp_rotation(evts, current, pre, post):
         str_post = str_post + " > " + _format_gp_list(post[1:])
     return msg + str_pre + str_now + str_post
 
+### Explainer Class definition ###
 
-def explain_gp_rotation(mgr, gps, timestamp):
-    """
-    mgr: the appropriate schedule manager
-    gps: a list of all valid gp names
-    """
-    cinfo = mgr.get_cycle_info(timestamp)
-    rotation = cinfo.find_rotation(gps)
-    evts = mgr.when_event(names=gps, count=len(rotation), timestamp=timestamp)
-    current = mgr.get_events(timestamp=timestamp, count=1)[0]
-    if not current.name in gps:
-        current = None
-
-    pre_evts, post_evts = _gp_rotation_split(evts)
-    return _display_gp_rotation(evts, current, pre_evts, post_evts)
-
-
-TOPICS = {
-    'Grand Prix Rotation': explain_gp_rotation
+TOPICS_BASE = {
+    'Grand Prix Rotation': 'explain_gp_rotation'
 }
 
 
-def explain(topic, mgr, gps):
-    if topic not in TOPICS:
-        return "Sorry, I cannot explain '%s'." % topic
-    if TOPICS.get(topic) == explain_gp_rotation:
-        return explain_gp_rotation(mgr, gps, None)
+class Explainer(object):
+    def __init__(self, config, mgr):
+        self._topics = TOPICS_BASE
+        # a slot2mgr instance used by GP rotation explainer
+        self._mgr = mgr
+
+    @property
+    def topics(self):
+        """ build a list of topics that can be auto-completed in the slash command
+        """
+        return list(self._topics.keys())
+
+    def explain_gp_rotation(self, timestamp=None):
+        """
+        Loads up a full rotation of Grand Prix to display
+        how it is put together.
+        """
+        cinfo = self._mgr.get_cycle_info(timestamp)
+        gps = ui.event_choices.get("Grand Prix")
+        rotation = cinfo.find_rotation(gps)
+        evts = self._mgr.when_event(names=gps, count=len(rotation), timestamp=timestamp)
+        current = self._mgr.get_events(timestamp=timestamp, count=1)[0]
+        if not current.name in gps:
+            current = None
+
+        pre_evts, post_evts = _gp_rotation_split(evts)
+        return _display_gp_rotation(evts, current, pre_evts, post_evts)
+
+    def explain(self, topic):
+        if topic not in self._topics:
+            return "Sorry, I cannot explain '%s'." % topic
+        if self._topics.get(topic) == 'explain_gp_rotation':
+            return self.explain_gp_rotation()

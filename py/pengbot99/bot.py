@@ -13,8 +13,8 @@ from pengbot99 import choicerace
 from pengbot99 import explain_cmd
 from pengbot99 import formatters
 from pengbot99 import miniprix
-from pengbot99 import misa
 from pengbot99 import schedule
+from pengbot99 import ui
 from pengbot99 import utils
 
 
@@ -66,82 +66,9 @@ pmp_mgr = miniprix.PrivateMPManager("miniprix", pl_slot1, mp_mgr, mirror_slot1)
 plcmp_slot1 = schedule.Slot1ScheduleManager(pcmp_origin, plcmpsched)
 pcmp_mgr = miniprix.PrivateMPManager("classicprix", plcmp_slot1, cmp_mgr)
 
-# Create the quotes manager
-quotes = misa.Quotes(env['CONFIG_PATH'])
-
+explainer = explain_cmd.Explainer(None, slot2mgr)
 
 bot = discord.Bot()
-
-
-# Internal event names to look up upon user selection
-event_choices = {
-    "Ace League": ["ace"],
-    "Classic": ["classic"],
-    "Classic Mini-Prix": ["classicprix"],
-    "Glitch 99": ["glitch99", "Mystery_3", "Mystery_4"],
-    "Glitch Mini-Prix": ["mysteryprix"],
-    "Grand Prix": ["ace", "knight", "mknight", "queen", "mqueen", "king", "mking"],
-    "Hard Tracks": ["protracks"],
-    "King League": ["king", "mking"],
-    "King League (no mirror)": ["king"],
-    "Knight League": ["knight", "mknight"],
-    "Knight League (no mirror)": ["knight"],
-    "Queen League (no mirror)": ["queen"],
-    "Mirror King League": ["mking"],
-    "Mirror Knight League": ["mknight"],
-    "Mirror Queen League": ["mqueen"],
-    "Mini-Prix": ["classicprix", "miniprix", "mysteryprix"],
-    "Pro-Tracks": ["protracks"],
-    "Queen League": ["queen", "mqueen"],
-    "Retro": ["classic"],
-    "Team Battle": ["teambattle"],
-}
-
-
-# Internal mini-prix types to look up upon user selection
-mp_event_choices = {
-    "Classic Mini-Prix": "classicprix",
-    "Mini-Prix": "miniprix",
-    "Private Classic Mini-Prix": "classicprix",
-    "Private Mini-Prix": "miniprix",
-}
-
-
-mp_track_choices = {
-    "Big Blue": "Big_Blue",
-    "Death Wind I": "Death_Wind_I",
-    "Death Wind II": "Death_Wind_II",
-    "Death Wind White Land": "Mystery_3",
-    "Fire City": "Mystery_4",
-    "Mute City I": "Mute_City_I",
-    "Mute City II": "Mute_City_II",
-    "Mute City III": "Mute_City_III",
-    "Port Town I": "Port_Town_I",
-    "Port Town II": "Port_Town_II",
-    "Red Canyon I": "Red_Canyon_I",
-    "Red Canyon II": "Red_Canyon_II",
-    "Sand Ocean": "Sand_Ocean",
-    "White Land I": "White_Land_I",
-}
-
-
-cmp_track_choices = {
-    "Big Blue": "Big_Blue",
-    "Death Wind I": "Death_Wind_I",
-    "Death Wind II": "Death_Wind_II",
-    "Fire Field": "Fire_Field",
-    "Mute City I": "Mute_City_I",
-    "Mute City II": "Mute_City_II",
-    "Mute City III": "Mute_City_III",
-    "Port Town I": "Port_Town_I",
-    "Port Town II": "Port_Town_II",
-    "Red Canyon I": "Red_Canyon_I",
-    "Red Canyon II": "Red_Canyon_II",
-    "Sand Ocean": "Sand_Ocean",
-    "Silence": "Silence",
-    "White Land I": "White_Land_I",
-    "White Land II": "White_Land_II",
-}
 
 
 def _validate_utc_time(str_time):
@@ -158,28 +85,28 @@ def _validate_utc_time(str_time):
 async def get_event_types(ctx: discord.AutocompleteContext):
     """ 
     """
-    return list(event_choices.keys())
+    return list(ui.event_choices.keys())
 
 
 async def get_mp_types(ctx: discord.AutocompleteContext):
     """ 
     """
-    return list(mp_event_choices.keys())
+    return list(ui.mp_event_choices.keys())
 
 
 async def get_tracks(ctx: discord.AutocompleteContext):
     """ 
     """
     if ctx.options.get("event_type") == "Classic Mini-Prix":
-        return list(cmp_track_choices.keys())
+        return list(ui.cmp_track_choices.keys())
     else:
-        return list(mp_track_choices.keys())
+        return list(ui.mp_track_choices.keys())
 
 
 async def get_topics(ctx: discord.AutocompleteContext):
     """ explain command options
     """
-    return list(explain_cmd.TOPICS.keys())
+    return explainer.topics
 
 
 async def create_schedule_messages():
@@ -277,7 +204,7 @@ async def showevents(
 
 
 def _when(event_type, from_time=None, count=5):
-    names = event_choices.get(event_type)
+    names = ui.event_choices.get(event_type)
     if event_type == "Private Glitch Mini-Prix":
         # This cannot happen as of 1.3.0 update, so the choice is removed.
         evts = _private_mini_when(names, from_time, count)
@@ -354,13 +281,13 @@ def _create_miniprix_message(event_type, track_filter, utc_time, verbose, privat
             mgr = pcmp_mgr
         else:
             mgr = cmp_mgr
-        track = cmp_track_choices.get(track_filter)
+        track = ui.cmp_track_choices.get(track_filter)
     else:
         if private:
             mgr = pmp_mgr
         else:
             mgr = mp_mgr
-        track = mp_track_choices.get(track_filter)
+        track = ui.mp_track_choices.get(track_filter)
 
     if not err:
         evts = mgr.get_miniprix(timestamp=from_time)
@@ -439,7 +366,7 @@ async def miniprix(
     """
     utils.log(f"{ctx.author.name} used {ctx.command}.")
     private = "Private" in event_type
-    event_type = mp_event_choices.get(event_type)
+    event_type = ui.mp_event_choices.get(event_type)
     err, response = _create_miniprix_message(event_type, track_filter, utc_time, verbose, private)
     await ctx.respond(err or response)
 
@@ -506,7 +433,7 @@ def kick_off_mp_update(mp_evt):
 
 
 def _create_schedule_message():
-    glitch_evts = event_choices.get("Glitch 99")
+    glitch_evts = ui.event_choices.get("Glitch 99")
     evts = slot2mgr.list_events(next=119)
     glitches = slot1mgr.when_event(names=glitch_evts, count=5, limit=119)
     if not evts:
@@ -600,7 +527,7 @@ async def edit_track_selection_message():
 async def announce_schedule():
     await bot.wait_until_ready()
     channel = bot.get_channel(int(env["ANNOUNCE_CHANNEL"]))
-    glitch_evts = event_choices.get("Glitch 99")
+    glitch_evts = ui.event_choices.get("Glitch 99")
     evts = slot2mgr.list_events(next=120)
     glitches = slot1mgr.when_event(names=glitch_evts, count=5, limit=120)
     if not evts:
@@ -633,15 +560,7 @@ async def explain(
         topic: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_topics)),
         ):
     utils.log(f"{ctx.author.name} used {ctx.command}.")
-    gps = event_choices.get("Grand Prix")
-    await ctx.respond(explain_cmd.explain(topic, slot2mgr, gps))
-
-
-@bot.slash_command(name="misa", description="Provide a pearl of wisdom from The One Ahead Of Us.",
-                    guild_ids=[env['TEST_GUILD_ID']])
-async def misa(ctx): # a slash command will be created with the name "ping"
-    utils.log(f"{ctx.author.name} used {ctx.command}.")
-    await ctx.respond(quotes.misa())
+    await ctx.respond(explainer.explain(topic))
 
 
 @bot.slash_command(name="ping", description="Sends the bot's latency.", guild_ids=[env['TEST_GUILD_ID']])
