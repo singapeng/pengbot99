@@ -19,6 +19,7 @@ event_display_names = {
     "protracks": "Pro-Tracks",
     "queen": "Queen League",
     "teambattle": "Team Battle",
+    "worldtour": "World Tour",
     "Mystery_3": "Mystery Track ??? ||:skull:DWWL||",
     "Mystery_4": "Mystery Track ??? ||:fire:FC:fire:||",
 }
@@ -53,6 +54,7 @@ event_custom_emoji = {
     "mqueen": "<:GPMirrorQueen:1227803769950048296>",
     "mysteryprix": "<:WhatQuestionmarksthree:1217243922418368734>",
     "queen": "<:GPQueen:1195076266311811233>",
+    "worldtour": ":globe_with_meridians:",
 }
 
 event_jokey_emoji = {

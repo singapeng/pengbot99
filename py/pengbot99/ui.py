@@ -20,6 +20,7 @@ event_choices = {
     "Queen League": ["queen", "mqueen"],
     "Retro": ["classic"],
     "Team Battle": ["teambattle"],
+    "World Tour": ["worldtour"],
 }
 
 

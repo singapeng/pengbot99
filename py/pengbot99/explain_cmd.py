@@ -92,7 +92,7 @@ class Explainer(object):
         how it is put together.
         """
         cinfo = self._mgr.get_cycle_info(timestamp)
-        gps = ui.event_choices.get("Grand Prix")
+        gps = ui.event_choices.get("Grand Prix") + ["worldtour"]
         rotation = cinfo.find_rotation(gps)
         evts = self._mgr.when_event(names=gps, count=len(rotation), timestamp=timestamp)
         current = self._mgr.get_events(timestamp=timestamp, count=1)[0]
