@@ -24,24 +24,6 @@ event_display_names = {
     "Mystery_4": "Mystery Track ??? ||:fire:FC:fire:||",
 }
 
-# We're building a serious bot and never use this
-event_jokey_names = {
-    "classic": "Bunny Classic",
-    "classicprix": "MV99 Bishop League",
-    "glitch99": "Mystery Egg ???",
-    "king": "GX99 Ruby Cup",
-    "knight": "GX99 Emerald Cup",
-    "miniprix": "MV99 Pawn Mini-Prix",
-    "mknight": "Mirror Knight League",
-    "mqueen": "Mirror Queen League",
-    "mysteryprix": "Glitch Mini-Egg",
-    "protracks": "Chocolate Rabbit-Tracks",
-    "queen": "GX99 Diamond Cup",
-    "teambattle": "Egghunt Battle",
-    "Mystery_3": "Mystery Egg ??? ||DWWL||",
-    "Mystery_4": "Mystery Egg ??? || FC ||",
-}
-
 # These are FZD Custom emoji codes to beautify the schedule printout
 event_custom_emoji = {
     "ace": "<:GPAce:1291196458233630760>",
@@ -55,17 +37,6 @@ event_custom_emoji = {
     "mysteryprix": "<:WhatQuestionmarksthree:1217243922418368734>",
     "queen": "<:GPQueen:1195076266311811233>",
     "worldtour": "<:WTFrozen:1319755918635962422>",
-}
-
-event_jokey_emoji = {
-    "classicprix": "<a:MVBishop:1222655476874084454>",
-    "glitch99": "<a:penguinspin:1222378931093635094>",
-    "king": "<:gx_ruby_cup:1222655252025839738>",
-    "knight": "<:GPKnight:1195076261232525332>",
-    "miniprix": "<a:MVPawn:1222655377418621008>",
-    "mknight": "<:gx_emerald_cup:1222655313493364809>",
-    "mysteryprix": "<:WhatQuestionmarksthree:1217243922418368734>",
-    "queen": "<:gx_diamond_cup:1223297468049920170>",
 }
 
 track_display_names = {
@@ -180,13 +151,8 @@ track_custom_emoji = {
 def format_event_name(internal_name):
     """ Adds custom emojis to event name
     """
-    now = datetime.now(timezone.utc)
-    if not (now.month == 4 and now.day == 1):
-        name = event_display_names.get(internal_name)
-        emoji = event_custom_emoji.get(internal_name)
-    else:
-        name = event_jokey_names.get(internal_name)
-        emoji = event_jokey_emoji.get(internal_name)
+    name = event_display_names.get(internal_name)
+    emoji = event_custom_emoji.get(internal_name)
     if not name:
         name = internal_name
     if emoji:
