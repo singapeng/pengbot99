@@ -63,7 +63,7 @@ track_display_names = {
     "Sand_Storm_I": "Sand Storm I",
     "Sand_Storm_II": "Sand Storm II",
     "Silence": "Silence",
-    "Silence_II": "Silence_II",
+    "Silence_II": "Silence II",
     "White_Land_I": "White Land I",
     "White_Land_II": "White Land II",
 }
