@@ -371,7 +371,7 @@ async def miniprix(
     await ctx.respond(err or response)
 
 
-def _ninetynine():
+def _ninetynine(guild_ids=[env['TEST_GUILD_ID']]):
     """
     """
     return '\n'.join(r99_mgr.get_formatted_events())
