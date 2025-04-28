@@ -396,11 +396,11 @@ def get_missing_event_types(evts):
     present_evts = list(set([evt.name for evt in evts]))
     missing_evts = []
     # we should show one of each standard/mirror prix pair
-    for mprix in [["knight", "mknight"], ["queen", "mqueen"], ["king", "mking"]]:
+    for mprix in [["knight", "mknight"], ["queen", "mqueen"], ["king", "mking"], ["ace", "mace"]]:
         if mprix[0] not in present_evts and mprix[1] not in present_evts:
             missing_evts.append(mprix)
     # now add events that don't have a mirror version
-    for name in ["ace", "miniprix", "classicprix"]:
+    for name in ["miniprix", "classicprix"]:
         if name not in present_evts:
             missing_evts.append([name])
     results = []

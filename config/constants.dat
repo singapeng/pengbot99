@@ -10,6 +10,6 @@ PRIVATE_MP_MINUTE_OFFSET=17
 # Used for Private Mini-Prix mirror timing
 PRIVATE_MP_MIRROR_MINUTE_OFFSET=0
 # Used for Private Classic Mini-Prix timing
-PRIVATE_CMP_MINUTE_OFFSET=6
+PRIVATE_CMP_MINUTE_OFFSET=8
 # Used for 99 races timing (public/private)
 NINETYNINE_MINUTE_OFFSET=24

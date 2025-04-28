@@ -31,7 +31,7 @@ event_custom_emoji = {
     "classicprix": "<:MPClassicMini:1222897226880123022>",
     "king": "<:GPKing:1195076258002899024>",
     "knight": "<:GPKnight:1195076261232525332>",
-    "mace": ":blue_heart:",
+    "mace": "<:GPMirrorAce:1366201644072833145>",
     "miniprix": "<:MPMini:1195076264294363187>",
     "mking": "<:GPMirrorKing:1232859986405756968>",
     "mknight": "<:GPMirrorKnight:1222897223054921832>",
