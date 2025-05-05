@@ -60,5 +60,44 @@ class TestMiniprixManagerMachineShuffle(unittest.TestCase):
         self.assertEqual(evts[0].start_time, datetime(2024, 8, 24, 2, 30, 0, 0, tzinfo=timezone.utc))
 
 
+class TestMiniprixManagerMiniWorldTourClassic(unittest.TestCase):
+    """ These test cases cover a scenario where the Miniprix event duration is set to
+        5 minutes instead of 10.
+    """
+    def create_manager(self):
+        """ Utility returning a built-up Miniprix Manager object.
+        """
+        wdsched = schedule.load_schedule(self.env['CONFIG_PATH'], 'slot2_schedule_miniworldtour')
+        wesched = schedule.load_schedule(self.env['CONFIG_PATH'], 'slot2_schedule_weekend_miniworldtour')
+        mpsched = schedule.load_schedule(self.env['CONFIG_PATH'], 'classic_mp_schedule_miniworldtour')
+        slot2mgr = schedule.Slot2ScheduleManager(self.origin, wdsched, wesched)
+
+        mp_offset = 18
+        mgr = miniprix.MiniPrixManager("classicprix", slot2mgr, mpsched, None, mp_offset, 0)
+        # force lineup offset to default 5 minutes
+        mgr.mp_cycles = 5
+        return mgr
+
+    def setUp(self):
+        # This .env file only needs CONFIG_PATH declared.
+        # .env is covered by .gitignore to avoid secrets accidentally pushed to server
+        env_path = "fixtures/.env"
+        self.env = utils.load_env("fixtures/.env")
+        self.origin = datetime(2025, 4, 23, 0, 0, 0, 0, tzinfo=timezone.utc)
+        self.mgr = self.create_manager()
+
+    def test_classicprix_selection1(self):
+        mmstart = datetime(2025, 5, 5, 0, 0, 0, 0, tzinfo=timezone.utc)
+        evts = self.mgr.get_miniprix(mmstart)
+        self.assertEqual(evts[0].name, "Silence > White_Land_II > Fire_Field (ClassicMiniPrix024.0)")
+        self.assertEqual(evts[0].start_time, datetime(2025, 5, 5, 2, 20, 0, 0, tzinfo=timezone.utc))
+
+    def test_classicprix_selection2(self):
+        mmstart = datetime(2025, 5, 5, 3, 0, 0, 0, tzinfo=timezone.utc)
+        evts = self.mgr.get_miniprix(mmstart)
+        self.assertEqual(evts[0].name, "Mute_City_IV > Red_Canyon_I > Silence_II (ClassicMiniPrix029.0)")
+        self.assertEqual(evts[0].start_time, datetime(2025, 5, 5, 5, 0, 0, 0, tzinfo=timezone.utc))
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -90,7 +90,7 @@ class MiniPrixManager(object):
         # get the current MP count.
         mp_count = info.get_event(self.name)
         # list all MPs in the current cycle
-        all_cycle_mps = self.mgr.get_remaining_events(next_mp.start_time, all=True, filter=self.name)
+        all_cycle_mps = self.mgr.get_remaining_events(next_mp.start_time, all=True, filter=[self.name])
         for mp in all_cycle_mps:
             if mp.start_time < next_mp.start_time:
                 # this MP is in this cycle, but it started earlier
