@@ -38,7 +38,7 @@ event_custom_emoji = {
     "mqueen": "<:GPMirrorQueen:1227803769950048296>",
     "mysteryprix": "<:WhatQuestionmarksthree:1217243922418368734>",
     "queen": "<:GPQueen:1195076266311811233>",
-    "worldtour": ":globe_with_meridians:",
+    "worldtour": "<:WTMini:1368768773301207070>",
 }
 
 track_display_names = {

@@ -185,7 +185,7 @@ async def showevents(
     if err:
         await ctx.respond(err)
         return None
-    evts = slot2mgr.list_events(timestamp=from_time, next=90)
+    evts = slot2mgr.list_events(timestamp=from_time, next=80)
     if not evts:
         await ctx.respond("Could not fetch any event :(")
         return None
@@ -529,8 +529,8 @@ async def announce_schedule():
     await bot.wait_until_ready()
     channel = bot.get_channel(int(env["ANNOUNCE_CHANNEL"]))
     glitch_evts = ui.event_choices.get("Glitch 99")
-    evts = slot2mgr.list_events(next=120)
-    glitches = slot1mgr.when_event(names=glitch_evts, count=5, limit=120)
+    evts = slot2mgr.list_events(next=110)
+    glitches = slot1mgr.when_event(names=glitch_evts, count=5, limit=110)
     if not evts:
         print("Could not fetch any event :(")
         return None

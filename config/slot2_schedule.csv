@@ -1,5 +1,9 @@
-0,worldtour,mqueen,worldtour,king,worldtour,mace,worldtour,mknight,worldtour,queen,worldtour,mking,worldtour,ace,worldtour,knight
-10,classic
-30,miniprix,classicprix
-40,teambattle,protracks
-60,next
+0,worldtour
+5,teambattle,protracks,classic
+20,queen,mking,ace,mace,mqueen,king,mknight
+25,protracks,classic,teambattle
+40,worldtour
+45,classic,teambattle,protracks
+60,miniprix,classicprix
+65,teambattle,protracks,classic
+80,next
