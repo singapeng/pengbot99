@@ -28,7 +28,10 @@ class TestMiniprixManagerMachineShuffle(unittest.TestCase):
 
         mp_offset = 24
         mirror_offset=6
-        return miniprix.MiniPrixManager("miniprix", slot2mgr, mpsched, mirrorsc, mp_offset, mirror_offset)
+        mgr = miniprix.MiniPrixManager("miniprix", slot2mgr, mpsched, mirrorsc, mp_offset, mirror_offset)
+        # force lineup offset to default 10 minutes
+        mgr.mp_cycles = 10
+        return mgr
 
     def setUp(self):
         # This .env file only needs CONFIG_PATH declared.
