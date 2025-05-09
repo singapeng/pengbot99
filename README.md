@@ -59,20 +59,20 @@ Files matching the bot's setup are supplied in the repository.
 
 The main module implements a `__main__` function so it may be started using a Python 3.11+ executable.
 ```
-python py/bot.py
+python bot.py
 ```
 
 ## Running tests
 
-For simplicity's sake, tests are written using Python's built-in unittest module. The tests currently shipped are minimal, only covering the dataloader module.
+For simplicity's sake, tests are written using Python's built-in unittest module.
 To run tests, we would ideally execute a test runner command sourcing tests from the `tests` folder at the root of the repository.
-As there is a single test module, you may also run tests using a simple python command, i.e.:
+At present, you may run tests using a simple python command, i.e.:
 ```
-> python tests/test_miniprix.py
-
-...
+> python test_schedule.py
+.............
 ----------------------------------------------------------------------
-Ran 3 tests in 0.004s
+Ran 13 tests in 0.011s
+
 OK
 ```
 
@@ -81,7 +81,7 @@ OK
 - Refactor schedule manager to more elegantly manage rotations
 - Bot Cogs
 - Migrate tests to Pytest and automate with Github Actions, add coverage report
-- Add verbose mode to /when queries to describe the rotation
+- Expand the /explain command to cover other topics than GP Rotation
 - Support for protracks/team battle as an upgrade to current /ninetynine command
 
 
