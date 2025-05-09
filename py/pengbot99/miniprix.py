@@ -88,15 +88,7 @@ class MiniPrixManager(object):
         """
         info = self.mgr.get_cycle_info(next_mp.start_time)
         # get the current MP count.
-        mp_count = info.get_event(self.name)
-        # list all MPs in the current cycle
-        all_cycle_mps = self.mgr.get_remaining_events(next_mp.start_time, all=True, filter=[self.name])
-        for mp in all_cycle_mps:
-            if mp.start_time < next_mp.start_time:
-                # this MP is in this cycle, but it started earlier
-                # so it isn't the next one, it's a past one.
-                mp_count += 1
-        return mp_count
+        return info.get_event(self.name)
 
     def get_miniprix(self, timestamp=None):
         next_mp = self.mgr.when_event(names=[self.name], timestamp=timestamp)

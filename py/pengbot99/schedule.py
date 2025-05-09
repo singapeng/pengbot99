@@ -79,6 +79,8 @@ class CycleInfo(object):
         self.minute = minute
         self.schedule = sched
         self._build_event_count()
+        if self.minute > 0:
+            self._offset_event_count()
 
     def _build_event_count(self):
         """ How many of each known event already occured.
@@ -106,6 +108,21 @@ class CycleInfo(object):
                 else:
                     # we have not seen this event yet
                     self._events[evt_name] = evt_count
+
+    def _offset_event_count(self):
+        """ If this cycle is in progress, what does it mean for the event count?
+        """
+        cycle_rots = self.schedule.get_rotations_until(self.minute)
+        for rot in set(cycle_rots):
+            # how many times did this rotation show up in this cycle?
+            count = cycle_rots.count(rot)
+            # current index for this rotation at cycle start
+            idx = self._rotations[rot] % len(rot)
+            for n in range(count):
+                evt_name = rot[(idx + n) % len(rot)]
+                self._events[evt_name] += 1
+            # then we need to update the rotation count
+            self._rotations[rot] += count
 
     def get_rotation(self, evts):
         """ Returns the number of occurences of this rotation of events
@@ -213,12 +230,17 @@ class TimeTable(object):
             minute = -1
         idx = 0
         evts = []
+        rots_count = {}
         while idx < len(self._data):
             row = self._data[idx]
             if row[0] > minute:
                 start_minute = row[0]
                 rotation = row[1:]
-                cycle = cycle_info.get_rotation(rotation)
+                if rotation not in rots_count:
+                    rots_count[rotation] = 0
+                else:
+                    rots_count[rotation] += 1
+                cycle = cycle_info.get_rotation(rotation) + rots_count[rotation]
                 rotation_index = cycle % len(rotation)
                 current = row[1:][rotation_index]
                 if not filter or current in filter or current == 'next':
@@ -248,6 +270,22 @@ class TimeTable(object):
                 rotations[t_row] += 1
             else:
                 rotations[t_row] = 1
+        return rotations
+
+    def get_rotations_until(self, minute):
+        """ Returns a list of rotations that occur before the given minute in
+            the current cycle.
+        """
+        rotations = []
+        for row in self._data:
+            start_minute = row[0]
+            if start_minute <= minute:
+                rotations.append(row[1:])
+            else:
+                break
+        if rotations:
+            # leave the last item out always since it's incomplete or 'next'
+            rotations.pop(-1)
         return rotations
 
 

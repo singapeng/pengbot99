@@ -53,5 +53,87 @@ class TestSchedule(unittest.TestCase):
         self.assertEqual(res, (70, 0))
 
 
+class TestMiniWorldTourRotation(unittest.TestCase):
+    """ Test when the special event rotation is Team Battle/Pro-Tracks/Classic
+        and appears 4 times in the cycle.
+    """
+
+    def create_manager(self):
+        """ Utility returning a built-up Slot 2 schedule manager
+        """
+        wdsched = schedule.load_schedule(self.env['CONFIG_PATH'], 'slot2_schedule_miniworldtour')
+        wesched = schedule.load_schedule(self.env['CONFIG_PATH'], 'slot2_schedule_weekend_miniworldtour')
+        slot2mgr = schedule.Slot2ScheduleManager(self.origin, wdsched, wesched)
+        return slot2mgr
+
+    def setUp(self):
+        # This .env file only needs CONFIG_PATH declared.
+        # .env is covered by .gitignore to avoid secrets accidentally pushed to server
+        env_path = "fixtures/.env"
+        self.env = utils.load_env("fixtures/.env")
+        self.origin = datetime(2025, 5, 5, 0, 0, 0, 0, tzinfo=timezone.utc)
+        self.mgr = self.create_manager()
+
+    def test_list_events_specials_1(self):
+        ts = datetime(2025, 5, 5, 2, 0, 0, 0, tzinfo=timezone.utc)
+        evts = self.mgr.list_events(timestamp=ts, next=119)
+        self.assertEqual(evts[0].name, "worldtour")
+        self.assertEqual(evts[1].name, "classic")
+
+    def test_list_events_specials_2(self):
+        ts = datetime(2025, 5, 5, 2, 0, 0, 0, tzinfo=timezone.utc)
+        evts = self.mgr.list_events(timestamp=ts, next=119)
+        self.assertEqual(evts[3].name, "teambattle")
+
+    def test_list_events_specials_3(self):
+        ts = datetime(2025, 5, 5, 2, 0, 0, 0, tzinfo=timezone.utc)
+        evts = self.mgr.list_events(timestamp=ts, next=119)
+        self.assertEqual(evts[5].name, "protracks")
+
+    def test_list_events_specials_4(self):
+        ts = datetime(2025, 5, 5, 2, 0, 0, 0, tzinfo=timezone.utc)
+        evts = self.mgr.list_events(timestamp=ts, next=119)
+        self.assertEqual(evts[7].name, "classic")
+
+    def test_cycle_info_count_at_origin(self):
+        ci = self.mgr.get_cycle_info(self.origin)
+        self.assertEqual(ci.get_event("teambattle"), 0)
+
+    def test_cycle_info_count_at_cycle_one(self):
+        """ We've had Classic, Team Battle, Protracks and Classic"""
+        cycle_duration = self.mgr.weekday.duration
+        assert cycle_duration == 80
+        ci = self.mgr.get_cycle_info(self.origin + timedelta(minutes=cycle_duration))
+        self.assertEqual(ci.get_event("classic"), 2)
+        self.assertEqual(ci.get_event("teambattle"), 1)
+        self.assertEqual(ci.get_event("protracks"), 1)
+
+    def test_cycle_info_count_at_cycle_two(self):
+        """ We've had Classic (1), Team Battle (1), Protracks (1), Classic (2) in cycle one
+        then Team Battle (2), Protracks (2), Classic (3), Team Battle (3) in cycle 2 """
+        cycle_duration = self.mgr.weekday.duration
+        ci = self.mgr.get_cycle_info(self.origin + timedelta(minutes=cycle_duration * 2))
+        self.assertEqual(ci.get_event("classic"), 3)
+        self.assertEqual(ci.get_event("teambattle"), 3)
+        self.assertEqual(ci.get_event("protracks"), 2)
+
+    def test_cycle_info_count_at_cycle_three(self):
+        """ We've had Classic (1), Team Battle (1), Protracks (1), Classic (2) in cycle one
+        then Team Battle (2), Protracks (2), Classic (3), Team Battle (3) in cycle 2
+        then Protracks (3), Classic (4), Team Battle (4), Protracks (4) in cycle 3"""
+        cycle_duration = self.mgr.weekday.duration
+        ci = self.mgr.get_cycle_info(self.origin + timedelta(minutes=cycle_duration * 3))
+        self.assertEqual(ci.get_event("classic"), 4)
+        self.assertEqual(ci.get_event("teambattle"), 4)
+        self.assertEqual(ci.get_event("protracks"), 4)
+
+    def test_cycle_info_count_inside_cycle_zero(self):
+        """ We've had Classic only"""
+        ci = self.mgr.get_cycle_info(self.origin + timedelta(minutes=20))
+        self.assertEqual(ci.get_event("classic"), 1)
+        self.assertEqual(ci.get_event("teambattle"), 0)
+        self.assertEqual(ci.get_event("protracks"), 0)
+
+
 if __name__ == "__main__":
     unittest.main()
