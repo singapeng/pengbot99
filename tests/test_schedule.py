@@ -135,5 +135,45 @@ class TestMiniWorldTourRotation(unittest.TestCase):
         self.assertEqual(ci.get_event("protracks"), 0)
 
 
+class TestMiniWorldTourRotation_EdgeCase(unittest.TestCase):
+    """ Test when the special event rotation is Team Battle/Pro-Tracks/Classic
+        and appears 4 times in the cycle.
+        Another case discovered after the weekend rotation appeared.
+    """
+
+    def create_manager(self):
+        """ Utility returning a built-up Slot 2 schedule manager
+        """
+        wdsched = schedule.load_schedule(self.env['CONFIG_PATH'], 'slot2_schedule_miniworldtour_edge')
+        wesched = schedule.load_schedule(self.env['CONFIG_PATH'], 'slot2_schedule_weekend_miniworldtour_edge')
+        slot2mgr = schedule.Slot2ScheduleManager(self.origin, wdsched, wesched)
+        return slot2mgr
+
+    def setUp(self):
+        # This .env file only needs CONFIG_PATH declared.
+        # .env is covered by .gitignore to avoid secrets accidentally pushed to server
+        env_path = "fixtures/.env"
+        self.env = utils.load_env("fixtures/.env")
+        self.origin = datetime(2025, 5, 5, 0, 0, 0, 0, tzinfo=timezone.utc)
+        self.mgr = self.create_manager()
+
+    def test_list_events_specials_edge_case_1(self):
+        ts = datetime(2025, 5, 10, 1, 40, 0, 0, tzinfo=timezone.utc)
+        evts = self.mgr.list_events(timestamp=ts, next=119)
+        self.assertEqual(evts[1].name, "classic")
+        self.assertEqual(evts[3].name, "teambattle")
+        self.assertEqual(evts[5].name, "protracks")
+        self.assertEqual(evts[7].name, "classic")
+
+    def test_list_events_specials_edge_case_2(self):
+        ts = datetime(2025, 5, 10, 1, 50, 0, 0, tzinfo=timezone.utc)
+        evts = self.mgr.list_events(timestamp=ts, next=119)
+        self.assertEqual(evts[0].name, "classic")
+        self.assertEqual(evts[2].name, "teambattle")
+        self.assertEqual(evts[4].name, "protracks")
+        self.assertEqual(evts[6].name, "classic")
+
+
+
 if __name__ == "__main__":
     unittest.main()
