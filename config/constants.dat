@@ -2,7 +2,7 @@
 # Used for Public Classic Miniprix
 CLASSIC_LINE_UP_OFFSET=24
 # Used for Public Mini-Prix (standard)
-MINIPRIX_LINE_UP_OFFSET=2
+MINIPRIX_LINE_UP_OFFSET=10
 # Used to line mirror track occurence in Public Mini-Prix
 MIRROR_LINE_UP_OFFSET=0
 # Used for Private Mini-Prix timing
