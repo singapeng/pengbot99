@@ -377,8 +377,7 @@ def _ninetynine():
     return '\n'.join(r99_mgr.get_formatted_events())
 
 
-@bot.slash_command(name="ninetynine", description="List the track selection for the upcoming 99 races",
-                    guild_ids=[env['TEST_GUILD_ID']])
+@bot.slash_command(name="ninetynine", description="List the track selection for the upcoming 99 races")
 async def ninetynine(
         ctx: discord.ApplicationContext,
         ):
