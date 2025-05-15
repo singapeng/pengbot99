@@ -157,22 +157,52 @@ class TestMiniWorldTourRotation_EdgeCase(unittest.TestCase):
         self.origin = datetime(2025, 5, 5, 0, 0, 0, 0, tzinfo=timezone.utc)
         self.mgr = self.create_manager()
 
+
     def test_list_events_specials_edge_case_1(self):
         ts = datetime(2025, 5, 10, 1, 40, 0, 0, tzinfo=timezone.utc)
         evts = self.mgr.list_events(timestamp=ts, next=119)
-        self.assertEqual(evts[1].name, "classic")
-        self.assertEqual(evts[3].name, "teambattle")
-        self.assertEqual(evts[5].name, "protracks")
-        self.assertEqual(evts[7].name, "classic")
+        expected = ("classic", "teambattle", "protracks", "classic")
+        result = (evts[1].name, evts[3].name, evts[5].name, evts[7].name)
 
     def test_list_events_specials_edge_case_2(self):
         ts = datetime(2025, 5, 10, 1, 50, 0, 0, tzinfo=timezone.utc)
         evts = self.mgr.list_events(timestamp=ts, next=119)
-        self.assertEqual(evts[0].name, "classic")
-        self.assertEqual(evts[2].name, "teambattle")
-        self.assertEqual(evts[4].name, "protracks")
-        self.assertEqual(evts[6].name, "classic")
+        expected = ("classic", "teambattle", "protracks", "classic")
+        result = (evts[0].name, evts[2].name, evts[4].name, evts[6].name)
+        self.assertEqual(result, expected)
 
+
+class TestPost160_GPRotation_EdgeCase(unittest.TestCase):
+    """ Fixing the edge case with multiple multi-events rotations appearances
+        caused an issue with Grand Prix Rotation.
+    """
+
+    def create_manager(self):
+        """ Utility returning a built-up Slot 2 schedule manager
+        """
+        wdsched = schedule.load_schedule(self.env['CONFIG_PATH'], 'slot2_schedule_edge160')
+        wesched = schedule.load_schedule(self.env['CONFIG_PATH'], 'slot2_schedule_weekend_edge160')
+        slot2mgr = schedule.Slot2ScheduleManager(self.origin, wdsched, wesched)
+        return slot2mgr
+
+    def setUp(self):
+        # This .env file only needs CONFIG_PATH declared.
+        # .env is covered by .gitignore to avoid secrets accidentally pushed to server
+        env_path = "fixtures/.env"
+        self.env = utils.load_env("fixtures/.env")
+        self.origin = datetime(2025, 5, 5, 0, 0, 0, 0, tzinfo=timezone.utc)
+        self.mgr = self.create_manager()
+
+    def test_list_events_specials_edge_case_gp_1(self):
+        ts = datetime(2025, 5, 15, 2, 0, 0, 0, tzinfo=timezone.utc)
+        evts = self.mgr.list_events(timestamp=ts, next=119)
+        self.assertEqual(evts[0].name, "mqueen")
+
+    def test_list_events_specials_edge_case_gp_2(self):
+        ts = datetime(2025, 5, 15, 2, 1, 0, 0, tzinfo=timezone.utc)
+        #import pdb; pdb.set_trace()
+        evts = self.mgr.list_events(timestamp=ts, next=119)
+        self.assertEqual(evts[0].name, "mqueen")
 
 
 if __name__ == "__main__":

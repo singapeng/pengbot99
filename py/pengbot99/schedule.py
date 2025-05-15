@@ -195,7 +195,8 @@ class TimeTable(object):
             start_minute = active_row[0]
             active_row = active_row[1:]
             cycle = cycle_info.get_rotation(active_row)
-            rotation_index = cycle % len(active_row)
+            rot_count = self.get_rotations_until(cycle_info.minute).count(active_row)
+            rotation_index = (cycle + rot_count) % len(active_row)
             name = active_row[rotation_index]
             next_row = self._get_next_row(cycle_info.minute)
             if next_row:
@@ -230,17 +231,16 @@ class TimeTable(object):
             minute = -1
         idx = 0
         evts = []
+        # rot_counts is used to keep track of rotations we visited, so that we
+        # calculate the correct rotation offset if a rotation appears more than
+        # once in remaining events
         rots_count = {}
         while idx < len(self._data):
             row = self._data[idx]
             if row[0] > minute:
                 start_minute = row[0]
                 rotation = row[1:]
-                if rotation not in rots_count:
-                    rots_count[rotation] = 0
-                else:
-                    rots_count[rotation] += 1
-                cycle = cycle_info.get_rotation(rotation) + rots_count[rotation]
+                cycle = cycle_info.get_rotation(rotation) + rots_count.get(rotation, 0)
                 rotation_index = cycle % len(rotation)
                 current = row[1:][rotation_index]
                 if not filter or current in filter or current == 'next':
@@ -253,6 +253,10 @@ class TimeTable(object):
                             start_minute=start_minute, end_minute=end_minute,
                             rotation=rotation, rotation_offset=rotation_index
                             ))
+                    if rotation not in rots_count:
+                        rots_count[rotation] = 1
+                    else:
+                        rots_count[rotation] += 1
             idx += 1
         return evts
 
@@ -277,15 +281,15 @@ class TimeTable(object):
             the current cycle.
         """
         rotations = []
+        start_minute = 0
         for row in self._data:
             start_minute = row[0]
-            if start_minute <= minute:
+            # capture past events and in-progress events
+            # but not one that's immediately starting.
+            if start_minute < minute and row[1] != 'next':
                 rotations.append(row[1:])
             else:
                 break
-        if rotations:
-            # leave the last item out always since it's incomplete or 'next'
-            rotations.pop(-1)
         return rotations
 
 
