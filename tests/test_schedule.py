@@ -200,9 +200,16 @@ class TestPost160_GPRotation_EdgeCase(unittest.TestCase):
 
     def test_list_events_specials_edge_case_gp_2(self):
         ts = datetime(2025, 5, 15, 2, 1, 0, 0, tzinfo=timezone.utc)
-        #import pdb; pdb.set_trace()
         evts = self.mgr.list_events(timestamp=ts, next=119)
         self.assertEqual(evts[0].name, "mqueen")
+
+    def test_list_events_specials_edge_case_3(self):
+        ts = datetime(2025, 5, 16, 2, 16, 0, 0, tzinfo=timezone.utc)
+        evts = self.mgr.list_events(timestamp=ts, next=119)
+        expected = ("protracks", "classic", "teambattle")
+        result = (evts[0].name, evts[2].name, evts[4].name)
+        self.assertEqual(result, expected)
+
 
 
 if __name__ == "__main__":

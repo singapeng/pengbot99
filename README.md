@@ -87,3 +87,8 @@ OK
 
 # References
 
+- Rotation may be simplified by using Python's own deque implementation, since it has a .rotate function
+ - deque docs https://docs.python.org/3/library/collections.html#collections.deque
+- Event schedule could be written as a tree using anytree or bigtree
+ - anytree https://github.com/c0fec0de/anytree
+ - bigtree https://bigtree.readthedocs.io/stable/
