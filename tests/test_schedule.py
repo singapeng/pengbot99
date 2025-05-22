@@ -211,6 +211,41 @@ class TestPost160_GPRotation_EdgeCase(unittest.TestCase):
         self.assertEqual(result, expected)
 
 
+class Test_Yet_Another_Rotation_EdgeCase(unittest.TestCase):
+    """ Fixing the edge case with multiple multi-events rotations appearances
+    """
+
+    def create_manager(self):
+        """ Utility returning a built-up Slot 2 schedule manager
+        """
+        wdsched = schedule.load_schedule(self.env['CONFIG_PATH'], 'slot2_schedule_tbptc_edge')
+        wesched = schedule.load_schedule(self.env['CONFIG_PATH'], 'slot2_schedule_weekend_tbptc_edge')
+        slot2mgr = schedule.Slot2ScheduleManager(self.origin, wdsched, wesched)
+        return slot2mgr
+
+    def setUp(self):
+        # This .env file only needs CONFIG_PATH declared.
+        # .env is covered by .gitignore to avoid secrets accidentally pushed to server
+        env_path = "fixtures/.env"
+        self.env = utils.load_env("fixtures/.env")
+        self.origin = datetime(2025, 5, 5, 0, 0, 0, 0, tzinfo=timezone.utc)
+        self.mgr = self.create_manager()
+
+    def test_list_events_specials_edge_case_4(self):
+        ts = datetime(2025, 5, 22, 3, 10, 0, 0, tzinfo=timezone.utc)
+        evts = self.mgr.list_events(timestamp=ts, next=119)
+        expected = ("teambattle", "protracks", "classic", "teambattle")
+        result = (evts[0].name, evts[2].name, evts[4].name, evts[6].name)
+        self.assertEqual(result, expected)
+
+    def test_list_events_specials_edge_case_5(self):
+        ts = datetime(2025, 5, 22, 3, 20, 0, 0, tzinfo=timezone.utc)
+        evts = self.mgr.list_events(timestamp=ts, next=119)
+        expected = ("teambattle", "protracks", "classic", "teambattle")
+        result = (evts[0].name, evts[2].name, evts[4].name, evts[6].name)
+        self.assertEqual(result, expected)
+
+
 
 if __name__ == "__main__":
     unittest.main()
