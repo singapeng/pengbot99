@@ -188,6 +188,14 @@ class TimeTable(object):
 
     def get_event(self, cycle_info):
         """ What event is on at specified cycle and minute
+
+            Because this is within the schedule, we need info supplied
+            by CycleInfo objects to calculate the state of rotations.
+            Most calls rely on get_remaining_events(), so CycleInfo offsets
+            for future events, and this call her needs to un-offset
+            rotations as a result. This is illustrates a flaw in the
+            relation between CycleInfo and TimeTable, which should
+            instead both be accessed by a manager class.
         """
         active_row = self._get_active_row(cycle_info.minute)
         if active_row:
@@ -196,8 +204,12 @@ class TimeTable(object):
             active_row = active_row[1:]
             cycle = cycle_info.get_rotation(active_row)
             if start_minute > 0:
-                # we're past the first timetable row so there may be repeated rotations
-                rot_count = self.get_rotations_until(cycle_info.minute).count(active_row)
+                if cycle_info.minute > start_minute:
+                    # the rotation for the current event was already counted
+                    rot_count = -1
+                else:
+                    # we're past the first timetable row so there may be repeated rotations
+                    rot_count = self.get_rotations_until(cycle_info.minute).count(active_row)
             elif cycle_info.minute == 0:
                 # the current event isn't started, rotation uncounted
                 rot_count = 0
