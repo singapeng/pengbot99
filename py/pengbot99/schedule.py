@@ -257,9 +257,9 @@ class TimeTable(object):
         rots_count = {}
         while idx < len(self._data):
             row = self._data[idx]
+            rotation = row[1:]
             if row[0] > minute:
                 start_minute = row[0]
-                rotation = row[1:]
                 cycle = cycle_info.get_rotation(rotation) + rots_count.get(rotation, 0)
                 rotation_index = cycle % len(rotation)
                 current = row[1:][rotation_index]
@@ -273,10 +273,13 @@ class TimeTable(object):
                             start_minute=start_minute, end_minute=end_minute,
                             rotation=rotation, rotation_offset=rotation_index
                             ))
-                    if rotation not in rots_count:
-                        rots_count[rotation] = 1
-                    else:
-                        rots_count[rotation] += 1
+            if row[0] >= minute:
+                # using greater-equal comparison here lets us catch the current event's
+                # rotation in case it's relevant to our offset.
+                if rotation not in rots_count:
+                    rots_count[rotation] = 1
+                else:
+                    rots_count[rotation] += 1
             idx += 1
         return evts
 
