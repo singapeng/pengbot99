@@ -203,19 +203,12 @@ class TimeTable(object):
             start_minute = active_row[0]
             active_row = active_row[1:]
             cycle = cycle_info.get_rotation(active_row)
-            if start_minute > 0:
-                if cycle_info.minute > start_minute:
-                    # the rotation for the current event was already counted
-                    rot_count = -1
-                else:
-                    # the current event isn't started, rotation uncounted
-                    rot_count = 0
-            elif cycle_info.minute == 0:
-                # the current event isn't started, rotation uncounted
-                rot_count = 0
-            else:
+            if cycle_info.minute > start_minute:
                 # the rotation for the current event was already counted
                 rot_count = -1
+            else:
+                # the current event isn't started, rotation uncounted
+                rot_count = 0
             rotation_index = (cycle + rot_count) % len(active_row)
             name = active_row[rotation_index]
             next_row = self._get_next_row(cycle_info.minute)
