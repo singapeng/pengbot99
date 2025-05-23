@@ -252,6 +252,13 @@ class Test_Yet_Another_Rotation_EdgeCase(unittest.TestCase):
         result = (evts[0].name, evts[2].name, evts[4].name, evts[6].name)
         self.assertEqual(result, expected)
 
+    def test_list_events_specials_edge_case_5(self):
+        ts = datetime(2025, 5, 23, 3, 40, 0, 0, tzinfo=timezone.utc)
+        evts = self.mgr.list_events(timestamp=ts, next=119)
+        expected = ("protracks", "classic", "teambattle", "protracks")
+        result = (evts[0].name, evts[2].name, evts[4].name, evts[6].name)
+        self.assertEqual(result, expected)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -208,8 +208,8 @@ class TimeTable(object):
                     # the rotation for the current event was already counted
                     rot_count = -1
                 else:
-                    # we're past the first timetable row so there may be repeated rotations
-                    rot_count = self.get_rotations_until(cycle_info.minute).count(active_row)
+                    # the current event isn't started, rotation uncounted
+                    rot_count = 0
             elif cycle_info.minute == 0:
                 # the current event isn't started, rotation uncounted
                 rot_count = 0
