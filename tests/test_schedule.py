@@ -245,6 +245,12 @@ class Test_Yet_Another_Rotation_EdgeCase(unittest.TestCase):
         result = (evts[0].name, evts[2].name, evts[4].name, evts[6].name)
         self.assertEqual(result, expected)
 
+    def test_list_events_specials_garusan_report(self):
+        ts = datetime(2025, 5, 22, 13, 27, 0, 0, tzinfo=timezone.utc)
+        evts = self.mgr.list_events(timestamp=ts, next=119)
+        expected = ("classic", "teambattle", "protracks", "classic")
+        result = (evts[0].name, evts[2].name, evts[4].name, evts[6].name)
+        self.assertEqual(result, expected)
 
 
 if __name__ == "__main__":
