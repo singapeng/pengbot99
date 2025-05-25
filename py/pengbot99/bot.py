@@ -474,7 +474,6 @@ async def post_schedule_message():
     msg = await channel.send('\n'.join(response))
     return msg.id
 
-
 @tasks.loop(seconds=600)
 async def edit_schedule_message():
     channel = bot.get_channel(int(env["SCHEDULE_EDIT_CHANNEL"]))
@@ -488,6 +487,10 @@ async def edit_schedule_message():
     # Edit message in place
     await msg.edit('\n'.join(response))
 
+
+### Festival League auto-update 99 race schedule ###
+
+# these functions are currently unused
 
 def _create_track_selection_message():
     response = r99_mgr.get_formatted_events()
@@ -522,9 +525,19 @@ async def edit_track_selection_message():
     # Edit message in place
     await msg.edit('\n'.join(response))
 
+### End Festival League auto-update 99 race schedule ###
+
 
 @tasks.loop(seconds=3600)
 async def announce_schedule():
+    """ Deprecated, currently unused and may not work.
+
+        This creates a new message every hour in the given channel.
+        It will cause the channel to go unread each time, which may
+        or may not be desirable. On some clients, it may be necessary
+        to scroll down from the last unread message when catching up.
+        That is most likely not desirable.
+    """
     await bot.wait_until_ready()
     channel = bot.get_channel(int(env["ANNOUNCE_CHANNEL"]))
     glitch_evts = ui.event_choices.get("Glitch 99")
