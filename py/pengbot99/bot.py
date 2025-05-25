@@ -432,6 +432,24 @@ def kick_off_mp_update(mp_evt):
     start_mp_edit.start()
 
 
+async def _update_bot_status(bot):
+    gps = ui.event_choices["Grand Prix"]
+    evt = slot2mgr.get_current_event()
+    if evt.name not in gps:
+        evts = slot2mgr.get_events(names=gps, count=1)
+        evt = evts[0]
+        evt_name = formatters.event_display_names.get(evt.name, evt.name)
+        delta = (evt.start_time - datetime.now(timezone.utc)).seconds // 60
+        if delta > 10:
+            content = "{0} in {1} minutes.".format(evt_name, delta)
+        else:
+            content = "{0} soon.".format(evt_name)
+    else:
+        content = "Now: " + formatters.event_display_names.get(evt.name, evt.name)
+    await apiadapter.update_activity(bot, content, evt.start_time)
+    return content
+
+
 def _create_schedule_message():
     glitch_evts = ui.event_choices.get("Glitch 99")
     evts = slot2mgr.list_events(next=119)
@@ -486,6 +504,9 @@ async def edit_schedule_message():
 
     # Edit message in place
     await msg.edit('\n'.join(response))
+
+    # Update status
+    await _update_bot_status(bot)
 
 
 ### Festival League auto-update 99 race schedule ###
