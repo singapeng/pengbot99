@@ -19,8 +19,8 @@
 018,mBig_Blue <> mSand_Storm_I
 019,mMute_City_I <> Port_Town_I
 020,Sand_Ocean <> Red_Canyon_I
-021,mMute_City_II <> Sand_Storm_I
-022,mSand_Ocean <> mBig_Blue_II
+021,Sand_Storm_I <> mMute_City_II
+022,mBig_Blue_II <> mSand_Ocean
 023,Big_Blue <> mPort_Town_I
 024,Death_Wind_I <> Mute_City_III
 025,Sand_Ocean <> Port_Town_I
