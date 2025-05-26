@@ -205,17 +205,14 @@ async def showevents(
 
 def _when(event_type, from_time=None, count=5):
     names = ui.event_choices.get(event_type)
-    if event_type == "Private Glitch Mini-Prix":
-        # This cannot happen as of 1.3.0 update, so the choice is removed.
-        evts = _private_mini_when(names, from_time, count)
-    elif event_type == "Glitch 99":
+    if event_type == "Glitch 99":
         mgr = slot1mgr
         evts = mgr.when_event(names=names, count=count, timestamp=from_time)
     else:
         mgr = slot2mgr
         evts = mgr.when_event(names=names, count=count, timestamp=from_time)
     if not evts:
-        print("Could not fetch any event :(")
+        utils.log("Could not fetch any '{0}' event :(".format(event_type))
         return None
     if from_time:
         header = "{0} events {1} local time:"
