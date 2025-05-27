@@ -162,6 +162,11 @@ async def on_ready():
     utils.log(f"{bot.user} is ready and online!")
     # configure schedule edit task
     await configure_schedule_edit()
+    # if ticker override is set, set description now.
+    ticker = env.get("TICKER_OVERRIDE")
+    if ticker:
+        utils.log("Ticker override is active, schedule ticker disabled.")
+        await apiadapter.update_activity(bot, ticker)
     # Kick-off the automatic announce
     #announce_schedule.start()
 
@@ -503,7 +508,8 @@ async def edit_schedule_message():
     await msg.edit('\n'.join(response))
 
     # Update status
-    await _update_bot_status(bot)
+    if not env.get("TICKER_OVERRIDE"):
+        await _update_bot_status(bot)
 
 
 ### Festival League auto-update 99 race schedule ###
