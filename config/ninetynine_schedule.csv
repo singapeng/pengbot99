@@ -1,4 +1,4 @@
-000,Red_Canyon_I <> mBig_Blue_II
+000,mBig_Blue_II <> Red_Canyon_I
 001,Big_Blue <> Sand_Storm_I
 002,Mute_City_I <> mPort_Town_I
 003,mSand_Ocean <> mRed_Canyon_I
@@ -31,5 +31,5 @@
 030,Death_Wind_I <> Sand_Storm_I
 031,mMute_City_III <> Big_Blue_II
 032,mSand_Ocean <> mDeath_Wind_I
-033,Port_Town_I <> mMute_City_IV
+033,mMute_City_IV <> Port_Town_I
 034,next
