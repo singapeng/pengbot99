@@ -15,7 +15,7 @@
 014,Mute_City_III <> mBig_Blue_II
 015,Sand_Ocean <> Death_Wind_I
 016,mPort_Town_I <> Mute_City_IV
-017,mRed_Canyon_I <> Big_Blue_II
+017,Big_Blue_II <> mRed_Canyon_I
 018,mBig_Blue <> mSand_Storm_I
 019,mMute_City_I <> Port_Town_I
 020,Sand_Ocean <> Red_Canyon_I
@@ -28,7 +28,7 @@
 027,Red_Canyon_I <> mMute_City_IV
 028,mBig_Blue <> Mute_City_II
 029,Mute_City_I <> mSand_Storm_I
-030,Death_Wind_I <> Sand_Storm_I
+030,Sand_Storm_I <> Death_Wind_I
 031,mMute_City_III <> Big_Blue_II
 032,mSand_Ocean <> mDeath_Wind_I
 033,mMute_City_IV <> Port_Town_I
