@@ -6,7 +6,7 @@ from pengbot99 import events
 
 # 10 miniprix selection cycles per individual mp cycle
 # (one each minute)
-MP_CYCLES = 10
+MP_CYCLES = 5
 
 
 def print_miniprix_rows(rows):
