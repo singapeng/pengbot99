@@ -2,7 +2,6 @@ from datetime import datetime, timedelta, timezone
 
 # local imports
 from pengbot99 import events
-from pengbot99 import utils
 
 
 # 10 miniprix selection cycles for private MP queries
@@ -39,7 +38,6 @@ class MiniPrixManager(object):
         self._mirror_schedule = mirror
         self.mirror_lineup_offset = mirror_offset
         self.mp_cycles = self._init_mp_cycles()
-        utils.log("Setting cycles to {0} for {1}.".format(self.mp_cycles, self.name))
         self.lineup_offset = offset
 
     @property

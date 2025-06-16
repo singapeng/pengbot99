@@ -52,6 +52,7 @@ slot2mgr = schedule.Slot2ScheduleManager(schedule.origin, wdsched, wesched)
 cmp_mgr = miniprix.MiniPrixManager("classicprix", slot2mgr, cmpsched, offset=cmp_offset)
 mp_mgr = miniprix.MiniPrixManager("miniprix", slot2mgr, mpsched, mirrorsc,
         mp_offset, mirror_offset)
+utils.log("Setting cycles to {0} for {1}.".format(mp_mgr.mp_cycles, mp_mgr.name))
 r99_mgr = choicerace.init_99_manager(name=None, glitch_mgr=slot1mgr, env=env,
         minutes_offset=r99_offset)
 
