@@ -2,11 +2,12 @@ from datetime import datetime, timedelta, timezone
 
 # local imports
 from pengbot99 import events
+from pengbot99 import utils
 
 
-# 10 miniprix selection cycles per individual mp cycle
+# 10 miniprix selection cycles for private MP queries
 # (one each minute)
-MP_CYCLES = 10
+PMP_CYCLES = 10
 
 
 def print_miniprix_rows(rows):
@@ -37,7 +38,8 @@ class MiniPrixManager(object):
         self._mp_schedule = mp_schedule
         self._mirror_schedule = mirror
         self.mirror_lineup_offset = mirror_offset
-        self.mp_cycles = MP_CYCLES
+        self.mp_cycles = self._init_mp_cycles()
+        utils.log("Setting cycles to {0} for {1}.".format(self.mp_cycles, self.name))
         self.lineup_offset = offset
 
     @property
@@ -49,6 +51,15 @@ class MiniPrixManager(object):
         if not self._mirror_schedule:
             return None
         return _trim_schedule(self._mirror_schedule)
+
+    def _init_mp_cycles(self):
+        """ Look up a MP to determine how long it lasts.
+            We use this to set how many track selections to present.
+        """
+        next_mp = self.mgr.when_event(names=[self.name], count=1)
+        if not next_mp:
+            return 0
+        return next_mp[0].duration
 
     def _get_start_mp_row(self, cycle):
         """ 
@@ -142,7 +153,7 @@ class PrivateMPManager(object):
         self.pmp_mgr = public_mp_manager
         self.mirror_mgr = mirror_manager
         # how many result rows (or minutes) to look up
-        self._lookup_count = MP_CYCLES
+        self._lookup_count = PMP_CYCLES
 
     def _get_rows_from_event(self, evts):
         if evts:
