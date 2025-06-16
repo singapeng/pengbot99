@@ -22,9 +22,9 @@
 021,Sand_Storm_I <> mMute_City_II
 022,mBig_Blue_II <> mSand_Ocean
 023,Big_Blue <> mPort_Town_I
-024,Death_Wind_I <> Mute_City_III
+024,mDeath_Wind_I <> Mute_City_III
 025,Sand_Ocean <> Port_Town_I
-026,mDeath_Wind_I <> mRed_Canyon_I
+026,Death_Wind_I <> mRed_Canyon_I
 027,mMute_City_IV <> Red_Canyon_I
 028,mBig_Blue <> Mute_City_II
 029,Mute_City_I <> mSand_Storm_I
