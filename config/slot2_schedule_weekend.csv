@@ -1,9 +1,9 @@
 0,mking,ace,mknight,queen,mace,knight,mqueen,king,mknight,queen,mking,ace,mqueen,king,mace,knight
-10,teambattle
+10,teambattle,protracks,classic
 30,miniprix
-40,classic
+40,teambattle,protracks,classic
 60,miniprix
-70,teambattle
+70,teambattle,protracks,classic
 90,miniprix
-100,protracks
+100,teambattle,protracks,classic
 120,next
