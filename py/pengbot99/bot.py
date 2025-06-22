@@ -63,8 +63,7 @@ pcmp_origin = schedule.origin + timedelta(minutes=int(csts["PRIVATE_CMP_MINUTE_O
 
 pl_slot1 = schedule.Slot1ScheduleManager(pmp_origin, plmpsched)
 mirror_slot1 = schedule.Slot1ScheduleManager(pmp_mirror_origin, mirrorsc)
-pmp_mgr = miniprix.PrivateMPManager("miniprix", pl_slot1, mp_mgr, None)
-#pmp_mgr = miniprix.PrivateMPManager("miniprix", pl_slot1, mp_mgr, mirror_slot1)
+pmp_mgr = miniprix.PrivateMPManager("miniprix", pl_slot1, mp_mgr, mirror_slot1)
 plcmp_slot1 = schedule.Slot1ScheduleManager(pcmp_origin, plcmpsched)
 pcmp_mgr = miniprix.PrivateMPManager("classicprix", plcmp_slot1, cmp_mgr)
 
