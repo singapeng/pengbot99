@@ -32,7 +32,6 @@ class Pengbot(object):
         cmp_offset = int(csts["CLASSIC_LINE_UP_OFFSET"])
         mirror_offset = int(csts["MIRROR_LINE_UP_OFFSET"])
 
-
         # load the schedule for slot 1 (99 races)
         r99sched = schedule.load_schedule(env['CONFIG_PATH'], 'slot1_schedule')
         # load the weekday schedule for slot 2 (Prix and special events)
@@ -70,6 +69,28 @@ class Pengbot(object):
         self.pmp_mgr = miniprix.PrivateMPManager("miniprix", pl_slot1, self.mp_mgr, mirror_slot1)
         plcmp_slot1 = schedule.Slot1ScheduleManager(pcmp_origin, plcmpsched)
         self.pcmp_mgr = miniprix.PrivateMPManager("classicprix", plcmp_slot1, self.cmp_mgr)
+
+        # Shuffle Mini-Prix schedule managers
+        self.smp_mgr = None
+        self.psmp_mgr = None
+
+        smp_offset = csts.get("SHUFFLE_MINIPRIX_LINE_UP_OFFSET")
+        if smp_offset is None:
+            # Shuffle is currently off
+            return
+        smp_offset = int(smp_offset)
+        smp_mirror_offset = int(csts.get("SHUFFLE_MIRROR_LINE_UP_OFFSET", mirror_offset))
+        self.smp_mgr = miniprix.MiniPrixManager("miniprix", self.slot2mgr, mpsched, mirrorsc,
+                smp_offset, smp_mirror_offset)
+        psmp_origin = schedule.origin + timedelta(minutes=int(csts["PRIVATE_SHUFFLE_MP_MINUTE_OFFSET"]))
+        psl_slot1 = schedule.Slot1ScheduleManager(psmp_origin, plmpsched)
+        self.psmp_mgr = miniprix.PrivateMPManager("miniprix", psl_slot1, self.smp_mgr, None)
+        utils.log("!! Configured Shuffle Weekend !!")
+
+    def is_shuffle_on(self):
+        if self.smp_mgr:
+            return True
+        return False
 
 
 # Using the Pengbot class as a holder for all schedule managers for now.
@@ -280,32 +301,57 @@ TIP_MINIPRIX_VERBOSE = "Set True to display the track selection internal code na
 TIP_MINIPRIX_TRACK_FILTER = "Only show track selections that include this track."
 
 
-def _create_miniprix_message(event_type, track_filter, utc_time, verbose, private=False):
+def _fetch_miniprix_events(event_type, from_time, private):
     """
     """
-    err, response = None, None
-    err, from_time = _validate_utc_time(utc_time)
-
     if event_type == "classicprix":
         if private:
             mgr = pb.pcmp_mgr
         else:
             mgr = pb.cmp_mgr
-        track = ui.cmp_track_choices.get(track_filter)
     else:
         if private:
             mgr = pb.pmp_mgr
         else:
             mgr = pb.mp_mgr
-        track = ui.mp_track_choices.get(track_filter)
+    evts = mgr.get_miniprix(timestamp=from_time)
+    if evts and event_type != "classicprix" and pb.is_shuffle_on():
+        if not pb.slot2mgr.is_weekday(evts[0].start_time):
+            utils.log("Fetching Shuffle Weekend events.")
+            if private:
+                mgr = pb.psmp_mgr
+            else:
+                mgr = pb.smp_mgr
+            evts = mgr.get_miniprix(timestamp=from_time)
+    return evts
+
+
+def _build_mp_event_name(event_type, private, start_time):
+    evt_name = formatters.event_display_names.get(event_type)
+    if event_type != "classicprix":
+       if pb.is_shuffle_on() and not pb.slot2mgr.is_weekday(start_time):
+           evt_name = "Machine Shuffle {0}".format(evt_name)
+    if private:
+        evt_name = "Private {0}".format(evt_name)
+    return evt_name
+
+
+def _create_miniprix_message(event_type, track_filter, utc_time, verbose, private=False):
+    """
+    """
+    response = None
+    err, from_time = _validate_utc_time(utc_time)
 
     if not err:
-        evts = mgr.get_miniprix(timestamp=from_time)
+        if event_type == "classicprix":
+            track = ui.cmp_track_choices.get(track_filter)
+        else:
+            track = ui.mp_track_choices.get(track_filter)
+
+        evts = _fetch_miniprix_events(event_type, from_time, private)
         if evts:
+            evt_name = _build_mp_event_name(event_type, private, evts[0].start_time)
             start = int(evts[0].start_time.timestamp())
-            evt_name = formatters.event_display_names.get(event_type)
-            if private:
-                evt_name = "Private {0}".format(evt_name)
             header = "Track selection for {0} scheduled <t:{1}:R>".format(evt_name, start)
             response = [header]
             for evt in evts:

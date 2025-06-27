@@ -19,6 +19,7 @@ event_display_names = {
     "mysteryprix": "Glitch Mini-Prix",
     "protracks": "Pro-Tracks",
     "queen": "Queen League",
+    "shuffleprix": "Machine Shuffle Mini-Prix",
     "teambattle": "Team Battle",
     "worldtour": "World Tour",
     "Mystery_3": "Mystery Track ??? ||:skull:DWWL||",
