@@ -74,6 +74,31 @@ It is used to have the bot repeat a schedule message every hour in the given cha
 If any other configuration key is defined (using the `NAME=value` scheme), it will be read but ignored by the bot.
 The configuration file may contain any number of comment lines starting with `#` character.
 
+### Constants information
+
+Constants are used to conveniently offset the schedule rotation without having to edit the schedule files.
+Constants are defined using `NAME=VALUE` syntax. Name is conventionally all-caps. Value is an integer that may be negative.
+The following constants are expected to be present:
+- CLASSIC_LINE_UP_OFFSET
+- MINIPRIX_LINE_UP_OFFSET
+- MIRROR_LINE_UP_OFFSET
+- PRIVATE_MP_MINUTE_OFFSET
+- PRIVATE_MP_MIRROR_MINUTE_OFFSET
+- PRIVATE_CMP_MINUTE_OFFSET
+- NINETYNINE_MINUTE_OFFSET
+
+To change the offset the bot is using, simply edit the Constant file and restart the bot.
+
+The bot uses the presence of the following constants as an indication that Machine Shuffle Weekend event is on:
+- SHUFFLE_MINIPRIX_LINE_UP_OFFSET
+- SHUFFLE_MIRROR_LINE_UP_OFFSET
+- PRIVATE_SHUFFLE_MP_MINUTE_OFFSET
+- PRIVATE_SHUFFLE_MP_MIRROR_MINUTE_OFFSET
+
+When they are present, the bot will use the specified offset for Miniprix events occuring at weekend time (UTC).
+If there is no Machine Shuffle event, those constants should be omitted from the config, or commented out.
+As of F-Zero 99 version 1.6.1, there is no mirroring in Private Machine Shuffle-Miniprix, unless the lobby is started at the time of a public Machine Shuffle event. In this later case, the track selection will follow the public event's setting. In any case, the mirroring constant currently does not affect the results in any way.
+
 
 ## Running the application
 
