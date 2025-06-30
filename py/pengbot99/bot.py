@@ -317,7 +317,6 @@ def _fetch_miniprix_events(event_type, from_time, private):
     evts = mgr.get_miniprix(timestamp=from_time)
     if evts and event_type != "classicprix" and pb.is_shuffle_on():
         if not pb.slot2mgr.is_weekday(evts[0].start_time):
-            utils.log("Fetching Shuffle Weekend events.")
             if private:
                 mgr = pb.psmp_mgr
             else:
