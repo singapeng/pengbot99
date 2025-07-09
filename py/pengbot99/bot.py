@@ -26,6 +26,7 @@ class Pengbot(object):
     def __init__(self, env, csts):
         self.env = env
         self.csts = csts
+        self._mwt_on = False
 
         # all env values are str, convert schedule offsets to int now
         mp_offset = int(csts["MINIPRIX_LINE_UP_OFFSET"])
@@ -51,11 +52,11 @@ class Pengbot(object):
         r99_offset = int(csts["NINETYNINE_MINUTE_OFFSET"])
 
         self.slot1mgr = schedule.Slot1ScheduleManager(schedule.glitch_origin, r99sched)
-        self.slot2mgr = schedule.Slot2ScheduleManager(schedule.origin, wdsched, wesched)
-        self.cmp_mgr = miniprix.MiniPrixManager("classicprix", self.slot2mgr, cmpsched, offset=cmp_offset)
-        self.mp_mgr = miniprix.MiniPrixManager("miniprix", self.slot2mgr, mpsched, mirrorsc,
+        self._slot2mgr = schedule.Slot2ScheduleManager(schedule.origin, wdsched, wesched)
+        self._cmp_mgr = miniprix.MiniPrixManager("classicprix", self._slot2mgr, cmpsched, offset=cmp_offset)
+        self._mp_mgr = miniprix.MiniPrixManager("miniprix", self._slot2mgr, mpsched, mirrorsc,
                 mp_offset, mirror_offset)
-        utils.log("Setting cycles to {0} for {1}.".format(self.mp_mgr.mp_cycles, self.mp_mgr.name))
+        utils.log("Setting cycles to {0} for {1}.".format(self._mp_mgr.mp_cycles, self._mp_mgr.name))
         self.r99_mgr = choicerace.init_99_manager(name=None, glitch_mgr=self.slot1mgr, env=env,
                 minutes_offset=r99_offset)
 
@@ -69,6 +70,10 @@ class Pengbot(object):
         self.pmp_mgr = miniprix.PrivateMPManager("miniprix", pl_slot1, self.mp_mgr, mirror_slot1)
         plcmp_slot1 = schedule.Slot1ScheduleManager(pcmp_origin, plcmpsched)
         self.pcmp_mgr = miniprix.PrivateMPManager("classicprix", plcmp_slot1, self.cmp_mgr)
+
+        if csts.get("MWT_MINIPRIX_LINE_UP_OFFSET"):
+            utils.log("Initializing Mini World Tour managers.")
+            self.init_miniworldtour()
 
         # Shuffle Mini-Prix schedule managers
         self.smp_mgr = None
@@ -87,10 +92,53 @@ class Pengbot(object):
         self.psmp_mgr = miniprix.PrivateMPManager("miniprix", psl_slot1, self.smp_mgr, None)
         utils.log("!! Configured Shuffle Weekend !!")
 
+    def init_miniworldtour(self):
+        mp_offset = int(csts["MWT_MINIPRIX_LINE_UP_OFFSET"])
+        cmp_offset = int(csts["MWT_CLASSIC_LINE_UP_OFFSET"])
+        mirror_offset = int(csts["MWT_MIRROR_LINE_UP_OFFSET"])
+
+        # load the schedule for slot 2 (Prix and special events)
+        mwtsched = schedule.load_schedule(env['CONFIG_PATH'], 'mwt_schedule')
+        # load the Classic Mini Prix track schedule
+        cmpsched = schedule.load_schedule(env['CONFIG_PATH'], 'classic_mp_schedule')
+        # load the Mini Prix track schedule
+        mpsched = schedule.load_schedule(env['CONFIG_PATH'], 'miniprix_schedule')
+        mirrorsc = schedule.load_schedule(env['CONFIG_PATH'], 'miniprix_mirroring_schedule')
+
+        self._mwt_slot2mgr = schedule.Slot2ScheduleManager(schedule.origin, mwtsched, mwtsched)
+        self._mwt_cmp_mgr = miniprix.MiniPrixManager("classicprix", self._mwt_slot2mgr, cmpsched, offset=cmp_offset)
+        self._mwt_mp_mgr = miniprix.MiniPrixManager("miniprix", self._mwt_slot2mgr, mpsched, mirrorsc,
+                mp_offset, mirror_offset)
+
     def is_shuffle_on(self):
         if self.smp_mgr:
             return True
         return False
+
+    @property
+    def slot2mgr(self):
+        if self.mwt_on:
+            return self._mwt_slot2mgr
+        return self._slot2mgr
+
+    @property
+    def mp_mgr(self):
+        if self.mwt_on:
+            return self._mwt_mp_mgr
+        return self._mp_mgr
+
+    @property
+    def cmp_mgr(self):
+        if self.mwt_on:
+            return self._mwt_cmp_mgr
+        return self._cmp_mgr
+
+    @property
+    def mwt_on(self):
+        return self._mwt_on
+
+    def flip_mwt(self):
+        self._mwt_on = not self._mwt_on
 
 
 # Using the Pengbot class as a holder for all schedule managers for now.
@@ -198,6 +246,40 @@ async def on_ready():
         await apiadapter.update_activity(bot, ticker)
     # Kick-off the automatic announce
     #announce_schedule.start()
+    # configure event mode flip
+    if csts.get("MWT_MINIPRIX_LINE_UP_OFFSET"):
+        await configure_mwt_flip()
+
+
+async def configure_mwt_flip():
+    """ Mini world tour vacation flip!
+    """
+    mwt_on_time = datetime(2025, 7, 13, 23, 55, tzinfo=timezone.utc)
+
+    @tasks.loop(time=mwt_on_time.time())
+    async def flip_mwt():
+        # flip-on/off dates:
+        mwt_on_time = datetime(2025, 7, 13, 23, 54, tzinfo=timezone.utc)
+        mwt_off_time = datetime(2025, 7, 20, 23, 54, tzinfo=timezone.utc)
+
+        now = datetime.now(timezone.utc)
+        flipped = False
+
+        if mwt_on_time < now < mwt_off_time and not pb.mwt_on:
+            utils.log("Doing a flip!")
+            pb.flip_mwt()
+            flipped = True
+        elif now > mwt_off_time and pb.mwt_on:
+            utils.log("Doing a backflip!")
+            pb.flip_mwt()
+            flipped = True
+
+        if flipped:
+            for mp_type in ("miniprix", "classicprix"):
+                await _edit_miniprix_message(mp_type)
+
+    utils.log("Mini World-Tour check will activate at {0}.".format(mwt_on_time.strftime("%H:%M")))
+    flip_mwt.start()
 
 
 # command option help tips

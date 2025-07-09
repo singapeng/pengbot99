@@ -23,3 +23,11 @@ NINETYNINE_MINUTE_OFFSET=25
 # Used for Private Shuffle Mini-Prix mirror timing (currently unused)
 # PRIVATE_SHUFFLE_MP_MIRROR_MINUTE_OFFSET=0
 # # # # # # # # # # # # # # # # # # # #
+# # # # MINI WORLD TOUR WEEK EVENTS # #
+# Used for Public Classic Miniprix
+MWT_CLASSIC_LINE_UP_OFFSET=24
+# Used for Public Mini-Prix (standard)
+MWT_MINIPRIX_LINE_UP_OFFSET=10
+# Used to line mirror track occurence in Public Mini-Prix
+MWT_MIRROR_LINE_UP_OFFSET=0
+# # # # # # # # # # # # # # # # # # # #
