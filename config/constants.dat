@@ -15,11 +15,11 @@ PRIVATE_CMP_MINUTE_OFFSET=8
 NINETYNINE_MINUTE_OFFSET=25
 # # # # SHUFFLE WEEKEND EVENTS # # # #
 # Used for Public Shuffle Mini-Prix
-# SHUFFLE_MINIPRIX_LINE_UP_OFFSET=19
+SHUFFLE_MINIPRIX_LINE_UP_OFFSET=14
 # Used to line mirror track occurence in Public Shuffle Mini-Prix
-# SHUFFLE_MIRROR_LINE_UP_OFFSET=1
+SHUFFLE_MIRROR_LINE_UP_OFFSET=1
 # Used for Private Shuffle Mini-Prix timing
-# PRIVATE_SHUFFLE_MP_MINUTE_OFFSET=12
+PRIVATE_SHUFFLE_MP_MINUTE_OFFSET=12
 # Used for Private Shuffle Mini-Prix mirror timing (currently unused)
-# PRIVATE_SHUFFLE_MP_MIRROR_MINUTE_OFFSET=0
+PRIVATE_SHUFFLE_MP_MIRROR_MINUTE_OFFSET=0
 # # # # # # # # # # # # # # # # # # # #
