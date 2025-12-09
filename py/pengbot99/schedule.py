@@ -12,7 +12,7 @@ from pengbot99 import events
 # but not 99s.
 origin = datetime(2025, 4, 23, 0, 0, 0, 0, tzinfo=timezone.utc)
 # A point observed to be a glitch sequence origin.
-glitch_origin = datetime(2024, 2, 13, 0, 59, tzinfo=timezone.utc)
+glitch_origin = datetime(2025, 12, 8, 22, 57, tzinfo=timezone.utc)
 
 
 def load_schedule(path, name):
