@@ -24,6 +24,9 @@ event_display_names = {
     "worldtour": "World Tour",
     "Mystery_3": "Mystery Track ??? ||:skull:DWWL||",
     "Mystery_4": "Mystery Track ??? ||:fire:FC:fire:||",
+    "Mystery_5": "Mystery Track ??? ||BB + RC||",
+    "Mystery_6": "Mystery Track ??? ||SO + PT||",
+    "Mystery_7": "Mystery Track ??? ||Si + SS||",
 }
 
 # These are FZD Custom emoji codes to beautify the schedule printout
@@ -56,6 +59,9 @@ track_display_names = {
     "Mystery_2": "BBB",
     "Mystery_3": "Death Wind White Land",
     "Mystery_4": "Fire City",
+    "Mystery_5": "Big Blue + Red Canyon",
+    "Mystery_6": "Sand Ocean + Port Town",
+    "Mystery_7": "Silence + Sand Storm",
     "Port_Town_I": "Port Town I",
     "Port_Town_II": "Port Town II",
     "Red_Canyon_I": "Red Canyon I",
@@ -73,6 +79,7 @@ track_display_names = {
 track_lookup_names = {
     'Big Blue': 'Big_Blue',
     'Big Blue II': 'Big_Blue_II',
+    'Big Blue + Red Canyon': 'Mystery_5',
     'Death Wind I': 'Death_Wind_I',
     'Death Wind II': 'Death_Wind_II',
     'Death Wind White Land': 'Mystery_3',
@@ -107,10 +114,12 @@ track_lookup_names = {
     'Red Canyon I': 'Red_Canyon_I',
     'Red Canyon II': 'Red_Canyon_II',
     'Sand Ocean': 'Sand_Ocean',
+    'Sand Ocean + Port Town': 'Mystery_6',
     'Sand Storm I': 'Sand_Storm_I',
     'Sand Storm II': 'Sand_Storm_II',
     'Silence': 'Silence',
     'Silence II': 'Silence_II',
+    'Silence + Sand Storm': 'Mystery_7',
     'White Land I': 'White_Land_I',
     'White Land II': 'White_Land_II'
 }
@@ -130,6 +139,9 @@ track_mirroring_enabled = {
     "Mystery_2": False,
     "Mystery_3": False,
     "Mystery_4": False,
+    "Mystery_5": False,
+    "Mystery_6": False,
+    "Mystery_7": False,
     "Port_Town_I": True,
     "Port_Town_II": True,
     "Red_Canyon_I": True,

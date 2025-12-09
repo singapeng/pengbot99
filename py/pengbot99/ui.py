@@ -4,7 +4,7 @@ event_choices = {
     "Ace League (no mirror)": ["ace"],
     "Classic": ["classic"],
     "Classic Mini-Prix": ["classicprix"],
-    "Glitch 99": ["glitch99", "Mystery_3", "Mystery_4"],
+    "Glitch 99": ["glitch99", "Mystery_3", "Mystery_4", "Mystery_5", "Mystery_6", "Mystery_7"],
     "Glitch Mini-Prix": ["mysteryprix"],
     "Grand Prix": ["ace", "mace", "knight", "mknight", "queen", "mqueen", "king", "mking"],
     "Hard Tracks": ["protracks"],
@@ -38,6 +38,7 @@ mp_event_choices = {
 mp_track_choices = {
     "Big Blue": "Big_Blue",
     "Big Blue II": "Big_Blue_II",
+    "Big Blue + Red Canyon": "Mystery_5",
     "Death Wind I": "Death_Wind_I",
     "Death Wind II": "Death_Wind_II",
     "Death Wind White Land": "Mystery_3",
@@ -51,8 +52,10 @@ mp_track_choices = {
     "Red Canyon I": "Red_Canyon_I",
     "Red Canyon II": "Red_Canyon_II",
     "Sand Ocean": "Sand_Ocean",
+    "Sand Ocean + Port Town": "Mystery_6",
     "Sand Storm I": "Sand_Storm_I",
     "Sand Storm II": "Sand_Storm_II",
+    "Silence + Sand Storm": "Mystery_7",
     "White Land I": "White_Land_I",
 }
 
