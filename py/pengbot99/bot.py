@@ -242,9 +242,11 @@ def _when(event_type, from_time=None, count=5):
     if event_type == "Glitch 99":
         mgr = pb.slot1mgr
         evts = mgr.when_event(names=names, count=count, timestamp=from_time)
+        fmt_func = formatters.format_glitch_event
     else:
         mgr = pb.slot2mgr
         evts = mgr.when_event(names=names, count=count, timestamp=from_time)
+        fmt_func = formatters.format_future_event
     if not evts:
         utils.log("Could not fetch any '{0}' event :(".format(event_type))
         return None
@@ -255,7 +257,7 @@ def _when(event_type, from_time=None, count=5):
     else:
         response = ["Next {0} events in your local time:".format(event_type)]
     for evt in evts:
-        response.append(formatters.format_future_event(evt))
+        response.append(fmt_func(evt))
     return '\n'.join(response)
 
 
@@ -525,7 +527,7 @@ def _create_schedule_message():
     if glitches:
         response.append("\nNext Glitch Races:")
         for glitch in glitches:
-            response.append(formatters.format_future_event(glitch))
+            response.append(formatters.format_glitch_event(glitch))
 
     # Also show events of desired types that aren't occuring soon
     missing_evts = get_missing_event_types(evts)
@@ -635,7 +637,7 @@ async def announce_schedule():
     if glitches:
         response.append("\nNext Glitch Races:")
         for glitch in glitches:
-            response.append(formatters.format_future_event(glitch))
+            response.append(formatters.format_glitch_event(glitch))
     if not has_king_gp:
         king_evt = pb.slot2mgr.when_event(names=["king"], count=1)
         if king_evt:

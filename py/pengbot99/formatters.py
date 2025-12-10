@@ -25,8 +25,8 @@ event_display_names = {
     "Mystery_3": "Mystery Track ??? ||:skull:DWWL||",
     "Mystery_4": "Mystery Track ??? ||:fire:FC:fire:||",
     "Mystery_5": "Mystery Track ??? ||BB + RC||",
-    "Mystery_6": "Mystery Track ??? ||SO + PT||",
-    "Mystery_7": "Mystery Track ??? ||Si + SS||",
+    "Mystery_6": "Mystery Track ??? ||Si + SS||",
+    "Mystery_7": "Mystery Track ??? ||SO + PT||",
 }
 
 # These are FZD Custom emoji codes to beautify the schedule printout
@@ -60,8 +60,8 @@ track_display_names = {
     "Mystery_3": "Death Wind White Land",
     "Mystery_4": "Fire City",
     "Mystery_5": "Big Blue + Red Canyon",
-    "Mystery_6": "Sand Ocean + Port Town",
-    "Mystery_7": "Silence + Sand Storm",
+    "Mystery_6": "Silence + Sand Storm",
+    "Mystery_7": "Sand Ocean + Port Town",
     "Port_Town_I": "Port Town I",
     "Port_Town_II": "Port Town II",
     "Red_Canyon_I": "Red Canyon I",
@@ -114,12 +114,12 @@ track_lookup_names = {
     'Red Canyon I': 'Red_Canyon_I',
     'Red Canyon II': 'Red_Canyon_II',
     'Sand Ocean': 'Sand_Ocean',
-    'Sand Ocean + Port Town': 'Mystery_6',
+    'Sand Ocean + Port Town': 'Mystery_7',
     'Sand Storm I': 'Sand_Storm_I',
     'Sand Storm II': 'Sand_Storm_II',
     'Silence': 'Silence',
     'Silence II': 'Silence_II',
-    'Silence + Sand Storm': 'Mystery_7',
+    'Silence + Sand Storm': 'Mystery_6',
     'White Land I': 'White_Land_I',
     'White Land II': 'White_Land_II'
 }
@@ -226,6 +226,18 @@ def format_future_event(evt):
     evt_time = int(evt.start_time.timestamp())
     evt_name = format_event_name(evt.name)
     return discord_text.format(ts, evt_name, evt_time)
+
+
+# TODO: make this schedule data
+glitch_rotation = ("Mystery_3", "Mystery_4", "Mystery_5", "Mystery_6", "Mystery_7", )
+
+
+def format_glitch_event(evt):
+    """ Hacking in the glitch rotation!
+    """
+    if evt.name == "glitch99":
+        evt._name = glitch_rotation[evt.cycle % len(glitch_rotation)]
+    return format_future_event(evt)
 
 
 def format_track_names(tracks, mode):
