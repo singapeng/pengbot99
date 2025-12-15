@@ -490,7 +490,7 @@ def kick_off_mp_update(mp_evt):
 
 
 async def _update_bot_status(bot):
-    gps = ui.event_choices["Grand Prix"]
+    gps = ui.event_choices["Grand Prix"] + ["worldtour"]
     evt = pb.slot2mgr.get_current_event()
     if evt.name not in gps:
         evts = pb.slot2mgr.get_events(names=gps, count=1)
