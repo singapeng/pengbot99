@@ -155,8 +155,9 @@ async def create_schedule_messages():
     return msg_env
 
 
-async def configure_schedule_edit():
+async def configure_schedule_edit(interval=10):
     """
+    interval: how many minutes between refreshes
     """
     msg_env = utils.read_msg_struct()
     if not msg_env:
@@ -171,10 +172,10 @@ async def configure_schedule_edit():
 
     # local time for the bot
     now = datetime.now(timezone.utc)
-    # round minutes to the tens
-    minute = now.minute // 10 * 10
-    # add 10 minutes delta
-    delta = timedelta(minutes=10)
+    # round minutes to the last interval occurence (e.g. tens)
+    minute = now.minute // interval * interval
+    # add interval minutes delta
+    delta = timedelta(minutes=interval)
     kickoff_time = datetime(now.year, now.month, now.day, now.hour, minute, tzinfo=timezone.utc) + delta
 
     @tasks.loop(time=kickoff_time.time(), count=1)
@@ -190,7 +191,8 @@ async def configure_schedule_edit():
 async def on_ready():
     utils.log(f"{bot.user} is ready and online!")
     # configure schedule edit task
-    await configure_schedule_edit()
+    interval = int(env.get("REFRESH_INTERVAL"), 10)
+    await configure_schedule_edit(interval)
     # if ticker override is set, set description now.
     ticker = env.get("TICKER_OVERRIDE")
     if ticker:
@@ -549,7 +551,7 @@ async def post_schedule_message():
     msg = await channel.send('\n'.join(response))
     return msg.id
 
-@tasks.loop(seconds=600)
+@tasks.loop(seconds=int(env.get("REFRESH_INTERVAL"), 10) * 60)
 async def edit_schedule_message():
     channel = bot.get_channel(int(env["SCHEDULE_EDIT_CHANNEL"]))
     msg_id = int(env["ANNOUNCE_MSG_ID"])
@@ -591,7 +593,7 @@ async def post_track_selection_message():
     return msg.id
 
 
-@tasks.loop(seconds=600)
+@tasks.loop(seconds=int(env.get("REFRESH_INTERVAL"), 10) * 60)
 async def edit_track_selection_message():
     channel = bot.get_channel(int(env["SCHEDULE_EDIT_CHANNEL"]))
     msg_id = int(env["TRACK_SELECTION_MSG_ID"])
