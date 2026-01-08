@@ -1,6 +1,10 @@
 from datetime import datetime, timedelta
 
 
+class EventModificationError(Exception):
+    pass
+
+
 class Event(object):
     def __init__(self, name, cycle=0, cycle_minute=0, start_minute=0, end_minute=0, rotation=None, rotation_offset=0):
         super().__init__()
@@ -20,11 +24,15 @@ class Event(object):
         self.rotation_offset = rotation_offset
         # start time
         self.start_time = None
+        # is a glitch active?
+        self.glitch = False
 
     @property
     def name(self):
         """ The Event's human-readable name
         """
+        if self.glitch:
+            return 'glitch_{0}'.format(self._name)
         return self._name
 
     @property
@@ -37,6 +45,29 @@ class Event(object):
         """
         """
         self.start_time = timestamp
+
+    def delay(self, delta):
+        """
+        Delay an event's start by a timedelta.
+        The event must still start before its current end time.
+        This makes the event's duration shorter.
+        """
+        if delta.seconds >= self.duration * 60:
+            raise EventModificationError("Event cannot be delayed more than its duration.")
+        minutes = delta.seconds // 60
+        self.set_start_time(self.start_time + delta)
+        self.start_minute += minutes
+
+    def cut_short(self, delta):
+        """
+        Adjust an event to end earlier than its currently set time.
+        The event must end no earlier than its current start time.
+        This makes the event's duration shorter.
+        """
+        if delta.seconds >= self.duration * 60:
+            raise EventModificationError("Event cannot be cut short more than its duration.")
+        minutes = delta.seconds // 60
+        self.end_minute -= minutes
 
     @property
     def end_time(self):
@@ -54,6 +85,41 @@ class Event(object):
         if trackname in self.name.split():
             return True
         return False
+
+    def copy_as_glitch(self):
+        """ Returns a glitched copy of self.
+            This intentionally does not bring over cycle info.
+        """
+        new_evt = Event(name=self.name, start_minute=self.start_minute, end_minute=self.end_minute)
+        new_evt.set_start_time(self.start_time)
+        new_evt.glitch = True
+        return new_evt
+
+    def split_by_glitch(self, glitch_first, split_delta):
+        """ Change this event into two events, one being a glitch,
+            the other a shorter version of self.
+
+            split_delta is an int. It is the point in the event when
+            the split occurs. This value must be less than the event
+            duration, otherwise an error will occur.
+
+            glitch_first is a boolean. Use True to make the first part
+            of the event a glitch, false to have it be the second part.
+            Self is modified in place with adjusted start/end time.
+
+            Returns the glitched event.
+        """
+        if split_delta.total_seconds() < 60:
+            msg = "Given value ({0}) would create a zero duration event."
+            raise EventModificationError(msg.format(split_delta.seconds))
+        glitch_event = self.copy_as_glitch()
+        if glitch_first is True:
+            glitch_event.cut_short(split_delta)
+            self.delay(split_delta)
+        else:
+            self.cut_short(split_delta)
+            glitch_event.delay(split_delta)
+        return glitch_event
 
     def __str__(self):
         """

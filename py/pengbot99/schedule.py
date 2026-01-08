@@ -456,7 +456,7 @@ class Slot2ScheduleManager(BaseScheduleManager):
         It provides support for a dual-schedule rotation with distinct
         weekdays and weekend days timetables.
     """
-    def __init__(self, origin, weekday_sched, weekend_sched):
+    def __init__(self, origin, weekday_sched, weekend_sched, glitch_sched=None):
         super().__init__(origin)
         # Monday to Friday schedule
         self.weekday = TimeTable(weekday_sched, "weekday")
@@ -468,6 +468,10 @@ class Slot2ScheduleManager(BaseScheduleManager):
         # that do not start at 0:00 on the first day
         # This caches some data in relation to this.
         self._set_alt_origin()
+        # if a Mystery GP weekend is happening (v1.7.0)
+        self._mystery_mgr = None
+        if glitch_sched:
+            self._mystery_mgr = Slot1ScheduleManager(origin, glitch_sched)
 
     def _set_alt_origin(self):
         """ We may cache the next day from origin and the number of
@@ -605,3 +609,51 @@ class Slot2ScheduleManager(BaseScheduleManager):
 
     def get_daily_weekend_event_count(self, name):
         return self._get_daily_event_count("weekend", name)
+
+    def get_remaining_events(self, timestamp, all=False, filter=None):
+        """ Events left in the current cycle.
+            Overrides base class to manage Mystery GP (v1.7)
+        """
+        evts = super().get_remaining_events(timestamp, all, filter)
+        if self._mystery_mgr:
+            evts = self._apply_glitch(evts, timestamp)
+        return evts
+
+    def _can_glitch(self, evt):
+        if evt.name in ('knight', 'mknight'):
+            return True
+        return False
+
+    def _apply_glitch(self, evts, timestamp):
+        # look up glitch events occuring during the events period
+        glitch = None
+        if evts:
+            limit = (evts[-1].end_time - evts[0].start_time).seconds // 60
+            glitches = self._mystery_mgr.get_events(names=["glitchgp"], timestamp=timestamp, limit=limit)
+        if glitches:
+            glitch = glitches.pop()
+
+        new_evts = []
+        for evt in evts:
+            if glitch and self._can_glitch(evt) and evt.start_time < glitch.end_time:
+                # There's a glitch now and until this event's end
+                if glitch.end_time == evt.end_time:
+                    # replace this event with Glitch GP
+                    new_evts.append(evt.copy_as_glitch())
+                elif glitch.end_time < evt.end_time:
+                    # there's a Glitch GP now but this event is available later
+                    #import pdb; pdb.set_trace()
+                    glitched_evt = evt.split_by_glitch(True, glitch.end_time - evt.start_time)
+                    new_evts.extend([glitched_evt, evt])
+                elif glitch.start_time < evt.end_time:
+                    # this event will be cut short by a glitch GP
+                    #import pdb; pdb.set_trace()
+                    glitched_evt = evt.split_by_glitch(False, evt.end_time - glitch.start_time)
+                    new_evts.extend([evt, glitched_evt])
+                else:
+                    new_evts.append(evt)
+            else:
+                new_evts.append(evt)
+            if glitch and evt.end_time > glitch.end_time:
+                glitch = glitches.pop() if glitches else None
+        return new_evts
