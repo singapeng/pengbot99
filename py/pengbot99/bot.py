@@ -14,6 +14,7 @@ from pengbot99 import explain_cmd
 from pengbot99 import formatters
 from pengbot99 import miniprix
 from pengbot99 import schedule
+from pengbot99 import secret_league
 from pengbot99 import ui
 from pengbot99 import utils
 
@@ -32,14 +33,21 @@ class Pengbot(object):
         cmp_offset = int(csts["CLASSIC_LINE_UP_OFFSET"])
         mirror_offset = int(csts["MIRROR_LINE_UP_OFFSET"])
 
+        # Glitch GP
+        secret_cfg = None
+        if csts.get("SECRET_LEAGUE_INTERVALS"):
+            secret_cfg = secret_league.SecretLeagueConfig(
+                    csts["SECRET_LEAGUE_INTERVALS"],
+                    csts.get("SECRET_LEAGUE_OFFSET")
+                )
+            utils.log("Secret League initialized with {0}".format(secret_cfg.indices))
+
         # load the schedule for slot 1 (99 races)
         r99sched = schedule.load_schedule(env['CONFIG_PATH'], 'slot1_schedule')
         # load the weekday schedule for slot 2 (Prix and special events)
         wdsched = schedule.load_schedule(env['CONFIG_PATH'], 'slot2_schedule')
         # load the weekend schedule for slot 2 (Prix and special events)
         wesched = schedule.load_schedule(env['CONFIG_PATH'], 'slot2_schedule_weekend')
-        # load the Mystery GP Glitch schedule (Mystery League Weekend Event)
-        ggpsched = schedule.load_schedule(env['CONFIG_PATH'], 'mysterygp_schedule')
         # load the Classic Mini Prix track schedule
         cmpsched = schedule.load_schedule(env['CONFIG_PATH'], 'classic_mp_schedule')
         # load the Mini Prix track schedule
@@ -53,7 +61,7 @@ class Pengbot(object):
         r99_offset = int(csts["NINETYNINE_MINUTE_OFFSET"])
 
         self.slot1mgr = schedule.Slot1ScheduleManager(schedule.glitch_origin, r99sched)
-        self.slot2mgr = schedule.Slot2ScheduleManager(schedule.origin, wdsched, wesched, ggpsched)
+        self.slot2mgr = schedule.Slot2ScheduleManager(schedule.origin, wdsched, wesched, secret_cfg)
         self.cmp_mgr = miniprix.MiniPrixManager("classicprix", self.slot2mgr, cmpsched, offset=cmp_offset)
         self.mp_mgr = miniprix.MiniPrixManager("miniprix", self.slot2mgr, mpsched, mirrorsc,
                 mp_offset, mirror_offset)

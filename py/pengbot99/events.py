@@ -32,7 +32,8 @@ class Event(object):
         """ The Event's human-readable name
         """
         if self.glitch:
-            return 'glitch_{0}'.format(self._name)
+            # used by Secret League only
+            return 'glitchgp'
         return self._name
 
     @property
