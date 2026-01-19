@@ -9,6 +9,7 @@ event_display_names = {
     "classic": "Classic",
     "classicprix": "Classic Mini-Prix",
     "glitch99": "Mystery Track ???",
+    "glitchgp": "Secret League",
     "king": "King League",
     "knight": "Knight League",
     "mace": "Mirror Ace League",
@@ -42,8 +43,8 @@ event_custom_emoji = {
     "mqueen": "<:GPMirrorQueen:1227803769950048296>",
     "mysteryprix": "<:WhatQuestionmarksthree:1217243922418368734>",
     "queen": "<:GPQueen:1195076266311811233>",
-    "worldtour": "<:WTFrozen:1449836993956806838>",
-#    "worldtour": "<:WTMini:1368768773301207070>",
+    "glitchgp": "<:GPSecretKnight:1462611891447791700>",
+    "worldtour": "<:WTMini:1462608159913934881>",
 }
 
 track_display_names = {
@@ -165,7 +166,9 @@ track_separators = {
 
 
 track_custom_emoji = {
-    #"Mute_City_II": "<:Festival:1260649041952378930>",
+    "Mystery_5": "<:WhatQuestionmarksthree:1217243922418368734>",
+    "Mystery_6": "<:WhatQuestionmarksthree:1217243922418368734>",
+    "Mystery_7": "<:WhatQuestionmarksthree:1217243922418368734>",
     }
 
 

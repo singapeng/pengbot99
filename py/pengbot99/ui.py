@@ -5,7 +5,6 @@ event_choices = {
     "Classic": ["classic"],
     "Classic Mini-Prix": ["classicprix"],
     "Glitch 99": ["glitch99", "Mystery_3", "Mystery_4", "Mystery_5", "Mystery_6", "Mystery_7"],
-    "Glitch Mini-Prix": ["mysteryprix"],
     "Grand Prix": ["ace", "mace", "knight", "mknight", "queen", "mqueen", "king", "mking"],
     "Hard Tracks": ["protracks"],
     "King League": ["king", "mking"],
@@ -21,6 +20,7 @@ event_choices = {
     "Pro-Tracks": ["protracks"],
     "Queen League": ["queen", "mqueen"],
     "Retro": ["classic"],
+    "Secret League": ["glitchgp"],
     "Team Battle": ["teambattle"],
     "World Tour": ["worldtour"],
 }
