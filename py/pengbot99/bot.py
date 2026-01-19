@@ -247,6 +247,10 @@ def _when(event_type, from_time=None, count=5):
         mgr = pb.slot1mgr
         evts = mgr.when_event(names=names, count=count, timestamp=from_time)
         fmt_func = formatters.format_glitch_event
+    elif event_type == "Secret League":
+        mgr = pb.slot2mgr._mystery_mgr
+        evts = mgr.when_event(names=names, count=count, timestamp=from_time)
+        fmt_func = formatters.format_future_event
     else:
         mgr = pb.slot2mgr
         evts = mgr.when_event(names=names, count=count, timestamp=from_time)

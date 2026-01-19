@@ -13,6 +13,8 @@ from pengbot99 import events
 origin = datetime(2025, 4, 23, 0, 0, 0, 0, tzinfo=timezone.utc)
 # A point observed to be a glitch sequence origin.
 glitch_origin = datetime(2025, 12, 8, 22, 57, tzinfo=timezone.utc)
+# A point observed to be a Mystery GP sequence origin.
+glitch_gp_origin = datetime(2026, 1, 18, 22, 0, tzinfo=timezone.utc)
 
 
 def load_schedule(path, name):
@@ -471,7 +473,7 @@ class Slot2ScheduleManager(BaseScheduleManager):
         # if a Mystery GP weekend is happening (v1.7.0)
         self._mystery_mgr = None
         if glitch_sched:
-            self._mystery_mgr = Slot1ScheduleManager(origin, glitch_sched)
+            self._mystery_mgr = Slot1ScheduleManager(glitch_gp_origin, glitch_sched)
 
     def _set_alt_origin(self):
         """ We may cache the next day from origin and the number of
@@ -620,7 +622,7 @@ class Slot2ScheduleManager(BaseScheduleManager):
         return evts
 
     def _can_glitch(self, evt):
-        if evt.name in ('knight', 'mknight'):
+        if evt.name in ('knight', 'mknight', 'queen', 'mqueen', 'king', 'mking', 'ace', 'mace'):
             return True
         return False
 
@@ -628,7 +630,7 @@ class Slot2ScheduleManager(BaseScheduleManager):
         # look up glitch events occuring during the events period
         glitch = None
         if evts:
-            limit = (evts[-1].end_time - evts[0].start_time).seconds // 60
+            limit = (evts[-1].end_time - evts[0].start_time).total_seconds() // 60
             glitches = self._mystery_mgr.get_events(names=["glitchgp"], timestamp=timestamp, limit=limit)
         if glitches:
             glitch = glitches.pop()
@@ -642,12 +644,10 @@ class Slot2ScheduleManager(BaseScheduleManager):
                     new_evts.append(evt.copy_as_glitch())
                 elif glitch.end_time < evt.end_time:
                     # there's a Glitch GP now but this event is available later
-                    #import pdb; pdb.set_trace()
                     glitched_evt = evt.split_by_glitch(True, glitch.end_time - evt.start_time)
                     new_evts.extend([glitched_evt, evt])
                 elif glitch.start_time < evt.end_time:
                     # this event will be cut short by a glitch GP
-                    #import pdb; pdb.set_trace()
                     glitched_evt = evt.split_by_glitch(False, evt.end_time - glitch.start_time)
                     new_evts.extend([evt, glitched_evt])
                 else:
