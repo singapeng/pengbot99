@@ -483,21 +483,31 @@ def get_missing_event_types(evts):
         missing from the must-have list
     """
     present_evts = list(set([evt.name for evt in evts]))
-    missing_evts = []
+    results = []
+    # we want to show the next Glitch GP if available
+    if "glitchgp" not in present_evts:
+        extra = _when_secret_league(pb.slot2mgr, 1, None)
+        if extra:
+            results.append(extra[0])
+
     # we should show one of each standard/mirror prix pair
     for mprix in [["knight", "mknight"], ["queen", "mqueen"], ["king", "mking"], ["ace", "mace"]]:
         if mprix[0] not in present_evts and mprix[1] not in present_evts:
-            missing_evts.append(mprix)
-    # now add events that don't have a mirror version
+            # for mirrored prix, we query both names but will only get the closest
+            # that is not a glitch gp
+            extra = pb.slot2mgr.when_event(names=mprix, count=5)
+            for item in extra:
+                if not item.glitch:
+                    results.append(item)
+                    break
+
+    # now add other events that don't have a mirror version
     for name in ["miniprix", "classicprix"]:
         if name not in present_evts:
-            missing_evts.append([name])
-    results = []
-    for item in missing_evts:
-        # for mirrored prix, we query both names but will only get the closest
-        extra = pb.slot2mgr.when_event(names=item, count=1)
-        if extra:
-            results.append(extra[0])
+            extra = pb.slot2mgr.when_event(names=[name], count=1)
+            if extra:
+                results.append(extra[0])
+
     # make sure results are ordered from next to last
     results = sorted(results, key=lambda item:item.start_time)
     return results
