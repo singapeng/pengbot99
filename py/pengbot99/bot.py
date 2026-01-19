@@ -249,15 +249,32 @@ async def showevents(
     await ctx.respond('\n'.join(response))
 
 
+def _when_secret_league(mgr, count, from_time):
+    if not mgr.is_secret_league_on():
+        return None
+    # let's look for all Grand Prix first.
+    names = ui.event_choices.get("Grand Prix")
+    # We need to query enough GPs for the secret league pattern to generate matches
+    # This might result in more results than we need so we will trim later.
+    gp_count = ((count // mgr._secret_cfg.interval_count) + 1) * mgr._secret_cfg.length
+    gp_evts = mgr.when_event(names=names, count=gp_count, timestamp=from_time)
+    # only keep glitch GPs
+    evts = [evt for evt in gp_evts if evt.glitch]
+    if len(evts) > count:
+        return evts[:count]
+    return evts
+
+
 def _when(event_type, from_time=None, count=5):
     names = ui.event_choices.get(event_type)
+    evts = None
     if event_type == "Glitch 99":
         mgr = pb.slot1mgr
         evts = mgr.when_event(names=names, count=count, timestamp=from_time)
         fmt_func = formatters.format_glitch_event
     elif event_type == "Secret League":
-        mgr = pb.slot2mgr._mystery_mgr
-        evts = mgr.when_event(names=names, count=count, timestamp=from_time)
+        mgr = pb.slot2mgr
+        evts = _when_secret_league(mgr, count, from_time)
         fmt_func = formatters.format_future_event
     else:
         mgr = pb.slot2mgr

@@ -558,6 +558,11 @@ class Slot2ScheduleManager(BaseScheduleManager):
             # Saturday or Sunday
             return False
 
+    def is_secret_league_on(self):
+        if self._secret_cfg:
+            return True
+        return False
+
     def get_cycle_count(self, timestamp):
         """ This works when cycles are less than a day
             and there's a weekday/weekend change.

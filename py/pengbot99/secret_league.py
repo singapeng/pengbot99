@@ -33,6 +33,10 @@ class SecretLeagueConfig(object):
         return self._intervals
 
     @property
+    def interval_count(self):
+        return len(self._intervals)
+
+    @property
     def indices(self):
         return self._indices
 
