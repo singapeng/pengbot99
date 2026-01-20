@@ -222,13 +222,21 @@ def format_discord_timestamp(dt, inline=False):
     return text.format(particle, int(dt.timestamp()), t_format)
 
 
+def _format_event_names(evt):
+    if not evt.glitch:
+        return format_event_name(evt.name)
+    replaced = format_event_name(evt._name)
+    glitch = format_event_name(evt.name)
+    return "{0} (replaces {1})".format(glitch, replaced)
+
+
 def format_future_event(evt):
     """ Nice display for events in the future
     """
     ts = format_discord_timestamp(evt.start_time)
     discord_text = "{0}: {1} (<t:{2}:R>)"
     evt_time = int(evt.start_time.timestamp())
-    evt_name = format_event_name(evt.name)
+    evt_name = _format_event_names(evt)
     return discord_text.format(ts, evt_name, evt_time)
 
 
