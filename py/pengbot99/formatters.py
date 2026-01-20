@@ -257,7 +257,7 @@ def format_track_names(tracks, mode):
             if track_mirroring_enabled.get(race[1:]):
                 # Mirror mode on
                 name = "_Mirror {0}_".format(name)
-        emoji = track_custom_emoji.get(race)
+        emoji = track_custom_emoji.get(race if race[0] != 'm' else race[1:])
         if mode != "classicprix" and emoji:
             name = '{} {}'.format(emoji, name)
         names.append(name)
