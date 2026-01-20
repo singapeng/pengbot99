@@ -461,21 +461,25 @@ async def miniprix(
     await ctx.respond(err or response)
 
 
-def _ninetynine():
+def _ninetynine(timestamp=None):
     """
     """
-    return '\n'.join(pb.r99_mgr.get_formatted_events())
+    return '\n'.join(pb.r99_mgr.get_formatted_events(timestamp))
 
 
 @bot.slash_command(name="ninetynine", description="List the track selection for the upcoming 99 races")
 async def ninetynine(
         ctx: discord.ApplicationContext,
+        utc_time: discord.Option(str, required=False, description=TIP_WHEN_FROM_TIME),
         ):
     """
     """
     utils.log(f"{ctx.author.name} used {ctx.command}.")
-    response = _ninetynine()
-    await ctx.respond(response)
+    response = None
+    err, from_time = _validate_utc_time(utc_time)
+    if not err:
+        response = _ninetynine(from_time)
+    await ctx.respond(err or response)
 
 
 def get_missing_event_types(evts):
