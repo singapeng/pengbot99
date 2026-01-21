@@ -624,6 +624,15 @@ class Slot2ScheduleManager(BaseScheduleManager):
             evts = self._apply_glitch(evts)
         return evts
 
+    def get_event(self, cycle_info):
+        """ Finds the ongoing event.
+            Overrides base class to manage Mystery GP (v1.7)
+        """
+        evt = super().get_event(cycle_info)
+        if self._secret_cfg:
+            evts = self._apply_glitch([evt])
+        return evts[0]
+
     def _apply_glitch(self, evts):
         # look up glitch events occuring during the events period
         for evt in evts:
