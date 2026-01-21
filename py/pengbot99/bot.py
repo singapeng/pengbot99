@@ -537,14 +537,14 @@ def kick_off_mp_update(mp_evt):
 
 
 async def _update_bot_status(bot):
-    gps = ui.event_choices["Grand Prix"] + ["worldtour"]
+    gps = ui.event_choices["Grand Prix"] + ["glitchgp"]
     evt = pb.slot2mgr.get_current_event()
     if evt.name not in gps:
         evts = pb.slot2mgr.get_events(names=gps, count=1)
         evt = evts[0]
         evt_name = formatters.event_display_names.get(evt.name, evt.name)
         delta = (evt.start_time - datetime.now(timezone.utc)).seconds // 60
-        if delta > 10:
+        if delta > int(env.get("REFRESH_INTERVAL"), 10):
             content = "{0} in {1} minutes.".format(evt_name, delta)
         else:
             content = "{0} soon.".format(evt_name)
@@ -564,6 +564,9 @@ def _create_schedule_message():
     response = ["F-Zero 99 Upcoming events in your local time:"]
     ongoing_evt = evts[0].name
     if ongoing_evt in ("miniprix", "classicprix"):
+        # TODO: this may get kicked off multiple times if the schedule
+        # is edited several times while the event is ongoing.
+        # It is not causing any known issues though.
         kick_off_mp_update(evts[0])
     ongoing_evt_end = evts[0].end_time
     ongoing_str = formatters.format_current_event(ongoing_evt, ongoing_evt_end)
