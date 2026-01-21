@@ -166,6 +166,8 @@ track_separators = {
 
 
 track_custom_emoji = {
+    "Mystery_3": ":skull:",
+    "Mystery_4": ":fire:",
     "Mystery_5": "<:WhatQuestionmarksthree:1217243922418368734>",
     "Mystery_6": "<:WhatQuestionmarksthree:1217243922418368734>",
     "Mystery_7": "<:WhatQuestionmarksthree:1217243922418368734>",
@@ -225,7 +227,7 @@ def format_discord_timestamp(dt, inline=False):
 def _format_event_names(evt):
     if not evt.glitch:
         return format_event_name(evt.name)
-    replaced = format_event_name(evt._name)
+    replaced = event_custom_emoji.get(evt.glitched_name)
     glitch = format_event_name(evt.name)
     return "{0} (replaces {1})".format(glitch, replaced)
 

@@ -37,6 +37,12 @@ class Event(object):
         return self._name
 
     @property
+    def glitched_name(self):
+        """ Always return the original name, even if glitched
+        """
+        return self._name
+
+    @property
     def duration(self):
         """ How many minutes this event lasts.
         """
