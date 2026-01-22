@@ -630,12 +630,12 @@ class Slot2ScheduleManager(BaseScheduleManager):
         """
         evt = super().get_event(cycle_info)
         if self._secret_cfg:
-            evts = self._apply_glitch([evt])
-        return evts[0]
+            evt = self._apply_glitch([evt], ongoing=True)[0]
+        return evt
 
-    def _apply_glitch(self, evts):
+    def _apply_glitch(self, evts, ongoing=False):
         # look up glitch events occuring during the events period
         for evt in evts:
-            if self._secret_cfg.can_glitch(evt):
+            if self._secret_cfg.can_glitch(evt, ongoing):
                 evt.glitch = True
         return evts

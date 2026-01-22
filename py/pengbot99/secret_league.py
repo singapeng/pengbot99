@@ -1,3 +1,6 @@
+from pengbot99 import utils
+
+
 class SecretLeagueDataError(Exception):
     pass
 
@@ -40,9 +43,15 @@ class SecretLeagueConfig(object):
     def indices(self):
         return self._indices
 
-    def can_glitch(self, event):
+    def can_glitch(self, event, ongoing=False):
         if event.name not in ('knight', 'mknight', 'queen', 'mqueen', 'king', 'mking', 'ace', 'mace'):
             return False
-        if (event.cycle % self.length) in self.indices:
+        if not ongoing and event.cycle % self.length in self.indices:
+            # event came from a get_remaining_events query
+            return True
+        if ongoing and (event.cycle - 1) % self.length in self.indices:
+            # event came from a TimeTable.get_event query.
+            # If it is past its first minute, the cycle is already counted.
+            utils.log("Correcting event cycle for {0}.".format(event.name))
             return True
         return False

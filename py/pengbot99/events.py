@@ -1,7 +1,10 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 
 class EventModificationError(Exception):
+    pass
+
+class UndefinedEventData(Exception):
     pass
 
 
@@ -83,6 +86,19 @@ class Event(object):
         if not self.start_time:
             return None
         return self.start_time + timedelta(minutes=self.duration)
+
+    def get_seconds_left(self):
+        """ How many seconds are left in this event.
+            This will query current time.
+            If current time is beyond the event's end time,
+            this will be zero.
+        """
+        if not self.end_time:
+            raise UndefinedEventData("End time not set for event {0}".format(self.name))
+        left = (self.end_time - datetime.now(timezone.utc)).total_seconds()
+        if left < 0:
+            return 0
+        return int(left)
 
     def has(self, trackname):
         """ Checks if this track name is contained in the event name.
