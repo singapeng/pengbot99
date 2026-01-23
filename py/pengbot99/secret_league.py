@@ -49,9 +49,13 @@ class SecretLeagueConfig(object):
         if not ongoing and event.cycle % self.length in self.indices:
             # event came from a get_remaining_events query
             return True
-        if ongoing and (event.cycle - 1) % self.length in self.indices:
+        if ongoing:
             # event came from a TimeTable.get_event query.
             # If it is past its first minute, the cycle is already counted.
-            utils.log("Correcting event cycle for {0}.".format(event.name))
-            return True
+            if event.get_seconds_left() // 60 < event.duration - 1:
+                if (event.cycle - 1) % self.length in self.indices:
+                    utils.log("Correcting event cycle for {0}.".format(event.name))
+                    return True
+            elif event.cycle % self.length in self.indices:
+                return True
         return False
