@@ -571,7 +571,7 @@ def _create_schedule_message():
     ongoing_evt_end = evts[0].end_time
     ongoing_str = formatters.format_current_event(ongoing_evt, ongoing_evt_end)
     response.append(format_schedule_edit(ongoing_evt, ongoing_str))
-    for evt in evts[1:]:
+    for evt in evts[1:10]:
         future_str = formatters.format_future_event(evt)
         response.append(format_schedule_edit(evt.name, future_str))
     if glitches:
@@ -580,7 +580,7 @@ def _create_schedule_message():
             response.append(formatters.format_glitch_event(glitch))
 
     # Also show events of desired types that aren't occuring soon
-    missing_evts = get_missing_event_types(evts)
+    missing_evts = get_missing_event_types(evts[:10])
     if missing_evts:
         response.append("\nFuture events:")
         for evt in missing_evts:
