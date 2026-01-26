@@ -46,12 +46,6 @@ class SecretLeagueConfig(object):
     def can_glitch(self, event, ongoing=False):
         if event.name not in ('knight', 'mknight', 'queen', 'mqueen', 'king', 'mking', 'ace', 'mace'):
             return False
-        if event.start_time.year == 2026 and event.start_time.month == 1 and 24 <= event.start_time.day <= 25:
-            # It's Secret League Weekend event!
-            if event.cycle % 2 == 0:
-                return True
-            else:
-                return False
         if not ongoing and event.cycle % self.length in self.indices:
             # event came from a get_remaining_events query
             return True
