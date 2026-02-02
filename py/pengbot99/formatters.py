@@ -9,6 +9,7 @@ event_display_names = {
     "classic": "Classic",
     "classicprix": "Classic Mini-Prix",
     "glitch99": "Mystery Track ???",
+    "glitchgp": "Secret League",
     "king": "King League",
     "knight": "Knight League",
     "mace": "Mirror Ace League",
@@ -24,6 +25,9 @@ event_display_names = {
     "worldtour": "World Tour",
     "Mystery_3": "Mystery Track ??? ||:skull:DWWL||",
     "Mystery_4": "Mystery Track ??? ||:fire:FC:fire:||",
+    "Mystery_5": "Mystery Track ??? ||BB + RC||",
+    "Mystery_6": "Mystery Track ??? ||Si + SS||",
+    "Mystery_7": "Mystery Track ??? ||SO + PT||",
 }
 
 # These are FZD Custom emoji codes to beautify the schedule printout
@@ -39,7 +43,8 @@ event_custom_emoji = {
     "mqueen": "<:GPMirrorQueen:1227803769950048296>",
     "mysteryprix": "<:WhatQuestionmarksthree:1217243922418368734>",
     "queen": "<:GPQueen:1195076266311811233>",
-    "worldtour": "<:WTMini:1368768773301207070>",
+    "glitchgp": "<:GPSecretKnight:1462611891447791700>",
+    "worldtour": "<:WTMini:1462608159913934881>",
 }
 
 track_display_names = {
@@ -56,6 +61,9 @@ track_display_names = {
     "Mystery_2": "BBB",
     "Mystery_3": "Death Wind White Land",
     "Mystery_4": "Fire City",
+    "Mystery_5": "Big Blue + Red Canyon",
+    "Mystery_6": "Silence + Sand Storm",
+    "Mystery_7": "Sand Ocean + Port Town",
     "Port_Town_I": "Port Town I",
     "Port_Town_II": "Port Town II",
     "Red_Canyon_I": "Red Canyon I",
@@ -73,6 +81,7 @@ track_display_names = {
 track_lookup_names = {
     'Big Blue': 'Big_Blue',
     'Big Blue II': 'Big_Blue_II',
+    'Big Blue + Red Canyon': 'Mystery_5',
     'Death Wind I': 'Death_Wind_I',
     'Death Wind II': 'Death_Wind_II',
     'Death Wind White Land': 'Mystery_3',
@@ -107,10 +116,12 @@ track_lookup_names = {
     'Red Canyon I': 'Red_Canyon_I',
     'Red Canyon II': 'Red_Canyon_II',
     'Sand Ocean': 'Sand_Ocean',
+    'Sand Ocean + Port Town': 'Mystery_7',
     'Sand Storm I': 'Sand_Storm_I',
     'Sand Storm II': 'Sand_Storm_II',
     'Silence': 'Silence',
     'Silence II': 'Silence_II',
+    'Silence + Sand Storm': 'Mystery_6',
     'White Land I': 'White_Land_I',
     'White Land II': 'White_Land_II'
 }
@@ -130,6 +141,9 @@ track_mirroring_enabled = {
     "Mystery_2": False,
     "Mystery_3": False,
     "Mystery_4": False,
+    "Mystery_5": False,
+    "Mystery_6": False,
+    "Mystery_7": False,
     "Port_Town_I": True,
     "Port_Town_II": True,
     "Red_Canyon_I": True,
@@ -152,7 +166,11 @@ track_separators = {
 
 
 track_custom_emoji = {
-    #"Mute_City_II": "<:Festival:1260649041952378930>",
+    "Mystery_3": ":skull:",
+    "Mystery_4": ":fire:",
+    "Mystery_5": "<:WhatQuestionmarksthree:1217243922418368734>",
+    "Mystery_6": "<:WhatQuestionmarksthree:1217243922418368734>",
+    "Mystery_7": "<:WhatQuestionmarksthree:1217243922418368734>",
     }
 
 
@@ -206,14 +224,34 @@ def format_discord_timestamp(dt, inline=False):
     return text.format(particle, int(dt.timestamp()), t_format)
 
 
+def _format_event_names(evt):
+    if not evt.glitch:
+        return format_event_name(evt.name)
+    replaced = event_custom_emoji.get(evt.glitched_name)
+    glitch = format_event_name(evt.name)
+    return "{0} (replaces {1})".format(glitch, replaced)
+
+
 def format_future_event(evt):
     """ Nice display for events in the future
     """
     ts = format_discord_timestamp(evt.start_time)
     discord_text = "{0}: {1} (<t:{2}:R>)"
     evt_time = int(evt.start_time.timestamp())
-    evt_name = format_event_name(evt.name)
+    evt_name = _format_event_names(evt)
     return discord_text.format(ts, evt_name, evt_time)
+
+
+# TODO: make this schedule data
+glitch_rotation = ("Mystery_3", "Mystery_4", "Mystery_5", "Mystery_6", "Mystery_7", )
+
+
+def format_glitch_event(evt):
+    """ Hacking in the glitch rotation!
+    """
+    if evt.name == "glitch99":
+        evt._name = glitch_rotation[evt.cycle % len(glitch_rotation)]
+    return format_future_event(evt)
 
 
 def format_track_names(tracks, mode):
@@ -229,7 +267,7 @@ def format_track_names(tracks, mode):
             if track_mirroring_enabled.get(race[1:]):
                 # Mirror mode on
                 name = "_Mirror {0}_".format(name)
-        emoji = track_custom_emoji.get(race)
+        emoji = track_custom_emoji.get(race if race[0] != 'm' else race[1:])
         if mode != "classicprix" and emoji:
             name = '{} {}'.format(emoji, name)
         names.append(name)

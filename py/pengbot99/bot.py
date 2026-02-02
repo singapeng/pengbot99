@@ -14,6 +14,7 @@ from pengbot99 import explain_cmd
 from pengbot99 import formatters
 from pengbot99 import miniprix
 from pengbot99 import schedule
+from pengbot99 import secret_league
 from pengbot99 import ui
 from pengbot99 import utils
 
@@ -31,6 +32,15 @@ class Pengbot(object):
         mp_offset = int(csts["MINIPRIX_LINE_UP_OFFSET"])
         cmp_offset = int(csts["CLASSIC_LINE_UP_OFFSET"])
         mirror_offset = int(csts["MIRROR_LINE_UP_OFFSET"])
+
+        # Glitch GP
+        secret_cfg = None
+        if csts.get("SECRET_LEAGUE_INTERVALS"):
+            secret_cfg = secret_league.SecretLeagueConfig(
+                    csts["SECRET_LEAGUE_INTERVALS"],
+                    csts.get("SECRET_LEAGUE_OFFSET")
+                )
+            utils.log("Secret League initialized with {0}".format(secret_cfg.indices))
 
         # load the schedule for slot 1 (99 races)
         r99sched = schedule.load_schedule(env['CONFIG_PATH'], 'slot1_schedule')
@@ -51,7 +61,7 @@ class Pengbot(object):
         r99_offset = int(csts["NINETYNINE_MINUTE_OFFSET"])
 
         self.slot1mgr = schedule.Slot1ScheduleManager(schedule.glitch_origin, r99sched)
-        self.slot2mgr = schedule.Slot2ScheduleManager(schedule.origin, wdsched, wesched)
+        self.slot2mgr = schedule.Slot2ScheduleManager(schedule.origin, wdsched, wesched, secret_cfg)
         self.cmp_mgr = miniprix.MiniPrixManager("classicprix", self.slot2mgr, cmpsched, offset=cmp_offset)
         self.mp_mgr = miniprix.MiniPrixManager("miniprix", self.slot2mgr, mpsched, mirrorsc,
                 mp_offset, mirror_offset)
@@ -194,8 +204,9 @@ async def create_schedule_messages():
     return msg_env
 
 
-async def configure_schedule_edit():
+async def configure_schedule_edit(interval=10):
     """
+    interval: how many minutes between refreshes
     """
     msg_env = utils.read_msg_struct()
     if not msg_env:
@@ -210,10 +221,10 @@ async def configure_schedule_edit():
 
     # local time for the bot
     now = datetime.now(timezone.utc)
-    # round minutes to the tens
-    minute = now.minute // 10 * 10
-    # add 10 minutes delta
-    delta = timedelta(minutes=10)
+    # round minutes to the last interval occurence (e.g. tens)
+    minute = now.minute // interval * interval
+    # add interval minutes delta
+    delta = timedelta(minutes=interval)
     kickoff_time = datetime(now.year, now.month, now.day, now.hour, minute, tzinfo=timezone.utc) + delta
 
     @tasks.loop(time=kickoff_time.time(), count=1)
@@ -229,7 +240,8 @@ async def configure_schedule_edit():
 async def on_ready():
     utils.log(f"{bot.user} is ready and online!")
     # configure schedule edit task
-    await configure_schedule_edit()
+    interval = int(env.get("REFRESH_INTERVAL"), 10)
+    await configure_schedule_edit(interval)
     # if ticker override is set, set description now.
     ticker = env.get("TICKER_OVERRIDE")
     if ticker:
@@ -310,14 +322,37 @@ async def showevents(
     await ctx.respond('\n'.join(response))
 
 
+def _when_secret_league(mgr, count, from_time):
+    if not mgr.is_secret_league_on():
+        return None
+    # let's look for all Grand Prix first.
+    names = ui.event_choices.get("Grand Prix")
+    # We need to query enough GPs for the secret league pattern to generate matches
+    # This might result in more results than we need so we will trim later.
+    gp_count = ((count // mgr._secret_cfg.interval_count) + 1) * mgr._secret_cfg.length
+    gp_evts = mgr.when_event(names=names, count=gp_count, timestamp=from_time)
+    # only keep glitch GPs
+    evts = [evt for evt in gp_evts if evt.glitch]
+    if len(evts) > count:
+        return evts[:count]
+    return evts
+
+
 def _when(event_type, from_time=None, count=5):
     names = ui.event_choices.get(event_type)
+    evts = None
     if event_type == "Glitch 99":
         mgr = pb.slot1mgr
         evts = mgr.when_event(names=names, count=count, timestamp=from_time)
+        fmt_func = formatters.format_glitch_event
+    elif event_type == "Secret League":
+        mgr = pb.slot2mgr
+        evts = _when_secret_league(mgr, count, from_time)
+        fmt_func = formatters.format_future_event
     else:
         mgr = pb.slot2mgr
         evts = mgr.when_event(names=names, count=count, timestamp=from_time)
+        fmt_func = formatters.format_future_event
     if not evts:
         utils.log("Could not fetch any '{0}' event :(".format(event_type))
         return None
@@ -328,7 +363,7 @@ def _when(event_type, from_time=None, count=5):
     else:
         response = ["Next {0} events in your local time:".format(event_type)]
     for evt in evts:
-        response.append(formatters.format_future_event(evt))
+        response.append(fmt_func(evt))
     return '\n'.join(response)
 
 
@@ -499,21 +534,25 @@ async def miniprix(
     await ctx.respond(err or response)
 
 
-def _ninetynine():
+def _ninetynine(timestamp=None):
     """
     """
-    return '\n'.join(pb.r99_mgr.get_formatted_events())
+    return '\n'.join(pb.r99_mgr.get_formatted_events(timestamp))
 
 
 @bot.slash_command(name="ninetynine", description="List the track selection for the upcoming 99 races")
 async def ninetynine(
         ctx: discord.ApplicationContext,
+        utc_time: discord.Option(str, required=False, description=TIP_WHEN_FROM_TIME),
         ):
     """
     """
     utils.log(f"{ctx.author.name} used {ctx.command}.")
-    response = _ninetynine()
-    await ctx.respond(response)
+    response = None
+    err, from_time = _validate_utc_time(utc_time)
+    if not err:
+        response = _ninetynine(from_time)
+    await ctx.respond(err or response)
 
 
 def get_missing_event_types(evts):
@@ -521,21 +560,31 @@ def get_missing_event_types(evts):
         missing from the must-have list
     """
     present_evts = list(set([evt.name for evt in evts]))
-    missing_evts = []
+    results = []
+    # we want to show the next Glitch GP if available
+    if "glitchgp" not in present_evts:
+        extra = _when_secret_league(pb.slot2mgr, 1, None)
+        if extra:
+            results.append(extra[0])
+
     # we should show one of each standard/mirror prix pair
     for mprix in [["knight", "mknight"], ["queen", "mqueen"], ["king", "mking"], ["ace", "mace"]]:
         if mprix[0] not in present_evts and mprix[1] not in present_evts:
-            missing_evts.append(mprix)
-    # now add events that don't have a mirror version
+            # for mirrored prix, we query both names but will only get the closest
+            # that is not a glitch gp
+            extra = pb.slot2mgr.when_event(names=mprix, count=5)
+            for item in extra:
+                if not item.glitch:
+                    results.append(item)
+                    break
+
+    # now add other events that don't have a mirror version
     for name in ["miniprix", "classicprix"]:
         if name not in present_evts:
-            missing_evts.append([name])
-    results = []
-    for item in missing_evts:
-        # for mirrored prix, we query both names but will only get the closest
-        extra = pb.slot2mgr.when_event(names=item, count=1)
-        if extra:
-            results.append(extra[0])
+            extra = pb.slot2mgr.when_event(names=[name], count=1)
+            if extra:
+                results.append(extra[0])
+
     # make sure results are ordered from next to last
     results = sorted(results, key=lambda item:item.start_time)
     return results
@@ -561,14 +610,14 @@ def kick_off_mp_update(mp_evt):
 
 
 async def _update_bot_status(bot):
-    gps = ui.event_choices["Grand Prix"]
+    gps = ui.event_choices["Grand Prix"] + ["glitchgp"]
     evt = pb.slot2mgr.get_current_event()
     if evt.name not in gps:
         evts = pb.slot2mgr.get_events(names=gps, count=1)
         evt = evts[0]
         evt_name = formatters.event_display_names.get(evt.name, evt.name)
         delta = (evt.start_time - datetime.now(timezone.utc)).seconds // 60
-        if delta > 10:
+        if delta > int(env.get("REFRESH_INTERVAL"), 10):
             content = "{0} in {1} minutes.".format(evt_name, delta)
         else:
             content = "{0} soon.".format(evt_name)
@@ -588,20 +637,23 @@ def _create_schedule_message():
     response = ["F-Zero 99 Upcoming events in your local time:"]
     ongoing_evt = evts[0].name
     if ongoing_evt in ("miniprix", "classicprix"):
+        # TODO: this may get kicked off multiple times if the schedule
+        # is edited several times while the event is ongoing.
+        # It is not causing any known issues though.
         kick_off_mp_update(evts[0])
     ongoing_evt_end = evts[0].end_time
     ongoing_str = formatters.format_current_event(ongoing_evt, ongoing_evt_end)
     response.append(format_schedule_edit(ongoing_evt, ongoing_str))
-    for evt in evts[1:]:
+    for evt in evts[1:10]:
         future_str = formatters.format_future_event(evt)
         response.append(format_schedule_edit(evt.name, future_str))
     if glitches:
         response.append("\nNext Glitch Races:")
         for glitch in glitches:
-            response.append(formatters.format_future_event(glitch))
+            response.append(formatters.format_glitch_event(glitch))
 
     # Also show events of desired types that aren't occuring soon
-    missing_evts = get_missing_event_types(evts)
+    missing_evts = get_missing_event_types(evts[:10])
     if missing_evts:
         response.append("\nFuture events:")
         for evt in missing_evts:
@@ -620,7 +672,7 @@ async def post_schedule_message():
     msg = await channel.send('\n'.join(response))
     return msg.id
 
-@tasks.loop(seconds=600)
+@tasks.loop(seconds=int(env.get("REFRESH_INTERVAL"), 10) * 60)
 async def edit_schedule_message():
     channel = bot.get_channel(int(env["SCHEDULE_EDIT_CHANNEL"]))
     msg_id = int(env["ANNOUNCE_MSG_ID"])
@@ -662,7 +714,7 @@ async def post_track_selection_message():
     return msg.id
 
 
-@tasks.loop(seconds=600)
+@tasks.loop(seconds=int(env.get("REFRESH_INTERVAL"), 10) * 60)
 async def edit_track_selection_message():
     channel = bot.get_channel(int(env["SCHEDULE_EDIT_CHANNEL"]))
     msg_id = int(env["TRACK_SELECTION_MSG_ID"])
@@ -708,7 +760,7 @@ async def announce_schedule():
     if glitches:
         response.append("\nNext Glitch Races:")
         for glitch in glitches:
-            response.append(formatters.format_future_event(glitch))
+            response.append(formatters.format_glitch_event(glitch))
     if not has_king_gp:
         king_evt = pb.slot2mgr.when_event(names=["king"], count=1)
         if king_evt:

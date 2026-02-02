@@ -12,7 +12,9 @@ from pengbot99 import events
 # but not 99s.
 origin = datetime(2025, 4, 23, 0, 0, 0, 0, tzinfo=timezone.utc)
 # A point observed to be a glitch sequence origin.
-glitch_origin = datetime(2024, 2, 13, 0, 59, tzinfo=timezone.utc)
+glitch_origin = datetime(2025, 12, 8, 22, 57, tzinfo=timezone.utc)
+# A point observed to be a Mystery GP sequence origin.
+glitch_gp_origin = datetime(2026, 1, 18, 22, 0, tzinfo=timezone.utc)
 
 
 def load_schedule(path, name):
@@ -456,7 +458,7 @@ class Slot2ScheduleManager(BaseScheduleManager):
         It provides support for a dual-schedule rotation with distinct
         weekdays and weekend days timetables.
     """
-    def __init__(self, origin, weekday_sched, weekend_sched):
+    def __init__(self, origin, weekday_sched, weekend_sched, secret_cfg=None):
         super().__init__(origin)
         # Monday to Friday schedule
         self.weekday = TimeTable(weekday_sched, "weekday")
@@ -468,6 +470,8 @@ class Slot2ScheduleManager(BaseScheduleManager):
         # that do not start at 0:00 on the first day
         # This caches some data in relation to this.
         self._set_alt_origin()
+        # if Secret League is happening (v1.7.0)
+        self._secret_cfg = secret_cfg
 
     def _set_alt_origin(self):
         """ We may cache the next day from origin and the number of
@@ -554,6 +558,11 @@ class Slot2ScheduleManager(BaseScheduleManager):
             # Saturday or Sunday
             return False
 
+    def is_secret_league_on(self):
+        if self._secret_cfg:
+            return True
+        return False
+
     def get_cycle_count(self, timestamp):
         """ This works when cycles are less than a day
             and there's a weekday/weekend change.
@@ -605,3 +614,28 @@ class Slot2ScheduleManager(BaseScheduleManager):
 
     def get_daily_weekend_event_count(self, name):
         return self._get_daily_event_count("weekend", name)
+
+    def get_remaining_events(self, timestamp, all=False, filter=None):
+        """ Events left in the current cycle.
+            Overrides base class to manage Mystery GP (v1.7)
+        """
+        evts = super().get_remaining_events(timestamp, all, filter)
+        if self._secret_cfg:
+            evts = self._apply_glitch(evts)
+        return evts
+
+    def get_event(self, cycle_info):
+        """ Finds the ongoing event.
+            Overrides base class to manage Mystery GP (v1.7)
+        """
+        evt = super().get_event(cycle_info)
+        if self._secret_cfg:
+            evt = self._apply_glitch([evt], ongoing=True)[0]
+        return evt
+
+    def _apply_glitch(self, evts, ongoing=False):
+        # look up glitch events occuring during the events period
+        for evt in evts:
+            if self._secret_cfg.can_glitch(evt, ongoing):
+                evt.glitch = True
+        return evts

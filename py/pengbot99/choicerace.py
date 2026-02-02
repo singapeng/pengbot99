@@ -52,7 +52,7 @@ class FZ99Manager(ChoiceRaceManager):
     """
     NAME = "F-Zero 99 Races"
     # Glitch events will be named as one of these
-    GLITCH_EVT_NAMES = ("Mystery_1", "Mystery_2", "Mystery_3", "Mystery_4")
+    GLITCH_EVT_NAMES = ("glitch99", "Mystery_1", "Mystery_2", "Mystery_3", "Mystery_4", "Mystery_5", "Mystery_6", "Mystery_7")
 
     def __init__(self, cycle_manager, glitch_manager):
         super().__init__("F-Zero 99 Races", cycle_manager)
@@ -60,6 +60,8 @@ class FZ99Manager(ChoiceRaceManager):
 
     def is_glitch(self, evt):
         if evt.name in self.GLITCH_EVT_NAMES:
+            if evt.name == "glitch99":
+                evt._name = formatters.glitch_rotation[evt.cycle % len(formatters.glitch_rotation)]
             return True
         return False
 
