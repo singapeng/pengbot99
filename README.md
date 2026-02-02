@@ -4,26 +4,23 @@ A library and Discord bot for useful F-Zero 99 schedule info
 
 ## Setup
 
-The files may be installed using pip. For example, from the source repository, simply run:
+This project uses `uv` for dependency management.
+From the repository root:
 ```
-pip install .
-```
-
-You may then import the module in your Python environment.
-```
->>> import pengbot99
+uv sync
 ```
 
-You may want to use a virtual environment since pengbot99 has dependencies on third-party libraries (namely py-cord).
-To create a virtual environment in a `venv` folder under the code location:
-
+If you want shorter commands, activate the uv-managed venv:
 ```
-python -m venv venv
-source venv/bin/activate
-pip install .
+uv venv
+source .venv/bin/activate
 ```
 
-Following this, you should be able to import modules as above.
+You may then import the module in your Python environment:
+```
+python -c "import pengbot99"
+```
+
 To run the application as a Discord bot, you will first need to set up a configuration file.
 
 ## Configuring the Discord bot
@@ -104,24 +101,16 @@ As of F-Zero 99 version 1.6.1, there is no mirroring in Private Machine Shuffle-
 
 The application can be started through the `bot.py` module.
 No assumption is made as to the target environment, therefore no shell script or similar is provided.
-
-The main module implements a `__main__` function so it may be started using a Python 3.11+ executable.
 ```
-python bot.py
+python -m pengbot99.bot
 ```
 
 ## Running tests
 
 For simplicity's sake, tests are written using Python's built-in unittest module.
-To run tests, we would ideally execute a test runner command sourcing tests from the `tests` folder at the root of the repository.
-At present, you may run tests using a simple python command, i.e.:
+To run tests from the repository root:
 ```
-> python test_schedule.py
-.............
-----------------------------------------------------------------------
-Ran 13 tests in 0.011s
-
-OK
+python -m unittest discover -s tests
 ```
 
 # Future improvements

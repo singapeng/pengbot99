@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pengbot99"
+version = "0.1.0"
+description = "F-Zero 99 Schedule Discord Bot"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Pengui", email = "pengui@gmail.com" }]
+
+dependencies = ["py-cord>=2.5", "discord"]
+
+classifiers = [
+  "License :: MIT",
+  "Natural Language :: English",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3.11",
+]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["py"]
+
+[dependency-groups]
+dev = ["ruff>=0.6.9"]
