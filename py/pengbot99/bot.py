@@ -101,6 +101,15 @@ class Pengbot(object):
         cmp_offset = int(csts["MWT_CLASSIC_LINE_UP_OFFSET"])
         mirror_offset = int(csts["MWT_MIRROR_LINE_UP_OFFSET"])
 
+        # Glitch GP
+        mwt_secret_cfg = None
+        if csts.get("SECRET_LEAGUE_INTERVALS"):
+            mwt_secret_cfg = secret_league.SecretLeagueConfig(
+                    csts["SECRET_LEAGUE_INTERVALS"],
+                    csts.get("MWT_SECRET_LEAGUE_OFFSET")
+                )
+            utils.log("MWT Secret League initialized with {0}".format(mwt_secret_cfg.indices))
+
         # load the schedule for slot 2 (Prix and special events)
         mwtsched = schedule.load_schedule(env['CONFIG_PATH'], 'mwt_schedule')
 
@@ -108,7 +117,7 @@ class Pengbot(object):
         # then we will store the currently active managers in here.
         # Mini World Tour slot2 manager intentionally uses the same
         # schedule for weekdays and weekend days.
-        self._off_slot2mgr = schedule.Slot2ScheduleManager(schedule.origin, mwtsched, mwtsched)
+        self._off_slot2mgr = schedule.Slot2ScheduleManager(schedule.origin, mwtsched, mwtsched, mwt_secret_cfg)
         self._off_cmp_mgr = miniprix.MiniPrixManager("classicprix", self._off_slot2mgr, cmpsched, offset=cmp_offset)
         self._off_mp_mgr = miniprix.MiniPrixManager("miniprix", self._off_slot2mgr, mpsched, mirrorsc,
                 mp_offset, mirror_offset)
@@ -257,13 +266,13 @@ async def on_ready():
 async def configure_mwt_flip():
     """ Mini world tour vacation flip!
     """
-    mwt_on_time = datetime(2025, 11, 30, 23, 55, tzinfo=timezone.utc)
+    mwt_on_time = datetime(2026, 2, 8, 23, 55, tzinfo=timezone.utc)
 
     @tasks.loop(time=mwt_on_time.time())
     async def flip_mwt():
         # flip-on/off dates:
-        mwt_on_time = datetime(2025, 11, 30, 23, 54, tzinfo=timezone.utc)
-        mwt_off_time = datetime(2025, 12, 7, 23, 54, tzinfo=timezone.utc)
+        mwt_on_time = datetime(2026, 2, 8, 23, 54, tzinfo=timezone.utc)
+        mwt_off_time = datetime(2026, 2, 15, 23, 54, tzinfo=timezone.utc)
 
         now = datetime.now(timezone.utc)
         flipped = False
