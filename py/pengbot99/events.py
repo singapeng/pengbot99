@@ -4,12 +4,22 @@ from datetime import datetime, timedelta, timezone
 class EventModificationError(Exception):
     pass
 
+
 class UndefinedEventData(Exception):
     pass
 
 
 class Event(object):
-    def __init__(self, name, cycle=0, cycle_minute=0, start_minute=0, end_minute=0, rotation=None, rotation_offset=0):
+    def __init__(
+        self,
+        name,
+        cycle=0,
+        cycle_minute=0,
+        start_minute=0,
+        end_minute=0,
+        rotation=None,
+        rotation_offset=0,
+    ):
         super().__init__()
         # the event's internal name
         self._name = name
@@ -32,28 +42,24 @@ class Event(object):
 
     @property
     def name(self):
-        """ The Event's human-readable name
-        """
+        """The Event's human-readable name"""
         if self.glitch:
             # used by Secret League only
-            return 'glitchgp'
+            return "glitchgp"
         return self._name
 
     @property
     def glitched_name(self):
-        """ Always return the original name, even if glitched
-        """
+        """Always return the original name, even if glitched"""
         return self._name
 
     @property
     def duration(self):
-        """ How many minutes this event lasts.
-        """
+        """How many minutes this event lasts."""
         return self.end_minute - self.start_minute
 
     def set_start_time(self, timestamp):
-        """
-        """
+        """ """
         self.start_time = timestamp
 
     def delay(self, delta):
@@ -63,7 +69,9 @@ class Event(object):
         This makes the event's duration shorter.
         """
         if delta.seconds >= self.duration * 60:
-            raise EventModificationError("Event cannot be delayed more than its duration.")
+            raise EventModificationError(
+                "Event cannot be delayed more than its duration."
+            )
         minutes = delta.seconds // 60
         self.set_start_time(self.start_time + delta)
         self.start_minute += minutes
@@ -75,23 +83,24 @@ class Event(object):
         This makes the event's duration shorter.
         """
         if delta.seconds >= self.duration * 60:
-            raise EventModificationError("Event cannot be cut short more than its duration.")
+            raise EventModificationError(
+                "Event cannot be cut short more than its duration."
+            )
         minutes = delta.seconds // 60
         self.end_minute -= minutes
 
     @property
     def end_time(self):
-        """
-        """
+        """ """
         if not self.start_time:
             return None
         return self.start_time + timedelta(minutes=self.duration)
 
     def get_seconds_left(self):
-        """ How many seconds are left in this event.
-            This will query current time.
-            If current time is beyond the event's end time,
-            this will be zero.
+        """How many seconds are left in this event.
+        This will query current time.
+        If current time is beyond the event's end time,
+        this will be zero.
         """
         if not self.end_time:
             raise UndefinedEventData("End time not set for event {0}".format(self.name))
@@ -101,36 +110,38 @@ class Event(object):
         return int(left)
 
     def has(self, trackname):
-        """ Checks if this track name is contained in the event name.
-            Note this uses track internal names (not display names),
-            e.g. 'mMute_City_II'
+        """Checks if this track name is contained in the event name.
+        Note this uses track internal names (not display names),
+        e.g. 'mMute_City_II'
         """
         if trackname in self.name.split():
             return True
         return False
 
     def copy_as_glitch(self):
-        """ Returns a glitched copy of self.
-            This intentionally does not bring over cycle info.
+        """Returns a glitched copy of self.
+        This intentionally does not bring over cycle info.
         """
-        new_evt = Event(name=self.name, start_minute=self.start_minute, end_minute=self.end_minute)
+        new_evt = Event(
+            name=self.name, start_minute=self.start_minute, end_minute=self.end_minute
+        )
         new_evt.set_start_time(self.start_time)
         new_evt.glitch = True
         return new_evt
 
     def split_by_glitch(self, glitch_first, split_delta):
-        """ Change this event into two events, one being a glitch,
-            the other a shorter version of self.
+        """Change this event into two events, one being a glitch,
+        the other a shorter version of self.
 
-            split_delta is an int. It is the point in the event when
-            the split occurs. This value must be less than the event
-            duration, otherwise an error will occur.
+        split_delta is an int. It is the point in the event when
+        the split occurs. This value must be less than the event
+        duration, otherwise an error will occur.
 
-            glitch_first is a boolean. Use True to make the first part
-            of the event a glitch, false to have it be the second part.
-            Self is modified in place with adjusted start/end time.
+        glitch_first is a boolean. Use True to make the first part
+        of the event a glitch, false to have it be the second part.
+        Self is modified in place with adjusted start/end time.
 
-            Returns the glitched event.
+        Returns the glitched event.
         """
         if split_delta.total_seconds() < 60:
             msg = "Given value ({0}) would create a zero duration event."
@@ -145,21 +156,32 @@ class Event(object):
         return glitch_event
 
     def __str__(self):
-        """
-        """
+        """ """
         start_str = self.start_time.strftime("%Y-%m-%d %H:%M")
         return "{0} - {1} ({2} minutes)".format(start_str, self.name, self.duration)
 
 
 class MiniPrixEvent(Event):
-    def __init__(self, mp_type, mp_id, race1, race2, race3, start_minute=0, end_minute=0, mirrored="000"):
+    def __init__(
+        self,
+        mp_type,
+        mp_id,
+        race1,
+        race2,
+        race3,
+        start_minute=0,
+        end_minute=0,
+        mirrored="000",
+    ):
         if mp_type == "classicprix":
             code = "ClassicMiniPrix"
         else:
             code = "MiniPrix"
         miniprix_id = "{:s}{:s}".format(code, mp_id)
         name = "{0} > {1} > {2} ({3})".format(race1, race2, race3, miniprix_id)
-        super().__init__(name=miniprix_id, start_minute=start_minute, end_minute=end_minute)
+        super().__init__(
+            name=miniprix_id, start_minute=start_minute, end_minute=end_minute
+        )
         self._mode = mp_type
         self._race1 = race1
         self._race2 = race2
@@ -174,20 +196,20 @@ class MiniPrixEvent(Event):
 
     @property
     def race1(self):
-        if self._mirrored[0] == '1':
-            return 'm' + self._race1
+        if self._mirrored[0] == "1":
+            return "m" + self._race1
         return self._race1
 
     @property
     def race2(self):
-        if self._mirrored[1] == '1':
-            return 'm' + self._race2
+        if self._mirrored[1] == "1":
+            return "m" + self._race2
         return self._race2
 
     @property
     def race3(self):
-        if self._mirrored[2] == '1':
-            return 'm' + self._race3
+        if self._mirrored[2] == "1":
+            return "m" + self._race3
         return self._race3
 
     @property

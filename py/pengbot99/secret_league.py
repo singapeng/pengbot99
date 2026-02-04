@@ -13,7 +13,7 @@ class SecretLeagueConfig(object):
         """
         super().__init__()
         try:
-            intervals = [int(interval) for interval in intervals.split(',')]
+            intervals = [int(interval) for interval in intervals.split(",")]
         except:
             raise SecretLeagueDataError("Invalid interval data: {0}".format(intervals))
         try:
@@ -24,7 +24,12 @@ class SecretLeagueConfig(object):
         except:
             raise SecretLeagueDataError("Invalid offset data: {0}".format(offset))
         self._intervals = intervals
-        self._indices = sorted([(sum(intervals[:i]) + offset) % sum(intervals) for i in range(len(intervals))])
+        self._indices = sorted(
+            [
+                (sum(intervals[:i]) + offset) % sum(intervals)
+                for i in range(len(intervals))
+            ]
+        )
         self.offset = offset
 
     @property
@@ -44,7 +49,16 @@ class SecretLeagueConfig(object):
         return self._indices
 
     def can_glitch(self, event, ongoing=False):
-        if event.name not in ('knight', 'mknight', 'queen', 'mqueen', 'king', 'mking', 'ace', 'mace'):
+        if event.name not in (
+            "knight",
+            "mknight",
+            "queen",
+            "mqueen",
+            "king",
+            "mking",
+            "ace",
+            "mace",
+        ):
             return False
         if not ongoing and event.cycle % self.length in self.indices:
             # event came from a get_remaining_events query

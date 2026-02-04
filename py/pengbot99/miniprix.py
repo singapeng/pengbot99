@@ -1,8 +1,7 @@
-from datetime import datetime, timedelta, timezone
+from datetime import timedelta
 
 # local imports
 from pengbot99 import events
-
 
 # 10 miniprix selection cycles for private MP queries
 # (one each minute)
@@ -18,19 +17,28 @@ def print_miniprix_rows(rows):
 
 
 def _trim_schedule(sched):
-    if sched[-1][1] == 'next':
+    if sched[-1][1] == "next":
         return sched[:-1]
     else:
         return sched
 
 
 class MiniPrixManager(object):
-    """ For Public MiniPrix (Classic and Regular).
-        Predicts the track selection line up for individual MiniPrix.
-        Uses a Slot2Mgr as the cycle manager to read when the next MP event occurs.
-        Optionally uses a mirroring schedule (for regular MP as of fz99 1.3)
+    """For Public MiniPrix (Classic and Regular).
+    Predicts the track selection line up for individual MiniPrix.
+    Uses a Slot2Mgr as the cycle manager to read when the next MP event occurs.
+    Optionally uses a mirroring schedule (for regular MP as of fz99 1.3)
     """
-    def __init__(self, event_name, cycle_manager, mp_schedule, mirror=None, offset=0, mirror_offset=0):
+
+    def __init__(
+        self,
+        event_name,
+        cycle_manager,
+        mp_schedule,
+        mirror=None,
+        offset=0,
+        mirror_offset=0,
+    ):
         super().__init__()
         self.name = event_name
         self.mgr = cycle_manager
@@ -51,8 +59,8 @@ class MiniPrixManager(object):
         return _trim_schedule(self._mirror_schedule)
 
     def _init_mp_cycles(self):
-        """ Look up a MP to determine how long it lasts.
-            We use this to set how many track selections to present.
+        """Look up a MP to determine how long it lasts.
+        We use this to set how many track selections to present.
         """
         next_mp = self.mgr.when_event(names=[self.name], count=1)
         if not next_mp:
@@ -60,14 +68,14 @@ class MiniPrixManager(object):
         return next_mp[0].duration
 
     def _get_start_mp_row(self, cycle):
-        """ 
-        """
+        """ """
         return (cycle * self.mp_cycles - self.lineup_offset) % len(self.schedule)
 
     def _get_start_mirror_row(self, cycle):
-        """ 
-        """
-        return (cycle * self.mp_cycles - self.mirror_lineup_offset) % len(self.mirror_schedule)
+        """ """
+        return (cycle * self.mp_cycles - self.mirror_lineup_offset) % len(
+            self.mirror_schedule
+        )
 
     def _build_rows_from_rotation(self, get_start_fn, sched, cycle):
         first_row = get_start_fn(cycle)
@@ -82,18 +90,22 @@ class MiniPrixManager(object):
         return rows
 
     def _get_track_selection_rows(self, cycle):
-        return self._build_rows_from_rotation(self._get_start_mp_row, self.schedule, cycle)
+        return self._build_rows_from_rotation(
+            self._get_start_mp_row, self.schedule, cycle
+        )
 
     def _get_mirroring_rows(self, cycle):
         if self._mirror_schedule:
-            return self._build_rows_from_rotation(self._get_start_mirror_row, self.mirror_schedule, cycle)
+            return self._build_rows_from_rotation(
+                self._get_start_mirror_row, self.mirror_schedule, cycle
+            )
         return [(0, "000")] * self.mp_cycles
 
     def _get_mp_cycle(self, next_mp):
-        """ Deal with the case where multiple miniprix appear
-            in the cycle, hence we can't just rely on the mp count
-            from the CycleInfo object. We also need to find if any
-            miniprix already occured in the present cycle.
+        """Deal with the case where multiple miniprix appear
+        in the cycle, hence we can't just rely on the mp count
+        from the CycleInfo object. We also need to find if any
+        miniprix already occured in the present cycle.
         """
         info = self.mgr.get_cycle_info(next_mp.start_time)
         # get the current MP count.
@@ -131,20 +143,32 @@ class MiniPrixManager(object):
             name = self.name
             mpid = "{:03d}.{:s}".format(int(row[0]), str(mirror_rows[idx][0]))
             mirror = mirror_rows[idx][1]
-            r1, r2, r3 = row[1].split(' > ')
-            evt = events.MiniPrixEvent(name, mpid, r1, r2, r3, start_minute=idx, end_minute=idx + 1, mirrored=mirror)
+            r1, r2, r3 = row[1].split(" > ")
+            evt = events.MiniPrixEvent(
+                name,
+                mpid,
+                r1,
+                r2,
+                r3,
+                start_minute=idx,
+                end_minute=idx + 1,
+                mirrored=mirror,
+            )
             evt.set_start_time(start_time + timedelta(minutes=idx))
             res.append(evt)
         return res
 
 
 class PrivateMPManager(object):
-    """ For Private MiniPrix track selection schedule.
-        Supplied with a public MP manager, since the public MP selection will
-        override Private MP if it is running concurrently.
-        Therefore a public MP manager must be initialized first.
+    """For Private MiniPrix track selection schedule.
+    Supplied with a public MP manager, since the public MP selection will
+    override Private MP if it is running concurrently.
+    Therefore a public MP manager must be initialized first.
     """
-    def __init__(self, event_name, cycle_manager, public_mp_manager, mirror_manager=None):
+
+    def __init__(
+        self, event_name, cycle_manager, public_mp_manager, mirror_manager=None
+    ):
         super().__init__()
         self.name = event_name
         self.mgr = cycle_manager
@@ -162,7 +186,9 @@ class PrivateMPManager(object):
         # get private mp schedule data
         evts = self.mgr.list_events(timestamp, next=self._lookup_count)
         if self.mirror_mgr:
-            mirror_evts = self.mirror_mgr.list_events(timestamp, next=self._lookup_count)
+            mirror_evts = self.mirror_mgr.list_events(
+                timestamp, next=self._lookup_count
+            )
         else:
             mirror_evts = []
 
@@ -187,8 +213,17 @@ class PrivateMPManager(object):
             name = self.name
             mpid = "{:03d}.{:s}".format(int(row[0]) + 1, str(mirror_rows[idx][0]))
             mirror = mirror_rows[idx][1]
-            r1, r2, r3 = row[1].split(' > ')
-            evt = events.MiniPrixEvent(name, mpid, r1, r2, r3, start_minute=idx, end_minute=idx + 1, mirrored=mirror)
+            r1, r2, r3 = row[1].split(" > ")
+            evt = events.MiniPrixEvent(
+                name,
+                mpid,
+                r1,
+                r2,
+                r3,
+                start_minute=idx,
+                end_minute=idx + 1,
+                mirrored=mirror,
+            )
             evt.set_start_time(start_time + timedelta(minutes=idx))
             res.append(evt)
         return res

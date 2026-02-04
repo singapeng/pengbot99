@@ -6,16 +6,15 @@ from pengbot99 import utils
 
 
 async def get_msg_url(client, channel_id, message_id):
-    """ Returns the URL for a given message ID on a given channel.
-    """
+    """Returns the URL for a given message ID on a given channel."""
     channel = client.get_channel(int(channel_id))
     message = await channel.fetch_message(int(message_id))
     return message.jump_url
 
 
 async def get_thread(channel, thread_id):
-    """ Get a Thread object for the requested thread.
-        If the thread was archived, unarchive it.
+    """Get a Thread object for the requested thread.
+    If the thread was archived, unarchive it.
     """
     thread = channel.get_thread(thread_id)
     if thread:
@@ -38,13 +37,15 @@ async def get_thread(channel, thread_id):
 
 
 async def update_activity(client, description, start_time=None):
-    """ Updates the bot's status activity message.
-        Do not block if this task failed.
+    """Updates the bot's status activity message.
+    Do not block if this task failed.
 
-        start_time: a UTC timezone datetime object.
-                    This does nothing useful :(
+    start_time: a UTC timezone datetime object.
+                This does nothing useful :(
     """
     try:
-        await client.change_presence(activity=discord.CustomActivity(name=description, start=start_time))
+        await client.change_presence(
+            activity=discord.CustomActivity(name=description, start=start_time)
+        )
     except Exception as exc:
         utils.log("Failed to update status: '{0}'".format(exc))

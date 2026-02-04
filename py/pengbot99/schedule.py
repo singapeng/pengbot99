@@ -1,11 +1,9 @@
-from datetime import datetime, timedelta, timezone
-
 import abc
 import csv
+from datetime import datetime, timedelta, timezone
 
 # local imports
 from pengbot99 import events
-
 
 # This should mark a cycle origin in UTC time
 # At present it drives all GP and MP cycles (public/private)
@@ -18,36 +16,35 @@ glitch_gp_origin = datetime(2026, 1, 18, 22, 0, tzinfo=timezone.utc)
 
 
 def load_schedule(path, name):
-    """ Loads a CSV schedule from the folder 'path' and the file
-        named 'name.csv'.
-        Each line in the csv should be formatted as such:
-        minutes,name[,name,name...]
-        'minutes' represents the event duration as an integer.
-        'name' is the event type.
-        There must be at least one event type name. If several
-        are provided, they represent a rotation for this event.
-        The last line event type should be 'next' and represents
-        the point at which the schedule moves on to the next cycle.
+    """Loads a CSV schedule from the folder 'path' and the file
+    named 'name.csv'.
+    Each line in the csv should be formatted as such:
+    minutes,name[,name,name...]
+    'minutes' represents the event duration as an integer.
+    'name' is the event type.
+    There must be at least one event type name. If several
+    are provided, they represent a rotation for this event.
+    The last line event type should be 'next' and represents
+    the point at which the schedule moves on to the next cycle.
     """
-    schedule_path = '{0}/{1}.csv'.format(path, name)
-    with open(schedule_path, newline='') as fd:
-        reader = csv.reader(fd, delimiter=',')
+    schedule_path = "{0}/{1}.csv".format(path, name)
+    with open(schedule_path, newline="") as fd:
+        reader = csv.reader(fd, delimiter=",")
         schedule = []
         for row in reader:
             try:
                 minutes = int(row[0])
                 rotation = [minutes] + [str(item) for item in row[1:]]
                 schedule.append(tuple(rotation))
-            except Exception as e:
-                #TODO: better validation
+            except Exception:
+                # TODO: better validation
                 raise
     assert schedule[-1][1] == "next", "Must end with next"
     return schedule
 
 
 def cptime(dt):
-    """ Utility to copy a date time into a new object.
-    """
+    """Utility to copy a date time into a new object."""
     year = dt.year
     month = dt.month
     day = dt.day
@@ -85,8 +82,7 @@ class CycleInfo(object):
             self._offset_event_count()
 
     def _build_event_count(self):
-        """ How many of each known event already occured.
-        """
+        """How many of each known event already occured."""
         for rotation in self._rotations:
             # how many complete rotations happened
             full_rots = self._rotations[rotation] // len(rotation)
@@ -112,8 +108,7 @@ class CycleInfo(object):
                     self._events[evt_name] = evt_count
 
     def _offset_event_count(self):
-        """ If this cycle is in progress, what does it mean for the event count?
-        """
+        """If this cycle is in progress, what does it mean for the event count?"""
         cycle_rots = self.schedule.get_rotations_until(self.minute)
         for rot in set(cycle_rots):
             # how many times did this rotation show up in this cycle?
@@ -127,19 +122,17 @@ class CycleInfo(object):
             self._rotations[rot] += count
 
     def get_rotation(self, evts):
-        """ Returns the number of occurences of this rotation of events
-        """
+        """Returns the number of occurences of this rotation of events"""
         return self._rotations.get(tuple(evts)) or self.id
 
     def get_event(self, evt):
-        """ Returns the number of occurences of this event across all rotations
-        """
+        """Returns the number of occurences of this event across all rotations"""
         return self._events.get(str(evt)) or 0
 
     def find_rotation(self, evts):
-        """ Given a list of event name, returns the first rotation that
-            contains any event with such name. Only one name in 'evt' needs to
-            match.
+        """Given a list of event name, returns the first rotation that
+        contains any event with such name. Only one name in 'evt' needs to
+        match.
         """
         for rot in self._rotations:
             for name in evts:
@@ -161,10 +154,11 @@ def build_rotation_data(timetables):
 
 
 class TimeTable(object):
-    """ This object doesn't know about actual time.
-        It is used to query relative time within its schedule, based
-        on cycle count.
+    """This object doesn't know about actual time.
+    It is used to query relative time within its schedule, based
+    on cycle count.
     """
+
     def __init__(self, data, name=None):
         super().__init__()
         self.name = name
@@ -189,15 +183,15 @@ class TimeTable(object):
         return next_row
 
     def get_event(self, cycle_info):
-        """ What event is on at specified cycle and minute
+        """What event is on at specified cycle and minute
 
-            Because this is within the schedule, we need info supplied
-            by CycleInfo objects to calculate the state of rotations.
-            Most calls rely on get_remaining_events(), so CycleInfo offsets
-            for future events, and this call her needs to un-offset
-            rotations as a result. This is illustrates a flaw in the
-            relation between CycleInfo and TimeTable, which should
-            instead both be accessed by a manager class.
+        Because this is within the schedule, we need info supplied
+        by CycleInfo objects to calculate the state of rotations.
+        Most calls rely on get_remaining_events(), so CycleInfo offsets
+        for future events, and this call her needs to un-offset
+        rotations as a result. This is illustrates a flaw in the
+        relation between CycleInfo and TimeTable, which should
+        instead both be accessed by a manager class.
         """
         active_row = self._get_active_row(cycle_info.minute)
         if active_row:
@@ -220,15 +214,20 @@ class TimeTable(object):
                 # likely not needed
                 end_minute = start_minute
             return events.Event(
-                    name=name, cycle=cycle, cycle_minute=cycle_info.minute,
-                    start_minute=start_minute, end_minute=end_minute,
-                    rotation=active_row, rotation_offset=rotation_index)
+                name=name,
+                cycle=cycle,
+                cycle_minute=cycle_info.minute,
+                start_minute=start_minute,
+                end_minute=end_minute,
+                rotation=active_row,
+                rotation_offset=rotation_index,
+            )
         else:
-            return ''
+            return ""
 
     def get_time_left(self, minute):
-        """ How many full minutes remain in the event that is
-            active at the given cycle and minute.
+        """How many full minutes remain in the event that is
+        active at the given cycle and minute.
         """
         next_row = self._get_next_row(minute)
         if next_row:
@@ -237,8 +236,8 @@ class TimeTable(object):
             return -1
 
     def get_remaining_events(self, cycle_info, all=False, filter=None):
-        """ Returns a list of events in the cycle that have yet
-            to start.
+        """Returns a list of events in the cycle that have yet
+        to start.
         """
         minute = cycle_info.minute
         if all:
@@ -258,16 +257,22 @@ class TimeTable(object):
                 cycle = cycle_info.get_rotation(rotation) + rots_count.get(rotation, 0)
                 rotation_index = cycle % len(rotation)
                 current = row[1:][rotation_index]
-                if not filter or current in filter or current == 'next':
+                if not filter or current in filter or current == "next":
                     if current != "next":
                         end_minute = self._data[idx + 1][0]
                     else:
                         end_minute = start_minute
-                    evts.append(events.Event(
-                            name = current, cycle=cycle, cycle_minute=cycle_info.minute,
-                            start_minute=start_minute, end_minute=end_minute,
-                            rotation=rotation, rotation_offset=rotation_index
-                            ))
+                    evts.append(
+                        events.Event(
+                            name=current,
+                            cycle=cycle,
+                            cycle_minute=cycle_info.minute,
+                            start_minute=start_minute,
+                            end_minute=end_minute,
+                            rotation=rotation,
+                            rotation_offset=rotation_index,
+                        )
+                    )
             if row[0] >= minute:
                 # using greater-equal comparison here lets us catch the current event's
                 # rotation in case it's relevant to our offset.
@@ -279,9 +284,9 @@ class TimeTable(object):
         return evts
 
     def get_rotations(self, name=None):
-        """ Returns a dict of rotations with their count.
-            Optionally, rotations can be filtered on a specific event name.
-            In this case, only rotations including the event will be returned.
+        """Returns a dict of rotations with their count.
+        Optionally, rotations can be filtered on a specific event name.
+        In this case, only rotations including the event will be returned.
         """
         rotations = {}
         for row in self._data[:-1]:
@@ -295,8 +300,8 @@ class TimeTable(object):
         return rotations
 
     def get_rotations_until(self, minute):
-        """ Returns a list of rotations that occur before the given minute in
-            the current cycle.
+        """Returns a list of rotations that occur before the given minute in
+        the current cycle.
         """
         rotations = []
         start_minute = 0
@@ -304,7 +309,7 @@ class TimeTable(object):
             start_minute = row[0]
             # capture past events and in-progress events
             # but not one that's immediately starting.
-            if start_minute < minute and row[1] != 'next':
+            if start_minute < minute and row[1] != "next":
                 rotations.append(row[1:])
             else:
                 break
@@ -312,9 +317,10 @@ class TimeTable(object):
 
 
 class BaseScheduleManager(metaclass=abc.ABCMeta):
-    """ Used to manage the cycle of schedules based on current time
-        and a time of origin.
+    """Used to manage the cycle of schedules based on current time
+    and a time of origin.
     """
+
     def __init__(self, origin):
         super().__init__()
         # Should be UTC time of any day starting at 00:00:00
@@ -325,18 +331,16 @@ class BaseScheduleManager(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def get_cycle_count(self, timestamp):
-        """ Which cycle this timestamp falls in.
-            Cycle 0 starts at origin.
+        """Which cycle this timestamp falls in.
+        Cycle 0 starts at origin.
         """
 
     @abc.abstractmethod
     def get_cycle_info(self, timestamp=None):
-        """ Get a CycleInfo object
-        """
+        """Get a CycleInfo object"""
 
     def get_event(self, timestamp):
-        """ Returns the name of the event occuring at given timestamp.
-        """
+        """Returns the name of the event occuring at given timestamp."""
         cycle_info = self.get_cycle_info(timestamp)
         event = cycle_info.schedule.get_event(cycle_info)
         minutes_in = event.cycle_minute - event.start_minute
@@ -345,10 +349,11 @@ class BaseScheduleManager(metaclass=abc.ABCMeta):
         return event
 
     def get_remaining_events(self, timestamp, all=False, filter=None):
-        """ Events left in the current cycle.
-        """
+        """Events left in the current cycle."""
         cycle_info = self.get_cycle_info(timestamp)
-        remaining_events = cycle_info.schedule.get_remaining_events(cycle_info, all, filter)
+        remaining_events = cycle_info.schedule.get_remaining_events(
+            cycle_info, all, filter
+        )
         # convert events relative times to datetimes
         ts_events = []
         for event in remaining_events:
@@ -359,22 +364,21 @@ class BaseScheduleManager(metaclass=abc.ABCMeta):
         return ts_events
 
     def get_current_event(self):
-        """ Returns the name of the event occuring now.
-        """
+        """Returns the name of the event occuring now."""
         return self.get_event(datetime.now(timezone.utc))
 
     def get_events(self, names=None, count=0, timestamp=None, limit=10080):
-        """ Get a list of all events and their start time
-            for the next 'next' minutes.
+        """Get a list of all events and their start time
+        for the next 'next' minutes.
 
-            names: a list of event names to filter on, or
-                   None to return any event name
-            count: the maximum number of events to return
-                   or set to zero for no maximum
-            timestamp: get events from this time onwards,
-                       or None from current time.
-            limit: allow events to be looked up to this many
-                   minutes in the future. Defaults to 7 days.
+        names: a list of event names to filter on, or
+               None to return any event name
+        count: the maximum number of events to return
+               or set to zero for no maximum
+        timestamp: get events from this time onwards,
+                   or None from current time.
+        limit: allow events to be looked up to this many
+               minutes in the future. Defaults to 7 days.
         """
         timestamp = timestamp or datetime.now(timezone.utc)
         evts = []
@@ -386,7 +390,7 @@ class BaseScheduleManager(metaclass=abc.ABCMeta):
             next_events = self.get_remaining_events(cycle_start, all=all, filter=names)
             for event in next_events:
                 if event.start_time <= ts_limit:
-                    if event.name == 'next':
+                    if event.name == "next":
                         # we need to query the next cycle
                         cycle_start = event.start_time
                         all = True
@@ -401,10 +405,10 @@ class BaseScheduleManager(metaclass=abc.ABCMeta):
         return evts
 
     def list_events(self, timestamp=None, next=60):
-        """ Get a list of all events and their start time
-            current and future for the next 'next' minutes.
-            This is a short-hand to get_events that also
-            fetches current, and sets a short minutes lookahead.
+        """Get a list of all events and their start time
+        current and future for the next 'next' minutes.
+        This is a short-hand to get_events that also
+        fetches current, and sets a short minutes lookahead.
         """
         timestamp = timestamp or datetime.now(timezone.utc)
         evts = self.get_events(timestamp=timestamp, limit=next)
@@ -413,36 +417,38 @@ class BaseScheduleManager(metaclass=abc.ABCMeta):
         return [start_event] + evts
 
     def when_event(self, names, count=1, timestamp=None, limit=10080):
-        """ When is the next instance of an event.
-            This is a shorthand to get_events that sets count to 1
-            and requires a names filter.
-            names can be given as a list of events to search for
+        """When is the next instance of an event.
+        This is a shorthand to get_events that sets count to 1
+        and requires a names filter.
+        names can be given as a list of events to search for
         """
-        return self.get_events(names=names, count=count, timestamp=timestamp, limit=limit)
+        return self.get_events(
+            names=names, count=count, timestamp=timestamp, limit=limit
+        )
 
 
 class Slot1ScheduleManager(BaseScheduleManager):
-    """ Used to manage the cycle of schedules based on current time
-        and a time of origin.
-        This manager is intended to deal with F-Zero 99's 'slot 1'
-        schedule, i.e. the 99 races slot.
+    """Used to manage the cycle of schedules based on current time
+    and a time of origin.
+    This manager is intended to deal with F-Zero 99's 'slot 1'
+    schedule, i.e. the 99 races slot.
     """
+
     def __init__(self, origin, sched):
         super().__init__(origin)
         self.sched = TimeTable(sched, "slot1")
         self.rotation_data = build_rotation_data([self.sched])
 
     def get_cycle_count(self, timestamp):
-        """ Which cycle this timestamp falls in.
-            Cycle 0 starts at origin.
+        """Which cycle this timestamp falls in.
+        Cycle 0 starts at origin.
         """
         now = timestamp or datetime.now(timezone.utc)
         minutes = int((now - self.origin).total_seconds()) // 60
         return minutes // self.sched.duration
 
     def get_cycle_info(self, timestamp=None):
-        """ Get cycle id and cycle minute
-        """
+        """Get cycle id and cycle minute"""
         timestamp = timestamp or datetime.now(timezone.utc)
         cycle = {"slot1": self.get_cycle_count(timestamp)}
         minutes = int((timestamp - self.origin).total_seconds()) // 60
@@ -451,13 +457,14 @@ class Slot1ScheduleManager(BaseScheduleManager):
 
 
 class Slot2ScheduleManager(BaseScheduleManager):
-    """ Used to manage the cycle of schedules based on current time
-        and a time of origin.
-        This manager is intended to deal with F-Zero 99's 'slot 2'
-        schedule, i.e. the Grand Prix and special events slot.
-        It provides support for a dual-schedule rotation with distinct
-        weekdays and weekend days timetables.
+    """Used to manage the cycle of schedules based on current time
+    and a time of origin.
+    This manager is intended to deal with F-Zero 99's 'slot 2'
+    schedule, i.e. the Grand Prix and special events slot.
+    It provides support for a dual-schedule rotation with distinct
+    weekdays and weekend days timetables.
     """
+
     def __init__(self, origin, weekday_sched, weekend_sched, secret_cfg=None):
         super().__init__(origin)
         # Monday to Friday schedule
@@ -474,15 +481,16 @@ class Slot2ScheduleManager(BaseScheduleManager):
         self._secret_cfg = secret_cfg
 
     def _set_alt_origin(self):
-        """ We may cache the next day from origin and the number of
-            minutes between origin and this next day.
-            This is to facilitate rotation offset calculations when
-            the origin is not at 0:00 on day 1.
+        """We may cache the next day from origin and the number of
+        minutes between origin and this next day.
+        This is to facilitate rotation offset calculations when
+        the origin is not at 0:00 on day 1.
         """
         if self.origin.hour or self.origin.minute:
             tmr = self.origin + timedelta(days=1)
-            self._alt_origin = datetime(tmr.year, tmr.month, tmr.day, 0, 0,
-                    tzinfo=timezone.utc)
+            self._alt_origin = datetime(
+                tmr.year, tmr.month, tmr.day, 0, 0, tzinfo=timezone.utc
+            )
             day1mins = (24 - self.origin.hour) * 60 + self.origin.minute
             if self.origin.weekday() < 5:
                 self._day1mins = (day1mins, 0)
@@ -493,10 +501,10 @@ class Slot2ScheduleManager(BaseScheduleManager):
             self._day1mins = (0, 0)
 
     def time_types_since_origin(self, until=None):
-        """ Utility for breaking down the current time (or the optional
-            timestamp) into weekday minutes, and weekend minutes since
-            origin.
-            The result is returned as a tuple of 2 ints.
+        """Utility for breaking down the current time (or the optional
+        timestamp) into weekday minutes, and weekend minutes since
+        origin.
+        The result is returned as a tuple of 2 ints.
         """
         now = until or datetime.now(timezone.utc)
         if now.date() != self.origin.date() and self._alt_origin:
@@ -536,15 +544,15 @@ class Slot2ScheduleManager(BaseScheduleManager):
 
     @property
     def daily_weekday_cycles(self):
-        """ How many cycles occur in a week day
-            Note: at the moment we assume this is an integer number
+        """How many cycles occur in a week day
+        Note: at the moment we assume this is an integer number
         """
         return 60 * 24 // self.weekday.duration
 
     @property
     def daily_weekend_cycles(self):
-        """ How many cycles occur in a week end
-            Note: at the moment we assume this is an integer number
+        """How many cycles occur in a week end
+        Note: at the moment we assume this is an integer number
         """
         return 60 * 24 // self.weekend.duration
 
@@ -564,9 +572,9 @@ class Slot2ScheduleManager(BaseScheduleManager):
         return False
 
     def get_cycle_count(self, timestamp):
-        """ This works when cycles are less than a day
-            and there's a weekday/weekend change.
-            It will not work for Mystery Tracks.
+        """This works when cycles are less than a day
+        and there's a weekday/weekend change.
+        It will not work for Mystery Tracks.
         """
         wd_mins, we_mins = self.time_types_since_origin(timestamp)
         weekday_cycles = wd_mins // self.weekday.duration
@@ -574,8 +582,7 @@ class Slot2ScheduleManager(BaseScheduleManager):
         return weekday_cycles, weekend_cycles
 
     def get_cycle_info(self, timestamp=None):
-        """ Get cycle id and cycle minute
-        """
+        """Get cycle id and cycle minute"""
         timestamp = timestamp or datetime.now(timezone.utc)
         if self.is_weekday(timestamp):
             sched = self.weekday
@@ -588,8 +595,8 @@ class Slot2ScheduleManager(BaseScheduleManager):
         return CycleInfo(sched, tt_count, self.rotation_data, cycle_minute)
 
     def _get_daily_event_count(self, day_type, name):
-        """ How many times an event occurs in a given day.
-            Will raise if cannot be accurately estimated.
+        """How many times an event occurs in a given day.
+        Will raise if cannot be accurately estimated.
         """
         if day_type == "weekday":
             tt = self.weekday
@@ -616,8 +623,8 @@ class Slot2ScheduleManager(BaseScheduleManager):
         return self._get_daily_event_count("weekend", name)
 
     def get_remaining_events(self, timestamp, all=False, filter=None):
-        """ Events left in the current cycle.
-            Overrides base class to manage Mystery GP (v1.7)
+        """Events left in the current cycle.
+        Overrides base class to manage Mystery GP (v1.7)
         """
         evts = super().get_remaining_events(timestamp, all, filter)
         if self._secret_cfg:
@@ -625,8 +632,8 @@ class Slot2ScheduleManager(BaseScheduleManager):
         return evts
 
     def get_event(self, cycle_info):
-        """ Finds the ongoing event.
-            Overrides base class to manage Mystery GP (v1.7)
+        """Finds the ongoing event.
+        Overrides base class to manage Mystery GP (v1.7)
         """
         evt = super().get_event(cycle_info)
         if self._secret_cfg:

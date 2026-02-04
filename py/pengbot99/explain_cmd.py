@@ -1,16 +1,12 @@
-from datetime import datetime
-
-from pengbot99 import formatters
-from pengbot99 import ui
-from pengbot99 import utils
-
+from pengbot99 import formatters, ui
 
 ### GRAND PRIX ROTATION METHODS ###
 
+
 def _gp_rotation_split(evts):
-    """ Create a split between events so that some are displayed ahead
-        of the current time, some after. This is based on the total
-        number of events in the rotation, not the events actual time.
+    """Create a split between events so that some are displayed ahead
+    of the current time, some after. This is based on the total
+    number of events in the rotation, not the events actual time.
     """
     # We define this for cosmetic purposes
     LONG_ROTATION = 7
@@ -39,7 +35,7 @@ def _format_gp_list(gps):
     for gp in gps:
         # if no emoji is defined for a gp, we just print its name
         emojis.append(formatters.event_custom_emoji.get(gp.name, gp.name))
-    return ' > '.join(emojis)
+    return " > ".join(emojis)
 
 
 def _display_gp_rotation(evts, current, pre, post):
@@ -62,11 +58,10 @@ def _display_gp_rotation(evts, current, pre, post):
         str_post = str_post + " > " + _format_gp_list(post[1:])
     return msg + str_pre + str_now + str_post
 
+
 ### Explainer Class definition ###
 
-TOPICS_BASE = {
-    'Grand Prix Rotation': 'explain_gp_rotation'
-}
+TOPICS_BASE = {"Grand Prix Rotation": "explain_gp_rotation"}
 
 
 class Explainer(object):
@@ -82,8 +77,7 @@ class Explainer(object):
 
     @property
     def topics(self):
-        """ build a list of topics that can be auto-completed in the slash command
-        """
+        """build a list of topics that can be auto-completed in the slash command"""
         return list(self._topics.keys())
 
     def explain_gp_rotation(self, timestamp=None):
@@ -96,7 +90,7 @@ class Explainer(object):
         rotation = cinfo.find_rotation(gps)
         evts = self._mgr.when_event(names=gps, count=len(rotation), timestamp=timestamp)
         current = self._mgr.get_events(timestamp=timestamp, count=1)[0]
-        if not current.name in gps:
+        if current.name not in gps:
             current = None
 
         pre_evts, post_evts = _gp_rotation_split(evts)
@@ -105,7 +99,7 @@ class Explainer(object):
     def explain(self, topic):
         if topic not in self._topics:
             return "Sorry, I cannot explain '%s'." % topic
-        if self._topics.get(topic) == 'explain_gp_rotation':
+        if self._topics.get(topic) == "explain_gp_rotation":
             return self.explain_gp_rotation()
         else:
             # definition entry

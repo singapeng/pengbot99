@@ -1,7 +1,6 @@
 # Python imports
 from datetime import datetime, timedelta, timezone
 
-
 ## UI lookup data
 # Nice names for event selection dropdown/auto-complete
 event_display_names = {
@@ -79,51 +78,51 @@ track_display_names = {
 
 
 track_lookup_names = {
-    'Big Blue': 'Big_Blue',
-    'Big Blue II': 'Big_Blue_II',
-    'Big Blue + Red Canyon': 'Mystery_5',
-    'Death Wind I': 'Death_Wind_I',
-    'Death Wind II': 'Death_Wind_II',
-    'Death Wind White Land': 'Mystery_3',
-    'Fire City': 'Mystery_4',
-    'Fire Field': 'Fire_Field',
-    'Mirror Big Blue': 'mBig_Blue',
-    'Mirror Big Blue II': 'mBig_Blue_II',
-    'Mirror Death Wind I': 'mDeath_Wind_I',
-    'Mirror Death Wind II': 'mDeath_Wind_II',
-    'Mirror Fire Field': 'mFire_Field',
-    'Mirror Mute City I': 'mMute_City_I',
-    'Mirror Mute City II': 'mMute_City_II',
-    'Mirror Mute City III': 'mMute_City_III',
-    'Mirror Mute City IV': 'mMute_City_IV',
-    'Mirror Port Town I': 'mPort_Town_I',
-    'Mirror Port Town II': 'mPort_Town_II',
-    'Mirror Red Canyon I': 'mRed_Canyon_I',
-    'Mirror Red Canyon II': 'mRed_Canyon_II',
-    'Mirror Sand Ocean': 'mSand_Ocean',
-    'Mirror Sand Storm I': 'mSand_Storm_I',
-    'Mirror Sand Storm II': 'mSand_Storm_II',
-    'Mirror Silence': 'mSilence',
-    'Mirror Silence II': 'mSilence_II',
-    'Mirror White Land I': 'mWhite_Land_I',
-    'Mirror White Land II': 'mWhite_Land_II',
-    'Mute City I': 'Mute_City_I',
-    'Mute City II': 'Mute_City_II',
-    'Mute City III': 'Mute_City_III',
-    'Mute City IV': 'Mute_City_IV',
-    'Port Town I': 'Port_Town_I',
-    'Port Town II': 'Port_Town_II',
-    'Red Canyon I': 'Red_Canyon_I',
-    'Red Canyon II': 'Red_Canyon_II',
-    'Sand Ocean': 'Sand_Ocean',
-    'Sand Ocean + Port Town': 'Mystery_7',
-    'Sand Storm I': 'Sand_Storm_I',
-    'Sand Storm II': 'Sand_Storm_II',
-    'Silence': 'Silence',
-    'Silence II': 'Silence_II',
-    'Silence + Sand Storm': 'Mystery_6',
-    'White Land I': 'White_Land_I',
-    'White Land II': 'White_Land_II'
+    "Big Blue": "Big_Blue",
+    "Big Blue II": "Big_Blue_II",
+    "Big Blue + Red Canyon": "Mystery_5",
+    "Death Wind I": "Death_Wind_I",
+    "Death Wind II": "Death_Wind_II",
+    "Death Wind White Land": "Mystery_3",
+    "Fire City": "Mystery_4",
+    "Fire Field": "Fire_Field",
+    "Mirror Big Blue": "mBig_Blue",
+    "Mirror Big Blue II": "mBig_Blue_II",
+    "Mirror Death Wind I": "mDeath_Wind_I",
+    "Mirror Death Wind II": "mDeath_Wind_II",
+    "Mirror Fire Field": "mFire_Field",
+    "Mirror Mute City I": "mMute_City_I",
+    "Mirror Mute City II": "mMute_City_II",
+    "Mirror Mute City III": "mMute_City_III",
+    "Mirror Mute City IV": "mMute_City_IV",
+    "Mirror Port Town I": "mPort_Town_I",
+    "Mirror Port Town II": "mPort_Town_II",
+    "Mirror Red Canyon I": "mRed_Canyon_I",
+    "Mirror Red Canyon II": "mRed_Canyon_II",
+    "Mirror Sand Ocean": "mSand_Ocean",
+    "Mirror Sand Storm I": "mSand_Storm_I",
+    "Mirror Sand Storm II": "mSand_Storm_II",
+    "Mirror Silence": "mSilence",
+    "Mirror Silence II": "mSilence_II",
+    "Mirror White Land I": "mWhite_Land_I",
+    "Mirror White Land II": "mWhite_Land_II",
+    "Mute City I": "Mute_City_I",
+    "Mute City II": "Mute_City_II",
+    "Mute City III": "Mute_City_III",
+    "Mute City IV": "Mute_City_IV",
+    "Port Town I": "Port_Town_I",
+    "Port Town II": "Port_Town_II",
+    "Red Canyon I": "Red_Canyon_I",
+    "Red Canyon II": "Red_Canyon_II",
+    "Sand Ocean": "Sand_Ocean",
+    "Sand Ocean + Port Town": "Mystery_7",
+    "Sand Storm I": "Sand_Storm_I",
+    "Sand Storm II": "Sand_Storm_II",
+    "Silence": "Silence",
+    "Silence II": "Silence_II",
+    "Silence + Sand Storm": "Mystery_6",
+    "White Land I": "White_Land_I",
+    "White Land II": "White_Land_II",
 }
 
 
@@ -159,9 +158,9 @@ track_mirroring_enabled = {
 
 
 track_separators = {
-    'choice': ' <> ',
-    'classicprix' : ' > ',
-    'miniprix' : ' > ',
+    "choice": " <> ",
+    "classicprix": " > ",
+    "miniprix": " > ",
 }
 
 
@@ -171,51 +170,50 @@ track_custom_emoji = {
     "Mystery_5": "<:WhatQuestionmarksthree:1217243922418368734>",
     "Mystery_6": "<:WhatQuestionmarksthree:1217243922418368734>",
     "Mystery_7": "<:WhatQuestionmarksthree:1217243922418368734>",
-    }
+}
 
 
 def format_event_name(internal_name):
-    """ Adds custom emojis to event name
-    """
+    """Adds custom emojis to event name"""
     name = event_display_names.get(internal_name)
     emoji = event_custom_emoji.get(internal_name)
     if not name:
         name = internal_name
     if emoji:
-        name = '{0} {1}'.format(emoji, name)
+        name = "{0} {1}".format(emoji, name)
     return name
 
 
 def format_current_event(event_name, event_end):
-    """ Nice display for current event
-        Note 2024/3/7: this does not properly deal with the
-        Mystery Prix/Regular Prix slot at the moment,
-        i.e. it doesn't know that Mystery Prix only
-        run first 3 minutes of the 10 minutes slot.
+    """Nice display for current event
+    Note 2024/3/7: this does not properly deal with the
+    Mystery Prix/Regular Prix slot at the moment,
+    i.e. it doesn't know that Mystery Prix only
+    run first 3 minutes of the 10 minutes slot.
     """
-    discord_text = 'Ongoing: {0} (ends <t:{1}:R>)'
+    discord_text = "Ongoing: {0} (ends <t:{1}:R>)"
     end = int(event_end.timestamp())
     evt_name = format_event_name(event_name)
     return discord_text.format(evt_name, end)
 
 
 def format_discord_timestamp(dt, inline=False):
-    """ Flexible timestamp builder.
-        If the event is not in the next few hours, it will use
-        a different format automatically.
-        Set inline to True if the timestamp appears in a
-        started sentence.
+    """Flexible timestamp builder.
+    If the event is not in the next few hours, it will use
+    a different format automatically.
+    Set inline to True if the timestamp appears in a
+    started sentence.
     """
     delta = dt - datetime.now(timezone.utc)
     if abs(delta.total_seconds()) > timedelta(hours=20).total_seconds():
         # Discord long date with short time
-        t_format = 'f'
+        t_format = "f"
         if inline:
-            particle = 'on '
+            particle = "on "
         else:
-            particle = ''
+            particle = ""
     else:
-        t_format = 't'
+        t_format = "t"
         if inline:
             particle = "at "
         else:
@@ -233,8 +231,7 @@ def _format_event_names(evt):
 
 
 def format_future_event(evt):
-    """ Nice display for events in the future
-    """
+    """Nice display for events in the future"""
     ts = format_discord_timestamp(evt.start_time)
     discord_text = "{0}: {1} (<t:{2}:R>)"
     evt_time = int(evt.start_time.timestamp())
@@ -243,40 +240,43 @@ def format_future_event(evt):
 
 
 # TODO: make this schedule data
-glitch_rotation = ("Mystery_3", "Mystery_4", "Mystery_5", "Mystery_6", "Mystery_7", )
+glitch_rotation = (
+    "Mystery_3",
+    "Mystery_4",
+    "Mystery_5",
+    "Mystery_6",
+    "Mystery_7",
+)
 
 
 def format_glitch_event(evt):
-    """ Hacking in the glitch rotation!
-    """
+    """Hacking in the glitch rotation!"""
     if evt.name == "glitch99":
         evt._name = glitch_rotation[evt.cycle % len(glitch_rotation)]
     return format_future_event(evt)
 
 
 def format_track_names(tracks, mode):
-    """ Nice display for track names
-    """
+    """Nice display for track names"""
     names = []
     separator = track_separators.get(mode)
-    for race in (tracks):
-        if race[0] != 'm':
+    for race in tracks:
+        if race[0] != "m":
             name = track_display_names.get(race) or race
         else:
             name = track_display_names.get(race[1:]) or race[1:]
             if track_mirroring_enabled.get(race[1:]):
                 # Mirror mode on
                 name = "_Mirror {0}_".format(name)
-        emoji = track_custom_emoji.get(race if race[0] != 'm' else race[1:])
+        emoji = track_custom_emoji.get(race if race[0] != "m" else race[1:])
         if mode != "classicprix" and emoji:
-            name = '{} {}'.format(emoji, name)
+            name = "{} {}".format(emoji, name)
         names.append(name)
     return separator.join(names)
 
 
 def format_track_selection(evt, verbose=False):
-    """ Nice display for Mini-Prix track selection
-    """
+    """Nice display for Mini-Prix track selection"""
     ts = format_discord_timestamp(evt.start_time)
     name = format_track_names([evt.race1, evt.race2, evt.race3], evt.mode)
     if verbose:
@@ -285,15 +285,14 @@ def format_track_selection(evt, verbose=False):
 
 
 def format_track_choice(evt, verbose=False):
-    """ Nice display for Choice races
-    """
+    """Nice display for Choice races"""
     ts = format_discord_timestamp(evt.start_time)
-    tracks = evt.name.split(track_separators['choice'])
-    name = format_track_names(tracks, mode='choice')
+    tracks = evt.name.split(track_separators["choice"])
+    name = format_track_names(tracks, mode="choice")
     # Internally, choice race selection IDs will correspond to
     # the event's start minute in the current cycle plus one,
     # because the ID list starts at 1 and not zero.
-    evt_id = '%03d' % (int(evt.start_minute) + 1)
+    evt_id = "%03d" % (int(evt.start_minute) + 1)
     if verbose:
         name = "{0} ({1})".format(name, evt_id)
     return "{0}: {1}".format(ts, name)

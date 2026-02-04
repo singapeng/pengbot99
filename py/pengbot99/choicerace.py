@@ -1,10 +1,7 @@
-from datetime import datetime, timedelta, timezone
+from datetime import timedelta
 
 # local imports
-from pengbot99 import events
-from pengbot99 import formatters
-from pengbot99 import schedule
-from pengbot99 import utils
+from pengbot99 import formatters, schedule, utils
 
 
 def init_99_manager(name=None, glitch_mgr=None, env=None, minutes_offset=0):
@@ -14,7 +11,7 @@ def init_99_manager(name=None, glitch_mgr=None, env=None, minutes_offset=0):
         env = utils.load_env()
     # Common origin plus constant offset
     r99_origin = schedule.origin + timedelta(minutes=minutes_offset)
-    nnsched = schedule.load_schedule(env['CONFIG_PATH'], 'ninetynine_schedule')
+    nnsched = schedule.load_schedule(env["CONFIG_PATH"], "ninetynine_schedule")
     r99mgr = schedule.Slot1ScheduleManager(r99_origin, nnsched)
     if glitch_mgr:
         return FZ99Manager(r99mgr, glitch_mgr)
@@ -22,9 +19,10 @@ def init_99_manager(name=None, glitch_mgr=None, env=None, minutes_offset=0):
 
 
 class ChoiceRaceManager(object):
-    """ For 99 races and other events on rotation offering a choice to players.
-        Predicts the track selection line up for individual races.
+    """For 99 races and other events on rotation offering a choice to players.
+    Predicts the track selection line up for individual races.
     """
+
     def __init__(self, event_name, cycle_manager):
         super().__init__()
         self.name = event_name
@@ -48,11 +46,20 @@ class ChoiceRaceManager(object):
 
 
 class FZ99Manager(ChoiceRaceManager):
-    """ A ChoiceRaceManager that supports overrides from Glitch events.
-    """
+    """A ChoiceRaceManager that supports overrides from Glitch events."""
+
     NAME = "F-Zero 99 Races"
     # Glitch events will be named as one of these
-    GLITCH_EVT_NAMES = ("glitch99", "Mystery_1", "Mystery_2", "Mystery_3", "Mystery_4", "Mystery_5", "Mystery_6", "Mystery_7")
+    GLITCH_EVT_NAMES = (
+        "glitch99",
+        "Mystery_1",
+        "Mystery_2",
+        "Mystery_3",
+        "Mystery_4",
+        "Mystery_5",
+        "Mystery_6",
+        "Mystery_7",
+    )
 
     def __init__(self, cycle_manager, glitch_manager):
         super().__init__("F-Zero 99 Races", cycle_manager)
@@ -61,7 +68,9 @@ class FZ99Manager(ChoiceRaceManager):
     def is_glitch(self, evt):
         if evt.name in self.GLITCH_EVT_NAMES:
             if evt.name == "glitch99":
-                evt._name = formatters.glitch_rotation[evt.cycle % len(formatters.glitch_rotation)]
+                evt._name = formatters.glitch_rotation[
+                    evt.cycle % len(formatters.glitch_rotation)
+                ]
             return True
         return False
 
@@ -70,7 +79,7 @@ class FZ99Manager(ChoiceRaceManager):
         for evt in evts:
             if evt.start_time >= glitch.start_time and evt.start_time < glitch.end_time:
                 # this event occurs during a Glitch
-                track1 = evt.name.split(' ')[0]
+                track1 = evt.name.split(" ")[0]
                 # Glitch always replaces the event's track 1 as per the schedule
                 evt._name = evt._name.replace(track1, glitch.name)
         return evts
