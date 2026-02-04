@@ -1,23 +1,27 @@
 # pengbot99
-A library and Discord bot for useful F-Zero 99 schedule info
 
+A library and Discord bot for useful F-Zero 99 schedule info
 
 ## Setup
 
 This project uses `uv` for dependency management.
 From the repository root:
-```
-uv sync
-```
 
-If you want shorter commands, activate the uv-managed venv:
-```
-uv venv
+### Create & activate a virtual env
+
+```bash
+uv sync --dev # This creates a venv at ./.venv and installs dependencies there
+
+# macOS/Linux
 source .venv/bin/activate
+
+# Windows PowerShell
+.venv\Scripts\Activate.ps1
 ```
 
 You may then import the module in your Python environment:
-```
+
+```bash
 python -c "import pengbot99"
 ```
 
@@ -25,12 +29,12 @@ To run the application as a Discord bot, you will first need to set up a configu
 
 ## Configuring the Discord bot
 
-The bot requires some configuration so that it can start. 
+The bot requires some configuration so that it can start.
 Base configuration is not provided in the repository and will need to be created alongside a fresh install.
 By default, the bot will attempt to load a `.env` file from its working directory.
 Here is a sample content for such a file with example (bogus) values.
 
-```
+```bash
 # .env
 # Discord Application Token (THIS IS A SECRET)
 DISCORD_BOT_TOKEN=Al0ngAlph4numericT0k3nSuppliedByD1scord
@@ -76,6 +80,7 @@ The configuration file may contain any number of comment lines starting with `#`
 Constants are used to conveniently offset the schedule rotation without having to edit the schedule files.
 Constants are defined using `NAME=VALUE` syntax. Name is conventionally all-caps. Value is an integer that may be negative.
 The following constants are expected to be present:
+
 - CLASSIC_LINE_UP_OFFSET
 - MINIPRIX_LINE_UP_OFFSET
 - MIRROR_LINE_UP_OFFSET
@@ -87,6 +92,7 @@ The following constants are expected to be present:
 To change the offset the bot is using, simply edit the Constant file and restart the bot.
 
 The bot uses the presence of the following constants as an indication that Machine Shuffle Weekend event is on:
+
 - SHUFFLE_MINIPRIX_LINE_UP_OFFSET
 - SHUFFLE_MIRROR_LINE_UP_OFFSET
 - PRIVATE_SHUFFLE_MP_MINUTE_OFFSET
@@ -96,12 +102,12 @@ When they are present, the bot will use the specified offset for Miniprix events
 If there is no Machine Shuffle event, those constants should be omitted from the config, or commented out.
 As of F-Zero 99 version 1.6.1, there is no mirroring in Private Machine Shuffle-Miniprix, unless the lobby is started at the time of a public Machine Shuffle event. In this later case, the track selection will follow the public event's setting. In any case, the mirroring constant currently does not affect the results in any way.
 
-
 ## Running the application
 
 The application can be started through the `bot.py` module.
 No assumption is made as to the target environment, therefore no shell script or similar is provided.
-```
+
+```bash
 python -m pengbot99.bot
 ```
 
@@ -109,11 +115,12 @@ python -m pengbot99.bot
 
 For simplicity's sake, tests are written using Python's built-in unittest module.
 To run tests from the repository root:
-```
+
+```bash
 python -m unittest discover -s tests
 ```
 
-# Future improvements
+## Future improvements
 
 - Refactor schedule manager to more elegantly manage rotations
 - Bot Cogs
@@ -121,11 +128,10 @@ python -m unittest discover -s tests
 - Expand the /explain command to cover other topics than GP Rotation
 - Support for protracks/team battle as an upgrade to current /ninetynine command
 
+## References
 
-# References
-
-* Rotation may be simplified by using Python's own deque implementation, since it has a .rotate function
-    * deque docs https://docs.python.org/3/library/collections.html#collections.deque
-* Event schedule could be written as a tree using anytree or bigtree
-    * anytree https://github.com/c0fec0de/anytree
-    * bigtree https://bigtree.readthedocs.io/stable/
+- Rotation may be simplified by using Python's own deque implementation, since it has a .rotate function
+  - deque docs <https://docs.python.org/3/library/collections.html#collections.deque>
+- Event schedule could be written as a tree using anytree or bigtree
+  - anytree <https://github.com/c0fec0de/anytree>
+  - bigtree <https://bigtree.readthedocs.io/stable/>

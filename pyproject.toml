@@ -11,7 +11,7 @@ requires-python = ">=3.11"
 license = { text = "MIT" }
 authors = [{ name = "Pengui", email = "pengui@gmail.com" }]
 
-dependencies = ["py-cord>=2.5", "discord"]
+dependencies = ["py-cord>=2.5"]
 
 classifiers = [
   "License :: MIT",
