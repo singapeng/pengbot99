@@ -17,7 +17,7 @@ NINETYNINE_MINUTE_OFFSET=25
 # Which GP in the cycle get replaced by Secret League
 SECRET_LEAGUE_INTERVALS=11,6,7,3,8,4
 # Secret League Cycle index offset
-SECRET_LEAGUE_OFFSET=21
+SECRET_LEAGUE_OFFSET=36
 # # # # # # # # # # # # # # # # # # # #
 # # # # SHUFFLE WEEKEND EVENTS # # # #
 # Used for Public Shuffle Mini-Prix
