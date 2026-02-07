@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pengbot99"
+version = "0.1.0"
+description = "F-Zero 99 Schedule Discord Bot"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "Unlicense"
+authors = [{ name = "Pengui", email = "pengui@gmail.com" }]
+
+dependencies = ["py-cord>=2.5"]
+
+classifiers = [
+  "Natural Language :: English",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3.11",
+]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["py"]
+
+[dependency-groups]
+dev = ["ruff>=0.6.9"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 88
+extend-exclude = [
+  ".venv",
+  ".uv-cache",
+  ".ruff_cache",
+  ".pytest_cache",
+  "__pycache__",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
