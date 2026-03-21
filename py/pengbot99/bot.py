@@ -85,9 +85,9 @@ class Pengbot(object):
 
         pl_slot1 = schedule.Slot1ScheduleManager(pmp_origin, plmpsched)
         mirror_slot1 = schedule.Slot1ScheduleManager(pmp_mirror_origin, mirrorsc)
-        self.pmp_mgr = miniprix.PrivateMPManager("private_miniprix", pl_slot1, self.mp_mgr, mirror_slot1)
+        self.pmp_mgr = miniprix.PrivateMPManager("miniprix", pl_slot1, self.mp_mgr, mirror_slot1)
         plcmp_slot1 = schedule.Slot1ScheduleManager(pcmp_origin, plcmpsched)
-        self.pcmp_mgr = miniprix.PrivateMPManager("private_classicprix", plcmp_slot1, self.cmp_mgr)
+        self.pcmp_mgr = miniprix.PrivateMPManager("classicprix", plcmp_slot1, self.cmp_mgr)
 
         # Shuffle Mini-Prix schedule managers
         self.smp_mgr = None
