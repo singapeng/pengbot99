@@ -8,6 +8,11 @@ class SecretLeagueDataError(Exception):
 class SecretLeagueConfig(object):
     def __init__(self, intervals, offset=None):
         """
+        The list of GP intervals between Secret Leagues.
+        During League Weekends, the way the interval applies and its offset are
+        different, and so we support a second set of interval/offset for these
+        events.
+
         intervals: a comma-separated list of ints
         offset: an integer, or will default to zero if None-like.
         """

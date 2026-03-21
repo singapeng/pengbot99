@@ -461,7 +461,7 @@ class Slot2ScheduleManager(BaseScheduleManager):
         It provides support for a dual-schedule rotation with distinct
         weekdays and weekend days timetables.
     """
-    def __init__(self, origin, weekday_sched, weekend_sched, secret_cfg=None):
+    def __init__(self, origin, weekday_sched, weekend_sched, secret_cfg=None, we_secret_cfg=None):
         super().__init__(origin)
         # Monday to Friday schedule
         self.weekday = TimeTable(weekday_sched, "weekday")
@@ -473,8 +473,12 @@ class Slot2ScheduleManager(BaseScheduleManager):
         # that do not start at 0:00 on the first day
         # This caches some data in relation to this.
         self._set_alt_origin()
+        self._secret_cfg = None
+        self._we_secret_cfg = None
         # if Secret League is happening (v1.7.0)
         self._secret_cfg = secret_cfg
+        # optional Weekend Secret League config for League Weekend events
+        self._we_secret_cfg = we_secret_cfg
 
     def _set_alt_origin(self):
         """ We may cache the next day from origin and the number of
@@ -639,6 +643,10 @@ class Slot2ScheduleManager(BaseScheduleManager):
     def _apply_glitch(self, evts, ongoing=False):
         # look up glitch events occuring during the events period
         for evt in evts:
-            if self._secret_cfg.can_glitch(evt, ongoing):
-                evt.glitch = True
+            if not self._we_secret_cfg or evt.schedule_name == "weekday":
+                if self._secret_cfg.can_glitch(evt, ongoing):
+                    evt.glitch = True
+            else:
+                if self._we_secret_cfg.can_glitch(evt, ongoing):
+                    evt.glitch = True
         return evts
