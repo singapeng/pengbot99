@@ -222,7 +222,9 @@ class TimeTable(object):
             return events.Event(
                     name=name, cycle=cycle, cycle_minute=cycle_info.minute,
                     start_minute=start_minute, end_minute=end_minute,
-                    rotation=active_row, rotation_offset=rotation_index)
+                    rotation=active_row, rotation_offset=rotation_index,
+                    schedname=self.name,
+                )
         else:
             return ''
 
@@ -264,10 +266,11 @@ class TimeTable(object):
                     else:
                         end_minute = start_minute
                     evts.append(events.Event(
-                            name = current, cycle=cycle, cycle_minute=cycle_info.minute,
+                            name=current, cycle=cycle, cycle_minute=cycle_info.minute,
                             start_minute=start_minute, end_minute=end_minute,
-                            rotation=rotation, rotation_offset=rotation_index
-                            ))
+                            rotation=rotation, rotation_offset=rotation_index,
+                            schedname=self.name,
+                        ))
             if row[0] >= minute:
                 # using greater-equal comparison here lets us catch the current event's
                 # rotation in case it's relevant to our offset.
