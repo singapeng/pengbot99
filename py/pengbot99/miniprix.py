@@ -132,7 +132,11 @@ class MiniPrixManager(object):
             mpid = "{:03d}.{:s}".format(int(row[0]), str(mirror_rows[idx][0]))
             mirror = mirror_rows[idx][1]
             r1, r2, r3 = row[1].split(' > ')
-            evt = events.MiniPrixEvent(name, mpid, r1, r2, r3, start_minute=idx, end_minute=idx + 1, mirrored=mirror)
+            evt = events.MiniPrixEvent(
+                    name, mpid, r1, r2, r3,
+                    start_minute=idx, end_minute=idx + 1, mirrored=mirror,
+                    schedname=self.name,
+                )
             evt.set_start_time(start_time + timedelta(minutes=idx))
             res.append(evt)
         return res
@@ -188,7 +192,11 @@ class PrivateMPManager(object):
             mpid = "{:03d}.{:s}".format(int(row[0]) + 1, str(mirror_rows[idx][0]))
             mirror = mirror_rows[idx][1]
             r1, r2, r3 = row[1].split(' > ')
-            evt = events.MiniPrixEvent(name, mpid, r1, r2, r3, start_minute=idx, end_minute=idx + 1, mirrored=mirror)
+            evt = events.MiniPrixEvent(
+                    name, mpid, r1, r2, r3,
+                    start_minute=idx, end_minute=idx + 1, mirrored=mirror,
+                    schedname=self.name,
+                )
             evt.set_start_time(start_time + timedelta(minutes=idx))
             res.append(evt)
         return res
