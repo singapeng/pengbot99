@@ -275,13 +275,13 @@ async def on_ready():
 async def configure_mwt_flip():
     """ Mini world tour vacation flip!
     """
-    mwt_on_time = datetime(2026, 2, 8, 23, 55, tzinfo=timezone.utc)
+    mwt_on_time = datetime(2026, 3, 29, 23, 55, tzinfo=timezone.utc)
 
     @tasks.loop(time=mwt_on_time.time())
     async def flip_mwt():
         # flip-on/off dates:
-        mwt_on_time = datetime(2026, 2, 8, 23, 54, tzinfo=timezone.utc)
-        mwt_off_time = datetime(2026, 2, 15, 23, 54, tzinfo=timezone.utc)
+        mwt_on_time = datetime(2026, 3, 29, 23, 54, tzinfo=timezone.utc)
+        mwt_off_time = datetime(2026, 4, 5, 23, 54, tzinfo=timezone.utc)
 
         now = datetime.now(timezone.utc)
         flipped = False
