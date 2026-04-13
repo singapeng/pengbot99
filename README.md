@@ -57,7 +57,7 @@ Therefore, once you have created one, you are responsible for tracking changes t
 
 **DISCORD_BOT_TOKEN**: This is supplied by Discord through the developer portal and is used to uniquely identify your bot.
 
-**SCHEDULE_EDIT_CHANNEL**: A Discord channel ID. The bot will post its schedule messages in this channel, and then will regularly update them (every 10 minutes).
+**SCHEDULE_EDIT_CHANNEL**: A Discord channel ID. The bot will post its schedule messages in this channel, and then will regularly update them (every 10 minutes or `REFRESH_INTERVAL` minutes).
 It is suggested that only the bot has permission to post to this channel so that the schedule remains the last message on the channel.
 
 **CONFIG_PATH**: The path to the bot's CSV schedule configuration directory. A complete set of CSV files is provided in the repository.
@@ -67,7 +67,7 @@ A default constants file is provided in the repository.
 
 ### Additional optional configuration
 
-**TICKER_OVERRIDE**: This value can be omitted from the config. If missing or empty, the bot will update its status description every 10 minutes to show the current or next Grand Prix.
+**TICKER_OVERRIDE**: This value can be omitted from the config. If missing or empty, the bot will update its status description every 10 minutes (or `REFRESH_INTERVAL` minutes) to show the current or next Grand Prix.
 If a text string is provided in this configuration entry, the bot will instead display its content as status. No automatic update will occur.
 Note that the status text has limited space for display on most clients. It is suggested to keep any override text short, i.e. 30 characters or less.
 
