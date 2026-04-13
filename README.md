@@ -46,6 +46,8 @@ SCHEDULE_EDIT_CHANNEL=9876543210
 CONFIG_PATH=C:/Path/to/schedule/files
 # Schedule constants file name (in config folder)
 CONSTANTS_FILE=constants.dat
+# Main refresh interval (for primary schedule and ticker) in minutes
+REFRESH_INTERVAL=5
 ```
 
 Note that because this file contains secrets, it is not under version control, per the repository's `.gitignore` file.
@@ -71,6 +73,8 @@ Note that the status text has limited space for display on most clients. It is s
 
 **ANNOUNCE_CHANNEL**: A Discord channel ID. This value can safely be omitted from the Config, as its associated method is currently considered deprecated. The bot's invocation of it is commented out but remains in code.
 It is used to have the bot repeat a schedule message every hour in the given channel.
+
+**REFRESH_INTERVAL**: How often the schedule and ticker message get refreshed, in minutes. If not specified, refresh every 10 minutes.
 
 If any other configuration key is defined (using the `NAME=value` scheme), it will be read but ignored by the bot.
 The configuration file may contain any number of comment lines starting with `#` character.
@@ -101,6 +105,22 @@ The bot uses the presence of the following constants as an indication that Machi
 When they are present, the bot will use the specified offset for Miniprix events occuring at weekend time (UTC).
 If there is no Machine Shuffle event, those constants should be omitted from the config, or commented out.
 As of F-Zero 99 version 1.6.1, there is no mirroring in Private Machine Shuffle-Miniprix, unless the lobby is started at the time of a public Machine Shuffle event. In this later case, the track selection will follow the public event's setting. In any case, the mirroring constant currently does not affect the results in any way.
+
+The bot uses the presence of the following constant as an indication that Secret League is active:
+
+- SECRET_LEAGUE_INTERVALS
+
+The value of SECRET_LEAGUE_INTERVALS is a comma-separated list of integers. Each integer represents an interval between Secret League Grand Prix. When enabled, the Grand Prix rotation proceeds as defined per the schedule, but some Grand Prix are replaced by Secret League as defined per the intervals. When this will happen, the Grand Prix will appear as `Secret League (replaces <replaced GP>)`, and the ticker will display Secret League instead of the replaced Grand Prix.
+Once all intervals in the list have elapsed, the process repeats from the start of the list.
+
+- SECRET_LEAGUE_OFFSET
+
+This may optionally be defined, as an integer value, to change the start Grand Prix of the Secret League intervals sequence. If not defined, it is set to zero.
+
+- WEEKEND_SECRET_LEAGUE_INTERVALS
+- WEEKEND_SECRET_LEAGUE_OFFSET
+
+In cases where the schedule defines a separate Grand Prix rotation for the weekend, these values can be defined to apply a separate intervals list and a separate offset applying to the weekend schedule. For v1.7, this is useful for Leagues weekend events. Similarly with the `SECRET_LEAGUE_INTERVALS` constant, the presence or absence of `WEEKEND_SECRET_LEAGUE_INTERVALS` is used to determine whether this feature should be activated when the bot starts. `WEEKEND_SECRET_LEAGUE_OFFSET` is set to zero if the constant is left undefined.
 
 ## Running the application
 
