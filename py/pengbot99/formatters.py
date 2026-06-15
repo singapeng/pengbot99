@@ -44,7 +44,7 @@ event_custom_emoji = {
     "mysteryprix": "<:WhatQuestionmarksthree:1217243922418368734>",
     "queen": "<:GPQueen:1195076266311811233>",
     "glitchgp": "<:GPSecretKnight:1462611891447791700>",
-    "worldtour": "<:WTMini:1462608159913934881>",
+    "worldtour": "<:WTFestival:1515888912676163764>",
 }
 
 track_display_names = {
