@@ -60,6 +60,18 @@ It is suggested that only the bot has permission to post to this channel so that
 
 **CONFIG_PATH**: The path to the bot's CSV schedule configuration directory. A complete set of CSV files is provided in the repository.
 
+> **Pending change — maintainer input needed.**
+> Work to make `pengbot99` usable as an installed library moves the shipped CSV
+> files out of `config/` and into the package itself, so that an installed copy
+> carries its own data and `CONFIG_PATH` becomes optional rather than mandatory.
+> Setting `CONFIG_PATH` will continue to override the packaged files and win, so
+> a directory of hand-edited CSVs keeps working exactly as it does now.
+>
+> What needs confirming before that lands: if a running instance points
+> `CONFIG_PATH` at *this repository's* `config/` directory, it will break — not
+> because the override stopped working, but because the path no longer exists.
+> If it points at a separate directory of CSVs, nothing changes for it.
+
 **CONSTANTS_FILE**: This file holds constants that are used for fine-tuning the schedule. It can reside alongside the CSV schedule files.
 A default constants file is provided in the repository.
 
@@ -130,6 +142,26 @@ python -m unittest discover -s tests
 Both resolve the fixture directory from `tests/conftest.py`, so neither depends
 on the working directory and neither needs a configuration file to be created
 first.
+
+## Releasing
+
+`pengbot99` is consumed as a library by other projects, which pin it to an
+immutable git reference rather than to a branch. Tags are that reference: when a
+change is ready to be depended on, tag it.
+
+```bash
+# bump `version` in pyproject.toml first
+git tag -a v0.2.0 -m "Short summary of what changed"
+git push origin v0.2.0
+```
+
+Use annotated tags (`-a`) rather than lightweight ones, and keep the tag in step
+with `version` in `pyproject.toml`. Either the maintainer or a contributor can
+cut one — what matters is that a tag exists, because without it a consumer has
+to pin a bare commit sha. That works, but it goes stale silently: nothing tells
+the consumer a newer release has happened.
+
+`shuffle_on` is an older feature marker, not a release tag.
 
 ## Future improvements
 
