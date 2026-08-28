@@ -26,7 +26,10 @@ include-package-data = true
 where = ["py"]
 
 [dependency-groups]
-dev = ["ruff>=0.6.9"]
+dev = ["ruff>=0.6.9", "pytest>=8.3"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
 
 [tool.ruff]
 target-version = "py311"

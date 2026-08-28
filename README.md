@@ -113,12 +113,23 @@ python -m pengbot99.bot
 
 ## Running tests
 
-For simplicity's sake, tests are written using Python's built-in unittest module.
-To run tests from the repository root:
+Tests are written using Python's built-in unittest module and are run with
+`pytest`, which executes `unittest.TestCase` classes as they are. From the
+repository root:
+
+```bash
+uv run pytest
+```
+
+The built-in runner still works and needs no extra dependency:
 
 ```bash
 python -m unittest discover -s tests
 ```
+
+Both resolve the fixture directory from `tests/conftest.py`, so neither depends
+on the working directory and neither needs a configuration file to be created
+first.
 
 ## Future improvements
 

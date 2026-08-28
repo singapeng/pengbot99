@@ -2,8 +2,10 @@
 from datetime import datetime, timedelta, timezone
 import unittest
 
+# Test support
+from conftest import FIXTURES_DIR
+
 # Local import
-from pengbot99 import utils
 from pengbot99 import schedule
 from pengbot99 import miniprix
 
@@ -34,10 +36,7 @@ class TestMiniprixManagerMachineShuffle(unittest.TestCase):
         return mgr
 
     def setUp(self):
-        # This .env file only needs CONFIG_PATH declared.
-        # .env is covered by .gitignore to avoid secrets accidentally pushed to server
-        env_path = "fixtures/.env"
-        self.env = utils.load_env("fixtures/.env")
+        self.env = {"CONFIG_PATH": FIXTURES_DIR}
         self.origin = datetime(2024, 2, 6, 0, 0, 0, 0, tzinfo=timezone.utc)
         self.mgr = self.create_manager()
 
@@ -79,10 +78,7 @@ class TestMiniprixManagerMiniWorldTourClassic(unittest.TestCase):
         return mgr
 
     def setUp(self):
-        # This .env file only needs CONFIG_PATH declared.
-        # .env is covered by .gitignore to avoid secrets accidentally pushed to server
-        env_path = "fixtures/.env"
-        self.env = utils.load_env("fixtures/.env")
+        self.env = {"CONFIG_PATH": FIXTURES_DIR}
         self.origin = datetime(2025, 4, 23, 0, 0, 0, 0, tzinfo=timezone.utc)
         self.mgr = self.create_manager()
 
