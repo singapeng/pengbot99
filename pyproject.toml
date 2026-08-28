@@ -11,13 +11,19 @@ requires-python = ">=3.11"
 license = "Unlicense"
 authors = [{ name = "Pengui", email = "pengui@gmail.com" }]
 
-dependencies = ["py-cord>=2.5"]
+dependencies = []
 
 classifiers = [
   "Natural Language :: English",
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3.11",
 ]
+
+# The Discord bot is one consumer of this package; the schedule logic is
+# another, and it needs no Discord client. Install `pengbot99[bot]` to run
+# the bot -- see README.md.
+[project.optional-dependencies]
+bot = ["py-cord>=2.5"]
 
 [tool.setuptools]
 include-package-data = true

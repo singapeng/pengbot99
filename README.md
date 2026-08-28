@@ -19,6 +19,14 @@ source .venv/bin/activate
 .venv\Scripts\Activate.ps1
 ```
 
+The Discord client library is an optional dependency, so the command above
+installs the schedule logic and the test suite but not `py-cord`. To work on or
+run the bot, ask for the `bot` extra as well:
+
+```bash
+uv sync --dev --extra bot
+```
+
 You may then import the module in your Python environment:
 
 ```bash
@@ -122,6 +130,21 @@ No assumption is made as to the target environment, therefore no shell script or
 ```bash
 python -m pengbot99.bot
 ```
+
+The bot requires the `bot` extra, which brings in `py-cord`. Installing the
+package without it gives the schedule logic alone, and starting the bot then
+fails at import with `ModuleNotFoundError: No module named 'discord'`:
+
+```bash
+uv pip install '.[bot]'   # bot deployment
+uv pip install .          # schedule logic only, for use as a library
+```
+
+The split exists because the schedule computation is useful on its own -- it
+reads CSV files and does arithmetic, and a caller that only wants that has no
+reason to install a Discord gateway client. `apiadapter.py` and `bot.py` are the
+only modules that require it, and a test in `tests/test_import_boundary.py`
+fails if a Discord import ever reaches the schedule modules.
 
 ## Running tests
 

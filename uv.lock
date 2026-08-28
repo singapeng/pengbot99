@@ -401,7 +401,9 @@ wheels = [
 name = "pengbot99"
 version = "0.1.0"
 source = { editable = "." }
-dependencies = [
+
+[package.optional-dependencies]
+bot = [
     { name = "py-cord" },
 ]
 
@@ -412,7 +414,8 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "py-cord", specifier = ">=2.5" }]
+requires-dist = [{ name = "py-cord", marker = "extra == 'bot'", specifier = ">=2.5" }]
+provides-extras = ["bot"]
 
 [package.metadata.requires-dev]
 dev = [
