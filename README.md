@@ -7,6 +7,11 @@ A library and Discord bot for useful F-Zero 99 schedule info
 This project uses `uv` for dependency management.
 From the repository root:
 
+`.python-version` pins Python 3.11, the oldest version `requires-python`
+supports and the one `ruff` targets. Developing against the floor is what keeps
+that floor honest for anything installing this package; the test suite also
+passes on 3.12, 3.13 and 3.14.
+
 ### Create & activate a virtual env
 
 ```bash
