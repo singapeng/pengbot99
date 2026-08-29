@@ -44,6 +44,10 @@ class Pengbot(object):
             utils.log(
                 "Secret League initialized with {0}".format(mgrs.secret_cfg.indices)
             )
+        if mgrs.we_secret_cfg:
+            utils.log(
+                "Weekend Secret League is ON: {0}".format(mgrs.we_secret_cfg.indices)
+            )
         utils.log(
             "Setting cycles to {0} for {1}.".format(
                 self.mp_mgr.mp_cycles, self.mp_mgr.name

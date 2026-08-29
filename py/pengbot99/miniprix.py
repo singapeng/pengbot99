@@ -153,6 +153,7 @@ class MiniPrixManager(object):
                 start_minute=idx,
                 end_minute=idx + 1,
                 mirrored=mirror,
+                schedname=self.name,
             )
             evt.set_start_time(start_time + timedelta(minutes=idx))
             res.append(evt)
@@ -223,6 +224,7 @@ class PrivateMPManager(object):
                 start_minute=idx,
                 end_minute=idx + 1,
                 mirrored=mirror,
+                schedname=self.name,
             )
             evt.set_start_time(start_time + timedelta(minutes=idx))
             res.append(evt)

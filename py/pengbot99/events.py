@@ -19,6 +19,7 @@ class Event(object):
         end_minute=0,
         rotation=None,
         rotation_offset=0,
+        schedname=None,
     ):
         super().__init__()
         # the event's internal name
@@ -37,6 +38,8 @@ class Event(object):
         self.rotation_offset = rotation_offset
         # start time
         self.start_time = None
+        # the name of the schedule this event was created from
+        self.schedule_name = schedname
         # is a glitch active?
         self.glitch = False
 
@@ -172,6 +175,7 @@ class MiniPrixEvent(Event):
         start_minute=0,
         end_minute=0,
         mirrored="000",
+        schedname=None,
     ):
         if mp_type == "classicprix":
             code = "ClassicMiniPrix"
@@ -180,7 +184,10 @@ class MiniPrixEvent(Event):
         miniprix_id = "{:s}{:s}".format(code, mp_id)
         name = "{0} > {1} > {2} ({3})".format(race1, race2, race3, miniprix_id)
         super().__init__(
-            name=miniprix_id, start_minute=start_minute, end_minute=end_minute
+            name=miniprix_id,
+            start_minute=start_minute,
+            end_minute=end_minute,
+            schedname=schedname,
         )
         self._mode = mp_type
         self._race1 = race1

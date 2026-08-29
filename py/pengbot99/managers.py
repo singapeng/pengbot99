@@ -33,6 +33,8 @@ class ScheduleConstants:
     ninetynine_offset: int
     secret_league_intervals: str | None = None
     secret_league_offset: str | None = None
+    weekend_secret_league_intervals: str | None = None
+    weekend_secret_league_offset: str | None = None
     shuffle_lineup_offset: int | None = None
     shuffle_mirror_lineup_offset: int | None = None
     private_shuffle_mp_offset: int | None = None
@@ -69,6 +71,10 @@ class ScheduleConstants:
             # absent; it is the one consumer that wants them unconverted.
             secret_league_intervals=csts.get("SECRET_LEAGUE_INTERVALS"),
             secret_league_offset=csts.get("SECRET_LEAGUE_OFFSET"),
+            # A League Weekend runs Secret League on a rotation of its own; the
+            # weekend constants are absent the rest of the time.
+            weekend_secret_league_intervals=csts.get("WEEKEND_SECRET_LEAGUE_INTERVALS"),
+            weekend_secret_league_offset=csts.get("WEEKEND_SECRET_LEAGUE_OFFSET"),
             shuffle_lineup_offset=int(shuffle_offset) if shuffle_on else None,
             # Shuffle mirrors on the same offset as the regular Mini-Prix
             # unless the config gives it one of its own.
@@ -90,7 +96,8 @@ class ScheduleManagers:
     ``smp_mgr`` and ``psmp_mgr`` are None while Shuffle Weekend is off, which
     is its usual state. ``secret_cfg`` is None when Secret League is not
     running; it is already inside ``slot2mgr``, and is here so a caller can
-    report on what was built.
+    report on what was built. ``we_secret_cfg`` is the same for the weekend
+    rotation, and is None outside a League Weekend.
     """
 
     slot1mgr: schedule.Slot1ScheduleManager
@@ -103,6 +110,7 @@ class ScheduleManagers:
     smp_mgr: MiniPrixManager | None = None
     psmp_mgr: PrivateMPManager | None = None
     secret_cfg: secret_league.SecretLeagueConfig | None = None
+    we_secret_cfg: secret_league.SecretLeagueConfig | None = None
 
     @property
     def is_shuffle_on(self):
@@ -121,10 +129,17 @@ def build_managers(csts, cfg_path=None):
         csts = ScheduleConstants.from_mapping(csts)
 
     secret_cfg = None
+    we_secret_cfg = None
     if csts.secret_league_intervals:
         secret_cfg = secret_league.SecretLeagueConfig(
             csts.secret_league_intervals, csts.secret_league_offset
         )
+        # The weekend rotation only replaces Grand Prix that the weekday one
+        # already replaces, so it is only built alongside it.
+        if csts.weekend_secret_league_intervals:
+            we_secret_cfg = secret_league.SecretLeagueConfig(
+                csts.weekend_secret_league_intervals, csts.weekend_secret_league_offset
+            )
 
     # the schedule for slot 1 (99 races)
     r99sched = schedule.load_schedule(cfg_path, "slot1_schedule")
@@ -144,7 +159,7 @@ def build_managers(csts, cfg_path=None):
     # The Public schedule managers
     slot1mgr = schedule.Slot1ScheduleManager(schedule.glitch_origin, r99sched)
     slot2mgr = schedule.Slot2ScheduleManager(
-        schedule.origin, wdsched, wesched, secret_cfg
+        schedule.origin, wdsched, wesched, secret_cfg, we_secret_cfg
     )
     cmp_mgr = MiniPrixManager(
         "classicprix", slot2mgr, cmpsched, offset=csts.classic_lineup_offset
@@ -188,6 +203,7 @@ def build_managers(csts, cfg_path=None):
         "pmp_mgr": pmp_mgr,
         "pcmp_mgr": pcmp_mgr,
         "secret_cfg": secret_cfg,
+        "we_secret_cfg": we_secret_cfg,
     }
     if not csts.is_shuffle_on:
         return ScheduleManagers(**built)
