@@ -11,7 +11,7 @@ def init_99_manager(name=None, glitch_mgr=None, env=None, minutes_offset=0):
         env = utils.load_env()
     # Common origin plus constant offset
     r99_origin = schedule.origin + timedelta(minutes=minutes_offset)
-    nnsched = schedule.load_schedule(env["CONFIG_PATH"], "ninetynine_schedule")
+    nnsched = schedule.load_schedule(env.get("CONFIG_PATH"), "ninetynine_schedule")
     r99mgr = schedule.Slot1ScheduleManager(r99_origin, nnsched)
     if glitch_mgr:
         return FZ99Manager(r99mgr, glitch_mgr)

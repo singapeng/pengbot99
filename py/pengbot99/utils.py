@@ -1,13 +1,27 @@
 import os
 from datetime import datetime
+from importlib import resources
+
+# The game-content dumps ship inside the package, under this directory.
+DATA_DIR = "data"
 
 
-def load_env(path=None):
-    """Reads the .env file and returns a dict"""
-    path = path or ".env"
+def open_data_file(path, name, **kwargs):
+    """Opens a game content file, from 'path' or from the packaged copy.
+
+    'path' is the CONFIG_PATH override: when it is set, the file is read from
+    that directory, and when it is None or empty the copy that shipped inside
+    the package is read instead. Resolved on every call, so a caller that
+    passes a path for one file and none for the next gets what it asked for.
+    """
+    if path:
+        return open(os.path.join(path, name), **kwargs)
+    return (resources.files("pengbot99") / DATA_DIR / name).open(**kwargs)
+
+
+def parse_env(lines):
+    """Parses KEY=VALUE lines into a dict, ignoring comments."""
     env = {}
-    with open(path) as fd:
-        lines = fd.readlines()
     for line in lines:
         line = line.strip()
         if line.startswith("#"):
@@ -18,13 +32,25 @@ def load_env(path=None):
     return env
 
 
-def _sideload_data(env, data_name):
-    if "CONFIG_PATH" in env and data_name in env:
-        cfg_path = os.path.join(env["CONFIG_PATH"], env[data_name])
-        values = load_env(path=cfg_path)
-    else:
-        values = None
-    return values
+def load_env(path=None):
+    """Reads the .env file and returns a dict"""
+    path = path or ".env"
+    with open(path) as fd:
+        return parse_env(fd.readlines())
+
+
+def _sideload_data(env, data_name, default_name=None):
+    """Loads a data file named by the env, from CONFIG_PATH or the package.
+
+    'default_name' is the packaged file to fall back on when the env does not
+    name one. Without it, an env that does not name the file gets nothing,
+    which is the behaviour these files had before any of them were packaged.
+    """
+    name = env.get(data_name, default_name)
+    if not name:
+        return None
+    with open_data_file(env.get("CONFIG_PATH"), name) as fd:
+        return parse_env(fd.readlines())
 
 
 def load_config(path=None):
@@ -35,7 +61,7 @@ def load_config(path=None):
     env = load_env(path)
 
     # load schedule constants from a versioned config file
-    csts = _sideload_data(env, "CONSTANTS_FILE")
+    csts = _sideload_data(env, "CONSTANTS_FILE", "constants.dat")
     # load explainer data from its config file
     xpln = _sideload_data(env, "EXPLAIN_FILE")
     return env, csts, xpln

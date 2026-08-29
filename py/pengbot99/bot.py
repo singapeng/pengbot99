@@ -5,19 +5,15 @@ from datetime import datetime, timedelta, timezone
 import discord
 from discord.ext import tasks
 
+# local imports
 from pengbot99 import (
     apiadapter,
-    choicerace,
     explain_cmd,
     formatters,
-    schedule,
-    secret_league,
+    managers,
     ui,
     utils,
 )
-
-# local imports
-from pengbot99.miniprix import MiniPrixManager, PrivateMPManager
 
 # Load tokens, ids, etc from an unversioned env file
 # Load schedule constants from a env-defined versioned config file
@@ -29,100 +25,32 @@ class Pengbot(object):
         self.env = env
         self.csts = csts
 
-        # all env values are str, convert schedule offsets to int now
-        mp_offset = int(csts["MINIPRIX_LINE_UP_OFFSET"])
-        cmp_offset = int(csts["CLASSIC_LINE_UP_OFFSET"])
-        mirror_offset = int(csts["MIRROR_LINE_UP_OFFSET"])
+        # Where the game content is read from. Absent from the env means the
+        # copy that shipped inside the package; set means that directory wins.
+        mgrs = managers.build_managers(csts, env.get("CONFIG_PATH"))
 
-        # Glitch GP
-        secret_cfg = None
-        if csts.get("SECRET_LEAGUE_INTERVALS"):
-            secret_cfg = secret_league.SecretLeagueConfig(
-                csts["SECRET_LEAGUE_INTERVALS"], csts.get("SECRET_LEAGUE_OFFSET")
+        self.slot1mgr = mgrs.slot1mgr
+        self.slot2mgr = mgrs.slot2mgr
+        self.cmp_mgr = mgrs.cmp_mgr
+        self.mp_mgr = mgrs.mp_mgr
+        self.r99_mgr = mgrs.r99_mgr
+        self.pmp_mgr = mgrs.pmp_mgr
+        self.pcmp_mgr = mgrs.pcmp_mgr
+        # Shuffle Mini-Prix managers, None while Shuffle Weekend is off
+        self.smp_mgr = mgrs.smp_mgr
+        self.psmp_mgr = mgrs.psmp_mgr
+
+        if mgrs.secret_cfg:
+            utils.log(
+                "Secret League initialized with {0}".format(mgrs.secret_cfg.indices)
             )
-            utils.log("Secret League initialized with {0}".format(secret_cfg.indices))
-
-        # load the schedule for slot 1 (99 races)
-        r99sched = schedule.load_schedule(env["CONFIG_PATH"], "slot1_schedule")
-        # load the weekday schedule for slot 2 (Prix and special events)
-        wdsched = schedule.load_schedule(env["CONFIG_PATH"], "slot2_schedule")
-        # load the weekend schedule for slot 2 (Prix and special events)
-        wesched = schedule.load_schedule(env["CONFIG_PATH"], "slot2_schedule_weekend")
-        # load the Classic Mini Prix track schedule
-        cmpsched = schedule.load_schedule(env["CONFIG_PATH"], "classic_mp_schedule")
-        # load the Mini Prix track schedule
-        mpsched = schedule.load_schedule(env["CONFIG_PATH"], "miniprix_schedule")
-        mirrorsc = schedule.load_schedule(
-            env["CONFIG_PATH"], "miniprix_mirroring_schedule"
-        )
-        # load the schedule for Private Lobbies Mini-Prix
-        plmpsched = schedule.load_schedule(
-            env["CONFIG_PATH"], "private_miniprix_schedule"
-        )
-        plcmpsched = schedule.load_schedule(
-            env["CONFIG_PATH"], "private_classic_mp_schedule"
-        )
-
-        # Create the Public schedule managers
-        r99_offset = int(csts["NINETYNINE_MINUTE_OFFSET"])
-
-        self.slot1mgr = schedule.Slot1ScheduleManager(schedule.glitch_origin, r99sched)
-        self.slot2mgr = schedule.Slot2ScheduleManager(
-            schedule.origin, wdsched, wesched, secret_cfg
-        )
-        self.cmp_mgr = MiniPrixManager(
-            "classicprix", self.slot2mgr, cmpsched, offset=cmp_offset
-        )
-        self.mp_mgr = MiniPrixManager(
-            "miniprix", self.slot2mgr, mpsched, mirrorsc, mp_offset, mirror_offset
-        )
         utils.log(
             "Setting cycles to {0} for {1}.".format(
                 self.mp_mgr.mp_cycles, self.mp_mgr.name
             )
         )
-        self.r99_mgr = choicerace.init_99_manager(
-            name=None, glitch_mgr=self.slot1mgr, env=env, minutes_offset=r99_offset
-        )
-
-        # Create Private Lobby schedule managers
-        pmp_origin = schedule.origin + timedelta(
-            minutes=int(csts["PRIVATE_MP_MINUTE_OFFSET"])
-        )
-        pmp_mirror_origin = schedule.origin + timedelta(
-            minutes=int(csts["PRIVATE_MP_MIRROR_MINUTE_OFFSET"])
-        )
-        pcmp_origin = schedule.origin + timedelta(
-            minutes=int(csts["PRIVATE_CMP_MINUTE_OFFSET"])
-        )
-
-        pl_slot1 = schedule.Slot1ScheduleManager(pmp_origin, plmpsched)
-        mirror_slot1 = schedule.Slot1ScheduleManager(pmp_mirror_origin, mirrorsc)
-        self.pmp_mgr = PrivateMPManager("miniprix", pl_slot1, self.mp_mgr, mirror_slot1)
-        plcmp_slot1 = schedule.Slot1ScheduleManager(pcmp_origin, plcmpsched)
-        self.pcmp_mgr = PrivateMPManager("classicprix", plcmp_slot1, self.cmp_mgr)
-
-        # Shuffle Mini-Prix schedule managers
-        self.smp_mgr = None
-        self.psmp_mgr = None
-
-        smp_offset = csts.get("SHUFFLE_MINIPRIX_LINE_UP_OFFSET")
-        if smp_offset is None:
-            # Shuffle is currently off
-            return
-        smp_offset = int(smp_offset)
-        smp_mirror_offset = int(
-            csts.get("SHUFFLE_MIRROR_LINE_UP_OFFSET", mirror_offset)
-        )
-        self.smp_mgr = MiniPrixManager(
-            "miniprix", self.slot2mgr, mpsched, mirrorsc, smp_offset, smp_mirror_offset
-        )
-        psmp_origin = schedule.origin + timedelta(
-            minutes=int(csts["PRIVATE_SHUFFLE_MP_MINUTE_OFFSET"])
-        )
-        psl_slot1 = schedule.Slot1ScheduleManager(psmp_origin, plmpsched)
-        self.psmp_mgr = PrivateMPManager("miniprix", psl_slot1, self.smp_mgr, None)
-        utils.log("!! Configured Shuffle Weekend !!")
+        if mgrs.is_shuffle_on:
+            utils.log("!! Configured Shuffle Weekend !!")
 
     def is_shuffle_on(self):
         if self.smp_mgr:

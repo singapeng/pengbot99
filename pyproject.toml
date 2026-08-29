@@ -28,6 +28,12 @@ bot = ["py-cord>=2.5"]
 [tool.setuptools]
 include-package-data = true
 
+# The CSV and .dat dumps of game content are what this package computes over.
+# An installed copy that does not carry them is of no use to a caller that has
+# no checkout. CONFIG_PATH still overrides them at runtime -- see README.md.
+[tool.setuptools.package-data]
+pengbot99 = ["data/*.csv", "data/*.dat"]
+
 [tool.setuptools.packages.find]
 where = ["py"]
 

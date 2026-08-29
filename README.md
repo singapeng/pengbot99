@@ -38,6 +38,40 @@ You may then import the module in your Python environment:
 python -c "import pengbot99"
 ```
 
+The game content the schedule is computed from ships inside the package, so a
+consumer that only wants the schedule logic needs neither a checkout nor a
+configuration file:
+
+```bash
+python -c "from pengbot99 import schedule; print(schedule.load_schedule(None, 'slot2_schedule'))"
+```
+
+Passing a directory in place of `None` reads that file from there instead. The
+bot does exactly this with `CONFIG_PATH`, described below.
+
+### Using it as a library
+
+Individual schedules are rarely what a caller wants. `pengbot99.managers` turns
+the constants and the content dumps into the managers that answer questions,
+which is the same call the bot makes at startup:
+
+```python
+from datetime import datetime, timezone
+
+from pengbot99 import managers, utils
+
+with utils.open_data_file(None, "constants.dat") as fd:
+    csts = utils.parse_env(fd.readlines())
+
+mgrs = managers.build_managers(csts)
+print(mgrs.slot2mgr.get_events(timestamp=datetime.now(timezone.utc), limit=120))
+```
+
+`build_managers` takes an optional second argument, the `CONFIG_PATH` directory
+to read the content from; without it, the packaged copy is read. It needs no
+`.env`, no Discord and no particular working directory. The managers it returns
+are described in the module.
+
 To run the application as a Discord bot, you will first need to set up a configuration file.
 
 ## Configuring the Discord bot
@@ -55,7 +89,7 @@ DISCORD_BOT_TOKEN=Al0ngAlph4numericT0k3nSuppliedByD1scord
 ANNOUNCE_CHANNEL=1234567890
 # ID for the bot's schedule channel
 SCHEDULE_EDIT_CHANNEL=9876543210
-# Config files folder
+# Config files folder (optional; overrides the packaged schedules)
 CONFIG_PATH=C:/Path/to/schedule/files
 # Schedule constants file name (in config folder)
 CONSTANTS_FILE=constants.dat
@@ -71,24 +105,16 @@ Therefore, once you have created one, you are responsible for tracking changes t
 **SCHEDULE_EDIT_CHANNEL**: A Discord channel ID. The bot will post its schedule messages in this channel, and then will regularly update them (every 10 minutes).
 It is suggested that only the bot has permission to post to this channel so that the schedule remains the last message on the channel.
 
-**CONFIG_PATH**: The path to the bot's CSV schedule configuration directory. A complete set of CSV files is provided in the repository.
-
-> **Pending change — maintainer input needed.**
-> Work to make `pengbot99` usable as an installed library moves the shipped CSV
-> files out of `config/` and into the package itself, so that an installed copy
-> carries its own data and `CONFIG_PATH` becomes optional rather than mandatory.
-> Setting `CONFIG_PATH` will continue to override the packaged files and win, so
-> a directory of hand-edited CSVs keeps working exactly as it does now.
->
-> What needs confirming before that lands: if a running instance points
-> `CONFIG_PATH` at *this repository's* `config/` directory, it will break — not
-> because the override stopped working, but because the path no longer exists.
-> If it points at a separate directory of CSVs, nothing changes for it.
-
 **CONSTANTS_FILE**: This file holds constants that are used for fine-tuning the schedule. It can reside alongside the CSV schedule files.
-A default constants file is provided in the repository.
+If omitted, the packaged `constants.dat` is used — see below.
 
 ### Additional optional configuration
+
+**CONFIG_PATH**: The path to a directory of CSV schedule files and, optionally, a `constants.dat` alongside them.
+
+A complete set of these files ships inside the package, in `py/pengbot99/data`, and the bot loads those when `CONFIG_PATH` is unset. Setting it overrides them: every file is then read from that directory instead, which is what you want if you keep a directory of hand-edited schedules. The override is all-or-nothing per file name — there is no merging of a partial directory with the packaged one.
+
+Note that the files moved out of a top-level `config/` directory when the package was made installable. An instance whose `.env` pointed `CONFIG_PATH` at that directory should either drop the setting, to use the packaged copies, or point it at a directory of its own.
 
 **TICKER_OVERRIDE**: This value can be omitted from the config. If missing or empty, the bot will update its status description every 10 minutes to show the current or next Grand Prix.
 If a text string is provided in this configuration entry, the bot will instead display its content as status. No automatic update will occur.

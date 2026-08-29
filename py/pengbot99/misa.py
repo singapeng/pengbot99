@@ -1,12 +1,13 @@
 import csv
 import random
 
+# local imports
+from pengbot99 import utils
+
 
 def load_quotes(path):
-    """Loads Misa quotes from file."""
-    name = "misa"
-    quotes_path = "{0}/{1}.csv".format(path, name)
-    with open(quotes_path, newline="") as fd:
+    """Loads Misa quotes from file, or from the packaged copy if path is None."""
+    with utils.open_data_file(path, "misa.csv", newline="") as fd:
         reader = csv.reader(fd, delimiter=";")
         quotes = list(reader)
     return quotes

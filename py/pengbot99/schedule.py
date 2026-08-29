@@ -3,7 +3,7 @@ import csv
 from datetime import datetime, timedelta, timezone
 
 # local imports
-from pengbot99 import events
+from pengbot99 import events, utils
 
 # This should mark a cycle origin in UTC time
 # At present it drives all GP and MP cycles (public/private)
@@ -18,6 +18,8 @@ glitch_gp_origin = datetime(2026, 1, 18, 22, 0, tzinfo=timezone.utc)
 def load_schedule(path, name):
     """Loads a CSV schedule from the folder 'path' and the file
     named 'name.csv'.
+    'path' may be None, in which case the copy of 'name.csv' that
+    shipped inside the package is read instead.
     Each line in the csv should be formatted as such:
     minutes,name[,name,name...]
     'minutes' represents the event duration as an integer.
@@ -27,8 +29,7 @@ def load_schedule(path, name):
     The last line event type should be 'next' and represents
     the point at which the schedule moves on to the next cycle.
     """
-    schedule_path = "{0}/{1}.csv".format(path, name)
-    with open(schedule_path, newline="") as fd:
+    with utils.open_data_file(path, "{0}.csv".format(name), newline="") as fd:
         reader = csv.reader(fd, delimiter=",")
         schedule = []
         for row in reader:

@@ -3,19 +3,25 @@ import subprocess
 import sys
 import unittest
 
-# Modules that compute the schedule. They are consumed by the Discord bot, but
-# also by callers that have no Discord client and no business installing one.
-SCHEDULE_MODULES = ("pengbot99.schedule", "pengbot99.miniprix", "pengbot99.events")
+# Modules that compute the schedule, plus the assembly that turns the content
+# dumps into managers. They are consumed by the Discord bot, but also by
+# callers that have no Discord client and no business installing one.
+SCHEDULE_MODULES = (
+    "pengbot99.schedule",
+    "pengbot99.miniprix",
+    "pengbot99.events",
+    "pengbot99.managers",
+)
 
 
 class TestDiscordImportBoundary(unittest.TestCase):
     """ The schedule modules must not pull in a Discord client library.
 
         py-cord is an optional dependency (the `bot` extra), so a consumer that
-        installs pengbot99 on its own must still be able to import these three
-        modules. The assertion is on sys.modules rather than on what is
-        installed, so that it stays meaningful in a development environment
-        where py-cord is present.
+        installs pengbot99 on its own must still be able to import them. The
+        assertion is on sys.modules rather than on what is installed, so that
+        it stays meaningful in a development environment where py-cord is
+        present.
 
         The check runs in a subprocess because sys.modules is process-wide: an
         in-process assertion would pass or fail depending on what the rest of
