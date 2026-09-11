@@ -36,8 +36,7 @@ class TestMiniprixManagerMachineShuffle(unittest.TestCase):
     def setUp(self):
         # This .env file only needs CONFIG_PATH declared.
         # .env is covered by .gitignore to avoid secrets accidentally pushed to server
-        env_path = "fixtures/.env"
-        self.env = utils.load_env("fixtures/.env")
+        self.env = utils.load_env("tests/fixtures/.env")
         self.origin = datetime(2024, 2, 6, 0, 0, 0, 0, tzinfo=timezone.utc)
         self.mgr = self.create_manager()
 
@@ -81,8 +80,7 @@ class TestMiniprixManagerMiniWorldTourClassic(unittest.TestCase):
     def setUp(self):
         # This .env file only needs CONFIG_PATH declared.
         # .env is covered by .gitignore to avoid secrets accidentally pushed to server
-        env_path = "fixtures/.env"
-        self.env = utils.load_env("fixtures/.env")
+        self.env = utils.load_env("tests/fixtures/.env")
         self.origin = datetime(2025, 4, 23, 0, 0, 0, 0, tzinfo=timezone.utc)
         self.mgr = self.create_manager()
 
@@ -152,8 +150,7 @@ class TestMiniprixManagerPrivateMiniFilter(unittest.TestCase):
     def setUp(self):
         # This .env file only needs CONFIG_PATH declared.
         # .env is covered by .gitignore to avoid secrets accidentally pushed to server
-        env_path = "fixtures/.env"
-        self.env = utils.load_env("fixtures/.env")
+        self.env = utils.load_env("tests/fixtures/.env")
         self.origin = datetime(2025, 4, 23, 0, 0, 0, 0, tzinfo=timezone.utc)
         self.mgr = self.create_manager()
 
