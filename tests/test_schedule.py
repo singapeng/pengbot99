@@ -23,8 +23,7 @@ class TestSchedule(unittest.TestCase):
     def setUp(self):
         # This .env file only needs CONFIG_PATH declared.
         # .env is covered by .gitignore to avoid secrets accidentally pushed to server
-        env_path = "fixtures/.env"
-        self.env = utils.load_env("fixtures/.env")
+        self.env = utils.load_env("tests/fixtures/.env")
         self.origin = datetime(2024, 10, 2, 2, 0, 0, 0, tzinfo=timezone.utc)
         self.mgr = self.create_manager()
 
@@ -69,8 +68,7 @@ class TestMiniWorldTourRotation(unittest.TestCase):
     def setUp(self):
         # This .env file only needs CONFIG_PATH declared.
         # .env is covered by .gitignore to avoid secrets accidentally pushed to server
-        env_path = "fixtures/.env"
-        self.env = utils.load_env("fixtures/.env")
+        self.env = utils.load_env("tests/fixtures/.env")
         self.origin = datetime(2025, 5, 5, 0, 0, 0, 0, tzinfo=timezone.utc)
         self.mgr = self.create_manager()
 
@@ -152,8 +150,7 @@ class TestMiniWorldTourRotation_EdgeCase(unittest.TestCase):
     def setUp(self):
         # This .env file only needs CONFIG_PATH declared.
         # .env is covered by .gitignore to avoid secrets accidentally pushed to server
-        env_path = "fixtures/.env"
-        self.env = utils.load_env("fixtures/.env")
+        self.env = utils.load_env("tests/fixtures/.env")
         self.origin = datetime(2025, 5, 5, 0, 0, 0, 0, tzinfo=timezone.utc)
         self.mgr = self.create_manager()
 
@@ -188,8 +185,7 @@ class TestPost160_GPRotation_EdgeCase(unittest.TestCase):
     def setUp(self):
         # This .env file only needs CONFIG_PATH declared.
         # .env is covered by .gitignore to avoid secrets accidentally pushed to server
-        env_path = "fixtures/.env"
-        self.env = utils.load_env("fixtures/.env")
+        self.env = utils.load_env("tests/fixtures/.env")
         self.origin = datetime(2025, 5, 5, 0, 0, 0, 0, tzinfo=timezone.utc)
         self.mgr = self.create_manager()
 
@@ -226,8 +222,7 @@ class Test_Yet_Another_Rotation_EdgeCase(unittest.TestCase):
     def setUp(self):
         # This .env file only needs CONFIG_PATH declared.
         # .env is covered by .gitignore to avoid secrets accidentally pushed to server
-        env_path = "fixtures/.env"
-        self.env = utils.load_env("fixtures/.env")
+        self.env = utils.load_env("tests/fixtures/.env")
         self.origin = datetime(2025, 5, 5, 0, 0, 0, 0, tzinfo=timezone.utc)
         self.mgr = self.create_manager()
 
