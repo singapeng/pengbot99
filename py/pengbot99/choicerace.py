@@ -21,6 +21,16 @@ def init_99_manager(name=None, glitch_mgr=None, env=None, minutes_offset=0):
     return ChoiceRaceManager(name, r99mgr)
 
 
+def init_pt_manager(name, env=None, minutes_offset=0):
+    if not env:
+        env = utils.load_env()
+    # Common origin plus constant offset
+    pt_origin = schedule.origin + timedelta(minutes=minutes_offset)
+    ptsched = schedule.load_schedule(env['CONFIG_PATH'], 'protracks_schedule')
+    ptmgr = schedule.Slot1ScheduleManager(pt_origin, ptsched)
+    return ChoiceRaceManager(name, ptmgr)
+
+
 class ChoiceRaceManager(object):
     """ For 99 races and other events on rotation offering a choice to players.
         Predicts the track selection line up for individual races.

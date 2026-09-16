@@ -13,6 +13,8 @@ PRIVATE_MP_MIRROR_MINUTE_OFFSET=0
 PRIVATE_CMP_MINUTE_OFFSET=8
 # Used for 99 races timing (public/private)
 NINETYNINE_MINUTE_OFFSET=25
+#
+PROTRACKS_MINUTE_OFFSET=0
 # # # # SECRET LEAGUE EVENTS # # # #
 # Which GP in the cycle get replaced by Secret League
 SECRET_LEAGUE_INTERVALS=11,6,7,3,8,4

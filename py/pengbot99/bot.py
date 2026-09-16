@@ -66,6 +66,7 @@ class Pengbot(object):
 
         # Create the Public schedule managers
         r99_offset = int(csts["NINETYNINE_MINUTE_OFFSET"])
+        pt_offset = int(csts["PROTRACKS_MINUTE_OFFSET"])
 
         self.slot1mgr = schedule.Slot1ScheduleManager(schedule.glitch_origin, r99sched)
         self.slot2mgr = schedule.Slot2ScheduleManager(
@@ -77,6 +78,7 @@ class Pengbot(object):
         utils.log("Setting cycles to {0} for {1}.".format(self.mp_mgr.mp_cycles, self.mp_mgr.name))
         self.r99_mgr = choicerace.init_99_manager(name=None, glitch_mgr=self.slot1mgr, env=env,
                 minutes_offset=r99_offset)
+        self.pt_mgr = choicerace.init_pt_manager(name="pt", env=env, minutes_offset=pt_offset)
 
         # Create Private Lobby schedule managers
         pmp_origin = schedule.origin + timedelta(minutes=int(csts["PRIVATE_MP_MINUTE_OFFSET"]))
@@ -488,6 +490,28 @@ async def ninetynine(
     err, from_time = _validate_utc_time(utc_time)
     if not err:
         response = _ninetynine(from_time)
+    await ctx.respond(err or response)
+
+
+def _protracks(timestamp=None):
+    """
+    """
+    return '\n'.join(pb.pt_mgr.get_formatted_events(timestamp))
+
+
+@bot.slash_command(name="protracks", description="List the track selection for Private protracks races",
+                    guild_ids=[env['TEST_GUILD_ID']])
+async def protracks(
+        ctx: discord.ApplicationContext,
+        utc_time: discord.Option(str, required=False, description=TIP_WHEN_FROM_TIME),
+        ):
+    """
+    """
+    utils.log(f"{ctx.author.name} used {ctx.command}.")
+    response = None
+    err, from_time = _validate_utc_time(utc_time)
+    if not err:
+        response = _protracks(from_time)
     await ctx.respond(err or response)
 
 
