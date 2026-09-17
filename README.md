@@ -42,9 +42,9 @@ DISCORD_BOT_TOKEN=Al0ngAlph4numericT0k3nSuppliedByD1scord
 ANNOUNCE_CHANNEL=1234567890
 # ID for the bot's schedule channel
 SCHEDULE_EDIT_CHANNEL=9876543210
-# Config files folder
-CONFIG_PATH=C:/Path/to/schedule/files
-# Schedule constants file name (in config folder)
+# Config files root folder (schedule profiles live as subfolders, e.g. default/)
+CONFIG_PATH=C:/Path/to/config
+# Schedule constants file name (in the schedule profile folder)
 CONSTANTS_FILE=constants.dat
 # Main refresh interval (for primary schedule and ticker) in minutes
 REFRESH_INTERVAL=5
@@ -60,10 +60,9 @@ Therefore, once you have created one, you are responsible for tracking changes t
 **SCHEDULE_EDIT_CHANNEL**: A Discord channel ID. The bot will post its schedule messages in this channel, and then will regularly update them (every 10 minutes or `REFRESH_INTERVAL` minutes).
 It is suggested that only the bot has permission to post to this channel so that the schedule remains the last message on the channel.
 
-**CONFIG_PATH**: The path to the bot's CSV schedule configuration directory. A complete set of CSV files is provided in the repository.
+**CONFIG_PATH**: The root path to the bot's configuration directory. Schedule configuration lives in profile subfolders, with the baseline schedule in `CONFIG_PATH/default`. A complete set of CSV schedule files is provided in the repository.
 
-**CONSTANTS_FILE**: This file holds constants that are used for fine-tuning the schedule. It can reside alongside the CSV schedule files.
-A default constants file is provided in the repository.
+**CONSTANTS_FILE**: This file holds constants that are used for fine-tuning the schedule. It resides in the schedule profile folder (i.e. `CONFIG_PATH/default` by default). A default constants file is provided in the repository.
 
 ### Additional optional configuration
 
@@ -95,20 +94,23 @@ The following constants are expected to be present:
 
 To change the offset the bot is using, simply edit the Constant file and restart the bot.
 
-The bot uses the presence of the following constants as an indication that Machine Shuffle Weekend event is on:
+Some of the schedule features are activated through feature flag constants defined in the constants file.
+Flags are set to `1` to enable a feature, or `0` to disable it. Their associated tuning constants may remain defined regardless.
+
+The bot activates the Machine Shuffle Weekend event when the `SHUFFLE_ENABLED` flag is set to `1`.
+In that case, it will use the specified offsets for Miniprix events occuring at weekend time (UTC):
 
 - SHUFFLE_MINIPRIX_LINE_UP_OFFSET
 - SHUFFLE_MIRROR_LINE_UP_OFFSET
 - PRIVATE_SHUFFLE_MP_MINUTE_OFFSET
 - PRIVATE_SHUFFLE_MP_MIRROR_MINUTE_OFFSET
 
-When they are present, the bot will use the specified offset for Miniprix events occuring at weekend time (UTC).
-If there is no Machine Shuffle event, those constants should be omitted from the config, or commented out.
+If there is no Machine Shuffle event, set the flag to `0`.
 As of F-Zero 99 version 1.6.1, there is no mirroring in Private Machine Shuffle-Miniprix, unless the lobby is started at the time of a public Machine Shuffle event. In this later case, the track selection will follow the public event's setting. In any case, the mirroring constant currently does not affect the results in any way.
 
-The bot uses the presence of the following constant as an indication that Secret League is active:
+The Secret League feature can be activated by setting the `SECRET_LEAGUE_ENABLED` flag to `1`:
 
-- SECRET_LEAGUE_INTERVALS
+- `SECRET_LEAGUE_INTERVALS`
 
 The value of SECRET_LEAGUE_INTERVALS is a comma-separated list of integers. Each integer represents an interval between Secret League Grand Prix. When enabled, the Grand Prix rotation proceeds as defined per the schedule, but some Grand Prix are replaced by Secret League as defined per the intervals. When this will happen, the Grand Prix will appear as `Secret League (replaces <replaced GP>)`, and the ticker will display Secret League instead of the replaced Grand Prix.
 Once all intervals in the list have elapsed, the process repeats from the start of the list.
@@ -117,10 +119,11 @@ Once all intervals in the list have elapsed, the process repeats from the start 
 
 This may optionally be defined, as an integer value, to change the start Grand Prix of the Secret League intervals sequence. If not defined, it is set to zero.
 
+- WEEKEND_SECRET_LEAGUE_ENABLED
 - WEEKEND_SECRET_LEAGUE_INTERVALS
 - WEEKEND_SECRET_LEAGUE_OFFSET
 
-In cases where the schedule defines a separate Grand Prix rotation for the weekend, these values can be defined to apply a separate intervals list and a separate offset applying to the weekend schedule. For v1.7, this is useful for Leagues weekend events. Similarly with the `SECRET_LEAGUE_INTERVALS` constant, the presence or absence of `WEEKEND_SECRET_LEAGUE_INTERVALS` is used to determine whether this feature should be activated when the bot starts. `WEEKEND_SECRET_LEAGUE_OFFSET` is set to zero if the constant is left undefined.
+In cases where the schedule defines a separate Grand Prix rotation for the weekend, the `WEEKEND_SECRET_LEAGUE_ENABLED` flag (along with the `SECRET_LEAGUE_ENABLED` flag) can be used to apply a separate intervals list and a separate offset applying to the weekend schedule. For v1.7, this is useful for Leagues weekend events. `WEEKEND_SECRET_LEAGUE_OFFSET` is set to zero if the constant is left undefined.
 
 ## Running the application
 
@@ -129,6 +132,15 @@ No assumption is made as to the target environment, therefore no shell script or
 
 ```bash
 python -m pengbot99.bot
+```
+
+The schedule profile to load can be selected with the `--profile` argument.
+The default profile is `default`; event profiles live in their own folder
+under `CONFIG_PATH` and overlay the default config. For example, to run with
+the Queen Leagues Weekend Event schedule:
+
+```bash
+python -m pengbot99.bot --profile queen
 ```
 
 ## Running tests

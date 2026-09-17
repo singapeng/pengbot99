@@ -1,4 +1,5 @@
 # Python imports
+import argparse
 from datetime import datetime, timedelta, timezone
 
 
@@ -19,14 +20,22 @@ from pengbot99 import ui
 from pengbot99 import utils
 
 
+parser = argparse.ArgumentParser(description='pengbot99 Discord bot')
+parser.add_argument('--profile', default='default',
+    help="Schedule config profile to load, e.g. 'queen'. Defaults to 'default'.")
+args = parser.parse_args()
+
 # Load tokens, ids, etc from an unversioned env file
 # Load schedule constants from a env-defined versioned config file
-env, csts, xpln = utils.load_config()
+env, csts, xpln = utils.load_config(profile=args.profile)
 
 class Pengbot(object):
-    def __init__(self, env, csts):
+    def __init__(self, env, csts, profile='default'):
         self.env = env
         self.csts = csts
+        sched_dir = utils.get_schedule_dir(env, profile)
+        default_dir = utils.get_schedule_dir(env, 'default')
+        utils.log_profile_csv_warnings(env, profile)
 
         # all env values are str, convert schedule offsets to int now
         mp_offset = int(csts["MINIPRIX_LINE_UP_OFFSET"])
@@ -36,13 +45,13 @@ class Pengbot(object):
         # Glitch GP
         secret_cfg = None
         we_secret_cfg = None
-        if csts.get("SECRET_LEAGUE_INTERVALS"):
+        if csts.get("SECRET_LEAGUE_ENABLED") == "1":
             secret_cfg = secret_league.SecretLeagueConfig(
                     csts["SECRET_LEAGUE_INTERVALS"],
                     csts.get("SECRET_LEAGUE_OFFSET"),
                 )
             utils.log("Secret League initialized with {0}".format(secret_cfg.indices))
-        if csts.get("SECRET_LEAGUE_INTERVALS") and csts.get("WEEKEND_SECRET_LEAGUE_INTERVALS"):
+        if csts.get("WEEKEND_SECRET_LEAGUE_ENABLED") == "1" and secret_cfg:
             we_secret_cfg = secret_league.SecretLeagueConfig(
                     csts["WEEKEND_SECRET_LEAGUE_INTERVALS"],
                     csts.get("WEEKEND_SECRET_LEAGUE_OFFSET"),
@@ -50,19 +59,19 @@ class Pengbot(object):
             utils.log("Weekend Secret League is ON: {0}".format(we_secret_cfg.indices))
 
         # load the schedule for slot 1 (99 races)
-        r99sched = schedule.load_schedule(env['CONFIG_PATH'], 'slot1_schedule')
+        r99sched = schedule.load_schedule(sched_dir, 'slot1_schedule', default_dir)
         # load the weekday schedule for slot 2 (Prix and special events)
-        wdsched = schedule.load_schedule(env['CONFIG_PATH'], 'slot2_schedule')
+        wdsched = schedule.load_schedule(sched_dir, 'slot2_schedule', default_dir)
         # load the weekend schedule for slot 2 (Prix and special events)
-        wesched = schedule.load_schedule(env['CONFIG_PATH'], 'slot2_schedule_weekend')
+        wesched = schedule.load_schedule(sched_dir, 'slot2_schedule_weekend', default_dir)
         # load the Classic Mini Prix track schedule
-        cmpsched = schedule.load_schedule(env['CONFIG_PATH'], 'classic_mp_schedule')
+        cmpsched = schedule.load_schedule(sched_dir, 'classic_mp_schedule', default_dir)
         # load the Mini Prix track schedule
-        mpsched = schedule.load_schedule(env['CONFIG_PATH'], 'miniprix_schedule')
-        mirrorsc = schedule.load_schedule(env['CONFIG_PATH'], 'miniprix_mirroring_schedule')
+        mpsched = schedule.load_schedule(sched_dir, 'miniprix_schedule', default_dir)
+        mirrorsc = schedule.load_schedule(sched_dir, 'miniprix_mirroring_schedule', default_dir)
         # load the schedule for Private Lobbies Mini-Prix
-        plmpsched = schedule.load_schedule(env["CONFIG_PATH"], "private_miniprix_schedule")
-        plcmpsched = schedule.load_schedule(env["CONFIG_PATH"], "private_classic_mp_schedule")
+        plmpsched = schedule.load_schedule(sched_dir, "private_miniprix_schedule", default_dir)
+        plcmpsched = schedule.load_schedule(sched_dir, "private_classic_mp_schedule", default_dir)
 
         # Create the Public schedule managers
         r99_offset = int(csts["NINETYNINE_MINUTE_OFFSET"])
@@ -76,7 +85,7 @@ class Pengbot(object):
                 mp_offset, mirror_offset)
         utils.log("Setting cycles to {0} for {1}.".format(self.mp_mgr.mp_cycles, self.mp_mgr.name))
         self.r99_mgr = choicerace.init_99_manager(name=None, glitch_mgr=self.slot1mgr, env=env,
-                minutes_offset=r99_offset)
+                minutes_offset=r99_offset, profile=profile)
 
         # Create Private Lobby schedule managers
         pmp_origin = schedule.origin + timedelta(minutes=int(csts["PRIVATE_MP_MINUTE_OFFSET"]))
@@ -93,11 +102,12 @@ class Pengbot(object):
         self.smp_mgr = None
         self.psmp_mgr = None
 
-        smp_offset = csts.get("SHUFFLE_MINIPRIX_LINE_UP_OFFSET")
-        if smp_offset is None:
+        smp_offset = None
+        if csts.get("SHUFFLE_ENABLED") == "1":
+            smp_offset = int(csts["SHUFFLE_MINIPRIX_LINE_UP_OFFSET"])
+        else:
             # Shuffle is currently off
             return
-        smp_offset = int(smp_offset)
         smp_mirror_offset = int(csts.get("SHUFFLE_MIRROR_LINE_UP_OFFSET", mirror_offset))
         self.smp_mgr = miniprix.MiniPrixManager("miniprix", self.slot2mgr, mpsched, mirrorsc,
                 smp_offset, smp_mirror_offset)
@@ -113,7 +123,7 @@ class Pengbot(object):
 
 
 # Using the Pengbot class as a holder for all schedule managers for now.
-pb = Pengbot(env, csts)
+pb = Pengbot(env, csts, args.profile)
 bot = discord.Bot()
 
 explainer = explain_cmd.Explainer(xpln, pb.slot2mgr)

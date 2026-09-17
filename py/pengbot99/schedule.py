@@ -2,6 +2,7 @@ from datetime import datetime, timedelta, timezone
 
 import abc
 import csv
+import os
 
 # local imports
 from pengbot99 import events
@@ -17,7 +18,7 @@ glitch_origin = datetime(2025, 12, 8, 22, 57, tzinfo=timezone.utc)
 glitch_gp_origin = datetime(2026, 1, 18, 22, 0, tzinfo=timezone.utc)
 
 
-def load_schedule(path, name):
+def load_schedule(path, name, default_path=None):
     """ Loads a CSV schedule from the folder 'path' and the file
         named 'name.csv'.
         Each line in the csv should be formatted as such:
@@ -28,8 +29,13 @@ def load_schedule(path, name):
         are provided, they represent a rotation for this event.
         The last line event type should be 'next' and represents
         the point at which the schedule moves on to the next cycle.
+        If the file is not present in 'path', and 'default_path' is
+        provided, the schedule is loaded from there instead. This lets
+        event profiles be defined as overrides of the default schedule.
     """
     schedule_path = '{0}/{1}.csv'.format(path, name)
+    if not os.path.isfile(schedule_path) and default_path:
+        schedule_path = '{0}/{1}.csv'.format(default_path, name)
     with open(schedule_path, newline='') as fd:
         reader = csv.reader(fd, delimiter=',')
         schedule = []
