@@ -4,15 +4,15 @@
 
 Replace the current "one branch per event" scheduling strategy with a
 single-branch, folder-based system where the default schedule lives in
-`config/default/` and each tracked event has its own small profile folder
+`py/pengbot99/data/default/` and each tracked event has its own small profile folder
 holding only the differences from default.
 
-This removes the need to switch branches (and manage a full `config/` copy
+This removes the need to switch branches (and manage a full config copy
 per event) whenever a new event starts.
 
 ## Status
 
-- [x] Step 1: restructure config into `config/default/`, feature-flag
+- [x] Step 1: restructure config into `data/default/`, feature-flag
       constants, profile-aware loader (CSV fallback + constants overlay),
       `--profile` startup argument.
 - [x] Event branches migrated: `queen`, `team_battle`, `meteor`,
@@ -22,10 +22,11 @@ per event) whenever a new event starts.
 
 ## Structure
 
-Under the existing `CONFIG_PATH` directory:
+Under `py/pengbot99/data/`, which ships as package data, and in the same
+shape under a `CONFIG_PATH` directory when one is set:
 
 ```
-config/
+data/
   default/                   # baseline schedule, always present
   queen/                     # Leagues Weekend: only deltas vs default
     slot2_schedule_weekend.csv

@@ -11,7 +11,7 @@ from dataclasses import dataclass
 from datetime import timedelta
 
 # local imports
-from pengbot99 import choicerace, schedule, secret_league
+from pengbot99 import choicerace, schedule, secret_league, utils
 from pengbot99.miniprix import MiniPrixManager, PrivateMPManager
 
 
@@ -21,7 +21,8 @@ class ScheduleConstants:
 
     Everything in the constants file is a string, and every offset in it is a
     number of minutes. ``from_mapping`` is the only place that names a
-    constant; it also decides whether Shuffle Weekend is on.
+    constant, and the only place that reads a feature flag: the constants of a
+    feature whose flag is off are None here, whatever the file says.
     """
 
     miniprix_lineup_offset: int
@@ -41,24 +42,26 @@ class ScheduleConstants:
 
     @property
     def is_shuffle_on(self):
-        """Shuffle Weekend runs when the config lines up its Mini-Prix.
-
-        No SHUFFLE_MINIPRIX_LINE_UP_OFFSET means Shuffle is off, and the rest
-        of the SHUFFLE_ constants are not looked at -- they are commented out
-        for most of the year.
-        """
+        """Whether SHUFFLE_ENABLED was set when the constants were read."""
         return self.shuffle_lineup_offset is not None
 
     @classmethod
     def from_mapping(cls, csts):
         """Reads the constants out of a mapping of strings, e.g. constants.dat.
 
+        A feature is on when its ``_ENABLED`` flag is "1", and only then: the
+        constants that tune it stay defined while it is off, so that a profile
+        can switch it on or off by overriding the flag alone.
+
         Raises KeyError when a constant the schedule cannot do without is
-        missing, including the Shuffle ones once Shuffle is switched on.
+        missing, including those of a feature once its flag switches it on.
         """
         mirror_offset = int(csts["MIRROR_LINE_UP_OFFSET"])
-        shuffle_offset = csts.get("SHUFFLE_MINIPRIX_LINE_UP_OFFSET")
-        shuffle_on = shuffle_offset is not None
+        shuffle_on = csts.get("SHUFFLE_ENABLED") == "1"
+        secret_on = csts.get("SECRET_LEAGUE_ENABLED") == "1"
+        # The weekend rotation only replaces Grand Prix that the weekday one
+        # already replaces, so it is never on without it.
+        we_secret_on = secret_on and csts.get("WEEKEND_SECRET_LEAGUE_ENABLED") == "1"
         return cls(
             miniprix_lineup_offset=int(csts["MINIPRIX_LINE_UP_OFFSET"]),
             classic_lineup_offset=int(csts["CLASSIC_LINE_UP_OFFSET"]),
@@ -67,15 +70,24 @@ class ScheduleConstants:
             private_mp_mirror_offset=int(csts["PRIVATE_MP_MIRROR_MINUTE_OFFSET"]),
             private_cmp_offset=int(csts["PRIVATE_CMP_MINUTE_OFFSET"]),
             ninetynine_offset=int(csts["NINETYNINE_MINUTE_OFFSET"]),
-            # SecretLeagueConfig parses these itself, and tolerates both being
-            # absent; it is the one consumer that wants them unconverted.
-            secret_league_intervals=csts.get("SECRET_LEAGUE_INTERVALS"),
-            secret_league_offset=csts.get("SECRET_LEAGUE_OFFSET"),
-            # A League Weekend runs Secret League on a rotation of its own; the
-            # weekend constants are absent the rest of the time.
-            weekend_secret_league_intervals=csts.get("WEEKEND_SECRET_LEAGUE_INTERVALS"),
-            weekend_secret_league_offset=csts.get("WEEKEND_SECRET_LEAGUE_OFFSET"),
-            shuffle_lineup_offset=int(shuffle_offset) if shuffle_on else None,
+            # SecretLeagueConfig parses these itself, and tolerates a missing
+            # offset; it is the one consumer that wants them unconverted.
+            secret_league_intervals=(
+                csts["SECRET_LEAGUE_INTERVALS"] if secret_on else None
+            ),
+            secret_league_offset=(
+                csts.get("SECRET_LEAGUE_OFFSET") if secret_on else None
+            ),
+            # A League Weekend runs Secret League on a rotation of its own.
+            weekend_secret_league_intervals=(
+                csts["WEEKEND_SECRET_LEAGUE_INTERVALS"] if we_secret_on else None
+            ),
+            weekend_secret_league_offset=(
+                csts.get("WEEKEND_SECRET_LEAGUE_OFFSET") if we_secret_on else None
+            ),
+            shuffle_lineup_offset=(
+                int(csts["SHUFFLE_MINIPRIX_LINE_UP_OFFSET"]) if shuffle_on else None
+            ),
             # Shuffle mirrors on the same offset as the regular Mini-Prix
             # unless the config gives it one of its own.
             shuffle_mirror_lineup_offset=(
@@ -117,16 +129,28 @@ class ScheduleManagers:
         return self.smp_mgr is not None
 
 
-def build_managers(csts, cfg_path=None):
+def build_managers(csts, cfg_path=None, profile=None):
     """Builds every schedule manager from the constants and the content dumps.
 
-    csts: the constants as a mapping of strings, or a ScheduleConstants.
-    cfg_path: the CONFIG_PATH override -- a directory the game content is read
-              from instead of the copy that ships inside the package. None
-              means the packaged copy.
+    csts: the constants as a mapping of strings, or a ScheduleConstants. They
+          are not read from 'profile' here: ``utils.load_constants`` does
+          that, given the same 'cfg_path' and 'profile'.
+    cfg_path: the CONFIG_PATH override -- a directory of profile folders the
+              game content is read from instead of the copy that ships inside
+              the package. None means the packaged copy.
+    profile: the event profile whose schedules replace the default ones, file
+             by file. None means the default profile alone.
     """
     if not isinstance(csts, ScheduleConstants):
         csts = ScheduleConstants.from_mapping(csts)
+
+    env = {"CONFIG_PATH": cfg_path}
+    utils.require_profile(env, profile)
+    sched_dir = utils.get_schedule_dir(env, profile)
+    default_dir = utils.get_schedule_dir(env)
+
+    def load(name):
+        return schedule.load_schedule(sched_dir, name, default_dir)
 
     secret_cfg = None
     we_secret_cfg = None
@@ -134,27 +158,25 @@ def build_managers(csts, cfg_path=None):
         secret_cfg = secret_league.SecretLeagueConfig(
             csts.secret_league_intervals, csts.secret_league_offset
         )
-        # The weekend rotation only replaces Grand Prix that the weekday one
-        # already replaces, so it is only built alongside it.
         if csts.weekend_secret_league_intervals:
             we_secret_cfg = secret_league.SecretLeagueConfig(
                 csts.weekend_secret_league_intervals, csts.weekend_secret_league_offset
             )
 
     # the schedule for slot 1 (99 races)
-    r99sched = schedule.load_schedule(cfg_path, "slot1_schedule")
+    r99sched = load("slot1_schedule")
     # the weekday schedule for slot 2 (Prix and special events)
-    wdsched = schedule.load_schedule(cfg_path, "slot2_schedule")
+    wdsched = load("slot2_schedule")
     # the weekend schedule for slot 2 (Prix and special events)
-    wesched = schedule.load_schedule(cfg_path, "slot2_schedule_weekend")
+    wesched = load("slot2_schedule_weekend")
     # the Classic Mini Prix track schedule
-    cmpsched = schedule.load_schedule(cfg_path, "classic_mp_schedule")
+    cmpsched = load("classic_mp_schedule")
     # the Mini Prix track schedule
-    mpsched = schedule.load_schedule(cfg_path, "miniprix_schedule")
-    mirrorsc = schedule.load_schedule(cfg_path, "miniprix_mirroring_schedule")
+    mpsched = load("miniprix_schedule")
+    mirrorsc = load("miniprix_mirroring_schedule")
     # the schedules for Private Lobbies Mini-Prix
-    plmpsched = schedule.load_schedule(cfg_path, "private_miniprix_schedule")
-    plcmpsched = schedule.load_schedule(cfg_path, "private_classic_mp_schedule")
+    plmpsched = load("private_miniprix_schedule")
+    plcmpsched = load("private_classic_mp_schedule")
 
     # The Public schedule managers
     slot1mgr = schedule.Slot1ScheduleManager(schedule.glitch_origin, r99sched)
@@ -177,8 +199,9 @@ def build_managers(csts, cfg_path=None):
     r99_mgr = choicerace.init_99_manager(
         name=None,
         glitch_mgr=slot1mgr,
-        env={"CONFIG_PATH": cfg_path},
+        env=env,
         minutes_offset=csts.ninetynine_offset,
+        profile=profile,
     )
 
     # The Private Lobby schedule managers

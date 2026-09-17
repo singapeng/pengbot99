@@ -75,7 +75,8 @@ class TestConfigPathPrecedence(unittest.TestCase):
 
     def test_config_path_wins_over_the_packaged_constants(self):
         with tempfile.TemporaryDirectory() as tmp:
-            with open(os.path.join(tmp, "constants.dat"), "w") as fd:
+            os.makedirs(os.path.join(tmp, "default"))
+            with open(os.path.join(tmp, "default", "constants.dat"), "w") as fd:
                 fd.write("# overridden\nMINIPRIX_LINE_UP_OFFSET=999\n")
             env_path = os.path.join(tmp, ".env")
             with open(env_path, "w") as fd:

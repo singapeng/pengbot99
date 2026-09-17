@@ -37,7 +37,7 @@ class Pengbot(object):
 
         # Where the game content is read from. Absent from the env means the
         # copy that shipped inside the package; set means that directory wins.
-        mgrs = managers.build_managers(csts, env.get("CONFIG_PATH"))
+        mgrs = managers.build_managers(csts, env.get("CONFIG_PATH"), profile)
 
         self.slot1mgr = mgrs.slot1mgr
         self.slot2mgr = mgrs.slot2mgr
