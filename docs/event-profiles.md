@@ -15,10 +15,10 @@ per event) whenever a new event starts.
 - [x] Step 1: restructure config into `config/default/`, feature-flag
       constants, profile-aware loader (CSV fallback + constants overlay),
       `--profile` startup argument.
-- [x] `queen` profile migrated.
-- [x] `team_battle` profile migrated.
-- [ ] Migrate the remaining event branches (meteor, machine shuffle,
-      mini world tour) to profile folders.
+- [x] Event branches migrated: `queen`, `team_battle`, `meteor`,
+      `machine_shuffle`, `mini_world_tour`, `festival_world_tour`.
+- [x] Leagues Weekend events migrated from commits on `main`: `knight`,
+      `king`, `ace`, `secret`.
 
 ## Structure
 
@@ -27,17 +27,32 @@ Under the existing `CONFIG_PATH` directory:
 ```
 config/
   default/                   # baseline schedule, always present
-  queen/                     # first event profile: only deltas vs default
+  queen/                     # Leagues Weekend: only deltas vs default
     slot2_schedule_weekend.csv
     constants.dat
   team_battle/               # migrated from branch v1.7_team_battle
     slot2_schedule.csv
     slot2_schedule_weekend.csv
     constants.dat
-  meteor/                    # event profile: only deltas vs default
-    ...
-  machine_shuffle/
-    ...
+  meteor/                    # migrated from event/v1.7_meteor_festival
+    slot2_schedule.csv
+    slot2_schedule_weekend.csv
+    constants.dat
+  machine_shuffle/           # migrated from branch v1.7/machine_shuffle
+    slot2_schedule.csv
+    slot2_schedule_weekend.csv
+    constants.dat
+  mini_world_tour/           # migrated from branch v1.7/mini_world_tour
+    slot2_schedule.csv
+    slot2_schedule_weekend.csv
+    constants.dat
+  festival_world_tour/       # migrated from branch v1.7/festival_world_tour
+    slot2_schedule.csv
+    slot2_schedule_weekend.csv
+    constants.dat
+  knight/ king/ ace/ secret/ # Leagues Weekend events from commits on main
+    slot2_schedule_weekend.csv
+    constants.dat
 ```
 
 ## Loading rules
