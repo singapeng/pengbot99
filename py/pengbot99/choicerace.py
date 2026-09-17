@@ -4,14 +4,20 @@ from datetime import timedelta
 from pengbot99 import formatters, schedule, utils
 
 
-def init_99_manager(name=None, glitch_mgr=None, env=None, minutes_offset=0):
+def init_99_manager(
+    name=None, glitch_mgr=None, env=None, minutes_offset=0, profile="default"
+):
     if not name:
         name = FZ99Manager.NAME
     if not env:
         env = utils.load_env()
     # Common origin plus constant offset
     r99_origin = schedule.origin + timedelta(minutes=minutes_offset)
-    nnsched = schedule.load_schedule(env.get("CONFIG_PATH"), "ninetynine_schedule")
+    nnsched = schedule.load_schedule(
+        utils.get_schedule_dir(env, profile),
+        "ninetynine_schedule",
+        utils.get_schedule_dir(env, "default"),
+    )
     r99mgr = schedule.Slot1ScheduleManager(r99_origin, nnsched)
     if glitch_mgr:
         return FZ99Manager(r99mgr, glitch_mgr)
@@ -27,9 +33,17 @@ class ChoiceRaceManager(object):
         super().__init__()
         self.name = event_name
         self.mgr = cycle_manager
+        # remember the start time of first event queried
+        # so we can correct glitch cycle if needed
+        self.first_event_start = None
 
     def list_events(self, timestamp=None, next=12):
-        return self.mgr.list_events(timestamp=timestamp, next=next)
+        evts = self.mgr.list_events(timestamp=timestamp, next=next)
+        if evts:
+            self.first_event_start = evts[0].start_time
+        else:
+            self.first_event_start = None
+        return evts
 
     def get_formatted_events(self, from_time=None, next=12):
         response = []
@@ -68,8 +82,15 @@ class FZ99Manager(ChoiceRaceManager):
     def is_glitch(self, evt):
         if evt.name in self.GLITCH_EVT_NAMES:
             if evt.name == "glitch99":
+                # if the glitch event started before the first event returned,
+                # then the cycle number it has may incorrectly point to the
+                # next cycle. Here we correct for this.
+                if self.first_event_start and evt.start_time < self.first_event_start:
+                    offset = -1
+                else:
+                    offset = 0
                 evt._name = formatters.glitch_rotation[
-                    evt.cycle % len(formatters.glitch_rotation)
+                    (evt.cycle + offset) % len(formatters.glitch_rotation)
                 ]
             return True
         return False

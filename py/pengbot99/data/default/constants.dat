@@ -14,24 +14,30 @@ PRIVATE_CMP_MINUTE_OFFSET=8
 # Used for 99 races timing (public/private)
 NINETYNINE_MINUTE_OFFSET=25
 # # # # SECRET LEAGUE EVENTS # # # #
+# Set to 1 to enable the Secret League feature
+SECRET_LEAGUE_ENABLED=1
 # Which GP in the cycle get replaced by Secret League
 SECRET_LEAGUE_INTERVALS=11,6,7,3,8,4
 # Secret League Cycle index offset
 SECRET_LEAGUE_OFFSET=21
 # # # # # # # # # # # # # # # # # # # #
 # # # # LEAGUE WEEKEND EVENTS # # # #
+# Set to 1 to enable the League Weekend overrides
+WEEKEND_SECRET_LEAGUE_ENABLED=0
 # Which GP in the weekend cycle get replaced by Secret League
-# WEEKEND_SECRET_LEAGUE_INTERVALS=22,12,14,6,16,8
+WEEKEND_SECRET_LEAGUE_INTERVALS=22,12,14,6,16,8
 # Weekend Secret League Cycle index offset
-# WEEKEND_SECRET_LEAGUE_OFFSET=60
+WEEKEND_SECRET_LEAGUE_OFFSET=60
 # # # # # # # # # # # # # # # # # # # #
 # # # # SHUFFLE WEEKEND EVENTS # # # #
+# Set to 1 to enable the Shuffle Weekend feature
+SHUFFLE_ENABLED=0
 # Used for Public Shuffle Mini-Prix
-# SHUFFLE_MINIPRIX_LINE_UP_OFFSET=19
+SHUFFLE_MINIPRIX_LINE_UP_OFFSET=19
 # Used to line mirror track occurence in Public Shuffle Mini-Prix
-# SHUFFLE_MIRROR_LINE_UP_OFFSET=1
+SHUFFLE_MIRROR_LINE_UP_OFFSET=1
 # Used for Private Shuffle Mini-Prix timing
-# PRIVATE_SHUFFLE_MP_MINUTE_OFFSET=12
+PRIVATE_SHUFFLE_MP_MINUTE_OFFSET=12
 # Used for Private Shuffle Mini-Prix mirror timing (currently unused)
-# PRIVATE_SHUFFLE_MP_MIRROR_MINUTE_OFFSET=0
+PRIVATE_SHUFFLE_MP_MIRROR_MINUTE_OFFSET=0
 # # # # # # # # # # # # # # # # # # # #

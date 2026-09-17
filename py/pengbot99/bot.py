@@ -1,4 +1,5 @@
 # Python imports
+import argparse
 from datetime import datetime, timedelta, timezone
 
 # 3rd party imports
@@ -15,15 +16,24 @@ from pengbot99 import (
     utils,
 )
 
+parser = argparse.ArgumentParser(description="pengbot99 Discord bot")
+parser.add_argument(
+    "--profile",
+    default="default",
+    help="Schedule config profile to load, e.g. 'queen'. Defaults to 'default'.",
+)
+args = parser.parse_args()
+
 # Load tokens, ids, etc from an unversioned env file
 # Load schedule constants from a env-defined versioned config file
-env, csts, xpln = utils.load_config()
+env, csts, xpln = utils.load_config(profile=args.profile)
 
 
 class Pengbot(object):
-    def __init__(self, env, csts):
+    def __init__(self, env, csts, profile="default"):
         self.env = env
         self.csts = csts
+        utils.log_profile_csv_warnings(env, profile)
 
         # Where the game content is read from. Absent from the env means the
         # copy that shipped inside the package; set means that directory wins.
@@ -63,7 +73,7 @@ class Pengbot(object):
 
 
 # Using the Pengbot class as a holder for all schedule managers for now.
-pb = Pengbot(env, csts)
+pb = Pengbot(env, csts, args.profile)
 bot = discord.Bot()
 
 explainer = explain_cmd.Explainer(xpln, pb.slot2mgr)

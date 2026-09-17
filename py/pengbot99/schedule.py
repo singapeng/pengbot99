@@ -15,11 +15,11 @@ glitch_origin = datetime(2025, 12, 8, 22, 57, tzinfo=timezone.utc)
 glitch_gp_origin = datetime(2026, 1, 18, 22, 0, tzinfo=timezone.utc)
 
 
-def load_schedule(path, name):
+def load_schedule(path, name, default_path=None):
     """Loads a CSV schedule from the folder 'path' and the file
     named 'name.csv'.
     'path' may be None, in which case the copy of 'name.csv' that
-    shipped inside the package is read instead.
+    shipped inside the package, in its default profile, is read instead.
     Each line in the csv should be formatted as such:
     minutes,name[,name,name...]
     'minutes' represents the event duration as an integer.
@@ -28,8 +28,15 @@ def load_schedule(path, name):
     are provided, they represent a rotation for this event.
     The last line event type should be 'next' and represents
     the point at which the schedule moves on to the next cycle.
+    If the file is not present in 'path', and 'default_path' is
+    provided, the schedule is loaded from there instead. This lets
+    event profiles be defined as overrides of the default schedule.
     """
-    with utils.open_data_file(path, "{0}.csv".format(name), newline="") as fd:
+    filename = "{0}.csv".format(name)
+    path = path or utils.get_schedule_dir({})
+    if default_path and not utils.has_data_file(path, filename):
+        path = default_path
+    with utils.open_data_file(path, filename, newline="") as fd:
         reader = csv.reader(fd, delimiter=",")
         schedule = []
         for row in reader:
