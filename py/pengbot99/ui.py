@@ -52,10 +52,10 @@ mp_track_choices = {
     "Red Canyon I": "Red_Canyon_I",
     "Red Canyon II": "Red_Canyon_II",
     "Sand Ocean": "Sand_Ocean",
-    "Sand Ocean + Port Town": "Mystery_6",
+    "Sand Ocean + Port Town": "Mystery_7",
     "Sand Storm I": "Sand_Storm_I",
     "Sand Storm II": "Sand_Storm_II",
-    "Silence + Sand Storm": "Mystery_7",
+    "Silence + Sand Storm": "Mystery_6",
     "White Land I": "White_Land_I",
 }
 
