@@ -1,0 +1,9 @@
+# Machine Shuffle event overrides
+# Used for Public Mini-Prix (standard)
+MINIPRIX_LINE_UP_OFFSET=19
+# Secret League Cycle index offset
+SECRET_LEAGUE_OFFSET=18
+# Public Shuffle Mini-Prix is active during this event
+SHUFFLE_ENABLED=1
+# Used for Public Shuffle Mini-Prix
+SHUFFLE_MINIPRIX_LINE_UP_OFFSET=14

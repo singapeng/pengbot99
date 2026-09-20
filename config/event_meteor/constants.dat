@@ -1,0 +1,9 @@
+# Meteor Festival event overrides
+# Used for Public Classic Miniprix
+CLASSIC_LINE_UP_OFFSET=3
+# Used for Public Mini-Prix (standard)
+MINIPRIX_LINE_UP_OFFSET=28
+# Used to line mirror track occurence in Public Mini-Prix
+MIRROR_LINE_UP_OFFSET=3
+# Secret League is not active during this event
+SECRET_LEAGUE_ENABLED=0

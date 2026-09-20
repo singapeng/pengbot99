@@ -1,0 +1,9 @@
+# Festival World Tour event overrides
+# Used for Public Classic Miniprix
+CLASSIC_LINE_UP_OFFSET=27
+# Used for Public Mini-Prix (standard)
+MINIPRIX_LINE_UP_OFFSET=32
+# Used to line mirror track occurence in Public Mini-Prix
+MIRROR_LINE_UP_OFFSET=0
+# Secret League Cycle index offset
+SECRET_LEAGUE_OFFSET=6

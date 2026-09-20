@@ -1,0 +1,5 @@
+# Knight Leagues Weekend event overrides
+# Secret League Cycle index offset for this event
+SECRET_LEAGUE_OFFSET=30
+# League Weekend overrides are active during this event
+WEEKEND_SECRET_LEAGUE_ENABLED=1
