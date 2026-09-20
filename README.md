@@ -42,7 +42,7 @@ DISCORD_BOT_TOKEN=Al0ngAlph4numericT0k3nSuppliedByD1scord
 ANNOUNCE_CHANNEL=1234567890
 # ID for the bot's schedule channel
 SCHEDULE_EDIT_CHANNEL=9876543210
-# Config files root folder (schedule profiles live as subfolders, e.g. default/)
+# Config files root folder (schedule profiles live as event_<name> subfolders, e.g. event_default/)
 CONFIG_PATH=C:/Path/to/config
 # Schedule constants file name (in the schedule profile folder)
 CONSTANTS_FILE=constants.dat
@@ -60,9 +60,9 @@ Therefore, once you have created one, you are responsible for tracking changes t
 **SCHEDULE_EDIT_CHANNEL**: A Discord channel ID. The bot will post its schedule messages in this channel, and then will regularly update them (every 10 minutes or `REFRESH_INTERVAL` minutes).
 It is suggested that only the bot has permission to post to this channel so that the schedule remains the last message on the channel.
 
-**CONFIG_PATH**: The root path to the bot's configuration directory. Schedule configuration lives in profile subfolders, with the baseline schedule in `CONFIG_PATH/default`. A complete set of CSV schedule files is provided in the repository.
+**CONFIG_PATH**: The root path to the bot's configuration directory. Schedule configuration lives in profile subfolders, with the baseline schedule in `CONFIG_PATH/event_default`. A complete set of CSV schedule files is provided in the repository.
 
-**CONSTANTS_FILE**: This file holds constants that are used for fine-tuning the schedule. It resides in the schedule profile folder (i.e. `CONFIG_PATH/default` by default). A default constants file is provided in the repository.
+**CONSTANTS_FILE**: This file holds constants that are used for fine-tuning the schedule. It resides in the schedule profile folder (i.e. `CONFIG_PATH/event_default` by default). A default constants file is provided in the repository.
 
 ### Additional optional configuration
 
@@ -136,8 +136,9 @@ python -m pengbot99.bot
 
 The schedule profile to load can be selected with the `--profile` argument.
 The default profile is `default`; event profiles live in their own folder
-under `CONFIG_PATH` and overlay the default config. For example, to run with
-the Queen Leagues Weekend Event schedule:
+(prefixed `event_`) under `CONFIG_PATH` and overlay the default config.
+For example, to run with the Queen Leagues Weekend Event schedule (loaded
+from `CONFIG_PATH/event_queen`):
 
 ```bash
 python -m pengbot99.bot --profile queen

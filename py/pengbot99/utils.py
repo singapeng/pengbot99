@@ -23,10 +23,20 @@ def load_env(path=None):
 def get_schedule_dir(env, profile=None):
     """ Returns the folder holding schedule config files for the given
         profile. Defaults to 'default'.
-        Profile folders live as subfolders of the CONFIG_PATH root.
+        Profile folders live as 'event_<profile>' subfolders of the
+        CONFIG_PATH root.
     """
     profile = profile or 'default'
-    return os.path.join(env['CONFIG_PATH'], profile)
+    return os.path.join(env['CONFIG_PATH'], 'event_{0}'.format(profile))
+
+
+def is_valid_profile(env, profile='default'):
+    """ Returns True if a schedule profile folder exists for the given
+        profile name, False otherwise. 'default' is always resolvable
+        to the baseline event_default folder.
+    """
+    profile = profile or 'default'
+    return os.path.isdir(get_schedule_dir(env, profile))
 
 
 def log_profile_csv_warnings(env, profile):

@@ -40,8 +40,8 @@ class TestScheduleConfigProfile(unittest.TestCase):
     def setUp(self):
         self._tmpdir = tempfile.TemporaryDirectory()
         self.root = self._tmpdir.name
-        default_dir = os.path.join(self.root, "default")
-        queen_dir = os.path.join(self.root, "queen")
+        default_dir = os.path.join(self.root, "event_default")
+        queen_dir = os.path.join(self.root, "event_queen")
         os.makedirs(default_dir)
         os.makedirs(queen_dir)
         with open(os.path.join(default_dir, "constants.dat"), "w") as fd:
@@ -70,12 +70,12 @@ class TestScheduleConfigProfile(unittest.TestCase):
     def test_schedule_dir_resolves_default(self):
         env = {"CONFIG_PATH": self.root}
         self.assertEqual(utils.get_schedule_dir(env),
-                         os.path.join(self.root, "default"))
+                         os.path.join(self.root, "event_default"))
 
     def test_schedule_dir_accepts_profile(self):
         env = {"CONFIG_PATH": self.root}
         self.assertEqual(utils.get_schedule_dir(env, profile="queen"),
-                         os.path.join(self.root, "queen"))
+                         os.path.join(self.root, "event_queen"))
 
     def test_constants_loaded_from_default_profile(self):
         env, csts, xpln = utils.load_config(path=self._env_path)
@@ -100,22 +100,34 @@ class TestScheduleConfigProfile(unittest.TestCase):
         self.assertEqual(xpln["QUEEN_LEAGUE"], "often on weekends")
 
     def test_profile_schedule_overrides_default(self):
-        default_dir = os.path.join(self.root, "default")
-        queen_dir = os.path.join(self.root, "queen")
+        default_dir = os.path.join(self.root, "event_default")
+        queen_dir = os.path.join(self.root, "event_queen")
         sched = schedule.load_schedule(queen_dir, "slot2_schedule_weekend", default_dir)
         self.assertEqual(sched[0][1], "queen")
 
     def test_profile_schedule_falls_back_to_default(self):
-        default_dir = os.path.join(self.root, "default")
-        queen_dir = os.path.join(self.root, "queen")
+        default_dir = os.path.join(self.root, "event_default")
+        queen_dir = os.path.join(self.root, "event_queen")
         override = schedule.load_schedule(queen_dir, "classic_mp_schedule", default_dir)
         baseline = schedule.load_schedule(default_dir, "classic_mp_schedule")
         self.assertEqual(override, baseline)
 
     def test_load_schedule_still_works_without_default_path(self):
-        default_dir = os.path.join(self.root, "default")
+        default_dir = os.path.join(self.root, "event_default")
         sched = schedule.load_schedule(default_dir, "slot2_schedule_weekend")
         self.assertEqual(sched[0][1], "mace")
+
+    def test_is_valid_profile_true_for_default(self):
+        env = {"CONFIG_PATH": self.root}
+        self.assertTrue(utils.is_valid_profile(env))
+
+    def test_is_valid_profile_true_for_existing_event(self):
+        env = {"CONFIG_PATH": self.root}
+        self.assertTrue(utils.is_valid_profile(env, "queen"))
+
+    def test_is_valid_profile_false_for_unknown_event(self):
+        env = {"CONFIG_PATH": self.root}
+        self.assertFalse(utils.is_valid_profile(env, "not_a_profile"))
 
 
 if __name__ == "__main__":

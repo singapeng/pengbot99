@@ -26,6 +26,16 @@ parser.add_argument('--profile', default='default',
 args = parser.parse_args()
 
 # Load tokens, ids, etc from an unversioned env file
+env = utils.load_env()
+# fail gracefully on an invalid --profile value
+if not utils.is_valid_profile(env, args.profile):
+    parser.error(
+        "Invalid '--profile' value '{0}': no profile folder '{1}' under "
+        "CONFIG_PATH ({2}).".format(
+            args.profile,
+            utils.get_schedule_dir(env, args.profile),
+            env['CONFIG_PATH'],
+        ))
 # Load schedule constants from a env-defined versioned config file
 env, csts, xpln = utils.load_config(profile=args.profile)
 utils.log("Loaded config profile: {0}".format(args.profile))
