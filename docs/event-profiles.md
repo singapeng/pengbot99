@@ -4,15 +4,15 @@
 
 Replace the current "one branch per event" scheduling strategy with a
 single-branch, folder-based system where the default schedule lives in
-`config/default/` and each tracked event has its own small profile folder
-holding only the differences from default.
+`config/event_default/` and each tracked event has its own small profile
+folder holding only the differences from default.
 
 This removes the need to switch branches (and manage a full `config/` copy
 per event) whenever a new event starts.
 
 ## Status
 
-- [x] Step 1: restructure config into `config/default/`, feature-flag
+- [x] Step 1: restructure config into `config/event_default/`, feature-flag
       constants, profile-aware loader (CSV fallback + constants overlay),
       `--profile` startup argument.
 - [x] Event branches migrated: `queen`, `team_battle`, `meteor`,
@@ -26,31 +26,31 @@ Under the existing `CONFIG_PATH` directory:
 
 ```
 config/
-  default/                   # baseline schedule, always present
-  queen/                     # Leagues Weekend: only deltas vs default
+  event_default/            # baseline schedule, always present
+  event_queen/              # Leagues Weekend: only deltas vs default
     slot2_schedule_weekend.csv
     constants.dat
-  team_battle/               # migrated from branch v1.7_team_battle
+  event_team_battle/        # migrated from branch v1.7_team_battle
     slot2_schedule.csv
     slot2_schedule_weekend.csv
     constants.dat
-  meteor/                    # migrated from event/v1.7_meteor_festival
+  event_meteor/             # migrated from event/v1.7_meteor_festival
     slot2_schedule.csv
     slot2_schedule_weekend.csv
     constants.dat
-  machine_shuffle/           # migrated from branch v1.7/machine_shuffle
+  event_machine_shuffle/    # migrated from branch v1.7/machine_shuffle
     slot2_schedule.csv
     slot2_schedule_weekend.csv
     constants.dat
-  mini_world_tour/           # migrated from branch v1.7/mini_world_tour
+  event_mini_world_tour/    # migrated from branch v1.7/mini_world_tour
     slot2_schedule.csv
     slot2_schedule_weekend.csv
     constants.dat
-  festival_world_tour/       # migrated from branch v1.7/festival_world_tour
+  event_festival_world_tour/  # migrated from branch v1.7/festival_world_tour
     slot2_schedule.csv
     slot2_schedule_weekend.csv
     constants.dat
-  knight/ king/ ace/ secret/ # Leagues Weekend events from commits on main
+  event_knight/ event_king/ event_ace/ event_secret/  # Leagues Weekend events from commits on main
     slot2_schedule_weekend.csv
     constants.dat
 ```
@@ -59,9 +59,12 @@ config/
 
 - A profile is selected at startup via a CLI argument, e.g.
   `python -m pengbot99.bot --profile meteor`. Defaults to `default`.
-- The loader composes `default/` then overlays the event folder:
+- Profile folders are named `event_<profile>` under `CONFIG_PATH`; the
+  baseline is `event_default`. The `--profile` value is validated at
+  startup: an invalid value aborts the bot before any schedule is loaded.
+- The loader composes `event_default/` then overlays the event folder:
   - A CSV present in the event folder replaces the whole default file
-    (no per-row merge); `schedule.load_schedule` falls back to `default`
+    (no per-row merge); `schedule.load_schedule` falls back to `event_default`
     when the file is absent from the profile folder.
   - A CSV absent from the event folder is inherited from default.
   - `constants.dat` is merged per-key: constants present in the event
@@ -106,5 +109,5 @@ mode with inherit-from-default).
 
 ## Migration of CONFIG_PATH
 
-`CONFIG_PATH` still points at a directory that now contains `default/` and
+`CONFIG_PATH` still points at a directory that now contains `event_default/` and
 the event profile folders; no new env var is needed.
