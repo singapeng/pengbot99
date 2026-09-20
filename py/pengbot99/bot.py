@@ -28,6 +28,7 @@ args = parser.parse_args()
 # Load tokens, ids, etc from an unversioned env file
 # Load schedule constants from a env-defined versioned config file
 env, csts, xpln = utils.load_config(profile=args.profile)
+utils.log("Loaded config profile: {0}".format(args.profile))
 
 class Pengbot(object):
     def __init__(self, env, csts, profile='default'):

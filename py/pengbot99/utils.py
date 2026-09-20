@@ -75,7 +75,6 @@ def load_config(path=None, profile='default'):
     # explainer data is not part of the schedule profile structure
     # and loads directly from the CONFIG_PATH root
     xpln = _sideload_data(env, 'EXPLAIN_FILE', env.get('CONFIG_PATH'))
-    log("Loaded config profile: {0}".format(profile))
     return env, csts, xpln
 
 
