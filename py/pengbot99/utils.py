@@ -66,6 +66,22 @@ def _sideload_data(env, data_name, base_path):
     return values
 
 
+def load_csts(env, profile='default'):
+    """ Loads the schedule constants overlay for the given profile.
+        Constants are read from the 'default' profile folder, then
+        overlaid with any constants defined in the active profile.
+        Takes an already-parsed env dict (see load_env).
+    """
+    # schedule constants are versioned and live under the schedule
+    # profile folders of the CONFIG_PATH root
+    csts = _sideload_data(env, 'CONSTANTS_FILE', get_schedule_dir(env, 'default')) or {}
+    if profile != 'default':
+        overlay = _sideload_data(env, 'CONSTANTS_FILE', get_schedule_dir(env, profile))
+        if overlay:
+            csts.update(overlay)
+    return csts
+
+
 def load_config(path=None, profile='default'):
     """ Reads the .env file and returns a dict.
         If the .env defines a constants file path, load that too.
@@ -74,14 +90,7 @@ def load_config(path=None, profile='default'):
         Returns both as a tuple of dicts.
     """
     env = load_env(path)
-
-    # schedule constants are versioned and live under the schedule
-    # profile folders of the CONFIG_PATH root
-    csts = _sideload_data(env, 'CONSTANTS_FILE', get_schedule_dir(env, 'default')) or {}
-    if profile != 'default':
-        overlay = _sideload_data(env, 'CONSTANTS_FILE', get_schedule_dir(env, profile))
-        if overlay:
-            csts.update(overlay)
+    csts = load_csts(env, profile)
     # explainer data is not part of the schedule profile structure
     # and loads directly from the CONFIG_PATH root
     xpln = _sideload_data(env, 'EXPLAIN_FILE', env.get('CONFIG_PATH'))
