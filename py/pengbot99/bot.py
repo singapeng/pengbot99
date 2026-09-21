@@ -10,12 +10,9 @@ from discord.ext import tasks
 
 # local imports
 from pengbot99 import apiadapter
-from pengbot99 import choicerace
 from pengbot99 import explain_cmd
 from pengbot99 import formatters
-from pengbot99 import miniprix
-from pengbot99 import schedule
-from pengbot99 import secret_league
+from pengbot99 import schedule_controller
 from pengbot99 import ui
 from pengbot99 import utils
 
@@ -40,104 +37,14 @@ if not utils.is_valid_profile(env, args.profile):
 env, csts, xpln = utils.load_config(profile=args.profile)
 utils.log("Loaded config profile: {0}".format(args.profile))
 
-class Pengbot(object):
-    def __init__(self, env, csts, profile='default'):
-        self.env = env
-        self.csts = csts
-        sched_dir = utils.get_schedule_dir(env, profile)
-        default_dir = utils.get_schedule_dir(env, 'default')
-        utils.log_profile_csv_warnings(env, profile)
-
-        # all env values are str, convert schedule offsets to int now
-        mp_offset = int(csts["MINIPRIX_LINE_UP_OFFSET"])
-        cmp_offset = int(csts["CLASSIC_LINE_UP_OFFSET"])
-        mirror_offset = int(csts["MIRROR_LINE_UP_OFFSET"])
-
-        # Glitch GP
-        secret_cfg = None
-        we_secret_cfg = None
-        if csts.get("SECRET_LEAGUE_ENABLED") == "1":
-            secret_cfg = secret_league.SecretLeagueConfig(
-                    csts["SECRET_LEAGUE_INTERVALS"],
-                    csts.get("SECRET_LEAGUE_OFFSET"),
-                )
-            utils.log("Secret League initialized with {0}".format(secret_cfg.indices))
-        if csts.get("WEEKEND_SECRET_LEAGUE_ENABLED") == "1" and secret_cfg:
-            we_secret_cfg = secret_league.SecretLeagueConfig(
-                    csts["WEEKEND_SECRET_LEAGUE_INTERVALS"],
-                    csts.get("WEEKEND_SECRET_LEAGUE_OFFSET"),
-                )
-            utils.log("Weekend Secret League is ON: {0}".format(we_secret_cfg.indices))
-
-        # load the schedule for slot 1 (99 races)
-        r99sched = schedule.load_schedule(sched_dir, 'slot1_schedule', default_dir)
-        # load the weekday schedule for slot 2 (Prix and special events)
-        wdsched = schedule.load_schedule(sched_dir, 'slot2_schedule', default_dir)
-        # load the weekend schedule for slot 2 (Prix and special events)
-        wesched = schedule.load_schedule(sched_dir, 'slot2_schedule_weekend', default_dir)
-        # load the Classic Mini Prix track schedule
-        cmpsched = schedule.load_schedule(sched_dir, 'classic_mp_schedule', default_dir)
-        # load the Mini Prix track schedule
-        mpsched = schedule.load_schedule(sched_dir, 'miniprix_schedule', default_dir)
-        mirrorsc = schedule.load_schedule(sched_dir, 'miniprix_mirroring_schedule', default_dir)
-        # load the schedule for Private Lobbies Mini-Prix
-        plmpsched = schedule.load_schedule(sched_dir, "private_miniprix_schedule", default_dir)
-        plcmpsched = schedule.load_schedule(sched_dir, "private_classic_mp_schedule", default_dir)
-
-        # Create the Public schedule managers
-        r99_offset = int(csts["NINETYNINE_MINUTE_OFFSET"])
-
-        self.slot1mgr = schedule.Slot1ScheduleManager(schedule.glitch_origin, r99sched)
-        self.slot2mgr = schedule.Slot2ScheduleManager(
-                origin=schedule.origin, weekday_sched=wdsched, weekend_sched=wesched,
-                secret_cfg=secret_cfg, we_secret_cfg=we_secret_cfg)
-        self.cmp_mgr = miniprix.MiniPrixManager("classicprix", self.slot2mgr, cmpsched, offset=cmp_offset)
-        self.mp_mgr = miniprix.MiniPrixManager("miniprix", self.slot2mgr, mpsched, mirrorsc,
-                mp_offset, mirror_offset)
-        utils.log("Setting cycles to {0} for {1}.".format(self.mp_mgr.mp_cycles, self.mp_mgr.name))
-        self.r99_mgr = choicerace.init_99_manager(name=None, glitch_mgr=self.slot1mgr, env=env,
-                minutes_offset=r99_offset, profile=profile)
-
-        # Create Private Lobby schedule managers
-        pmp_origin = schedule.origin + timedelta(minutes=int(csts["PRIVATE_MP_MINUTE_OFFSET"]))
-        pmp_mirror_origin = schedule.origin + timedelta(minutes=int(csts["PRIVATE_MP_MIRROR_MINUTE_OFFSET"]))
-        pcmp_origin = schedule.origin + timedelta(minutes=int(csts["PRIVATE_CMP_MINUTE_OFFSET"]))
-
-        pl_slot1 = schedule.Slot1ScheduleManager(pmp_origin, plmpsched)
-        mirror_slot1 = schedule.Slot1ScheduleManager(pmp_mirror_origin, mirrorsc)
-        self.pmp_mgr = miniprix.PrivateMPManager("miniprix", pl_slot1, self.mp_mgr, mirror_slot1)
-        plcmp_slot1 = schedule.Slot1ScheduleManager(pcmp_origin, plcmpsched)
-        self.pcmp_mgr = miniprix.PrivateMPManager("classicprix", plcmp_slot1, self.cmp_mgr)
-
-        # Shuffle Mini-Prix schedule managers
-        self.smp_mgr = None
-        self.psmp_mgr = None
-
-        smp_offset = None
-        if csts.get("SHUFFLE_ENABLED") == "1":
-            smp_offset = int(csts["SHUFFLE_MINIPRIX_LINE_UP_OFFSET"])
-        else:
-            # Shuffle is currently off
-            return
-        smp_mirror_offset = int(csts.get("SHUFFLE_MIRROR_LINE_UP_OFFSET", mirror_offset))
-        self.smp_mgr = miniprix.MiniPrixManager("miniprix", self.slot2mgr, mpsched, mirrorsc,
-                smp_offset, smp_mirror_offset)
-        psmp_origin = schedule.origin + timedelta(minutes=int(csts["PRIVATE_SHUFFLE_MP_MINUTE_OFFSET"]))
-        psl_slot1 = schedule.Slot1ScheduleManager(psmp_origin, plmpsched)
-        self.psmp_mgr = miniprix.PrivateMPManager("miniprix", psl_slot1, self.smp_mgr, None)
-        utils.log("!! Configured Shuffle Weekend !!")
-
-    def is_shuffle_on(self):
-        if self.smp_mgr:
-            return True
-        return False
-
-
-# Using the Pengbot class as a holder for all schedule managers for now.
-pb = Pengbot(env, csts, args.profile)
+# The ScheduleController holds the shared slot-1 world and the loaded
+# event schedules (one per profile). Reads such as controller.slot2mgr resolve
+# against the currently active schedule at call time. Only the startup
+# profile is loaded for now; switch() is not used by the bot yet.
+controller = schedule_controller.ScheduleController(env, profile=args.profile, csts=csts)
 bot = discord.Bot()
 
-explainer = explain_cmd.Explainer(xpln, pb.slot2mgr)
+explainer = explain_cmd.Explainer(xpln, controller)
 
 
 def _validate_utc_time(str_time):
@@ -261,7 +168,7 @@ async def showevents(
     if err:
         await ctx.respond(err)
         return None
-    evts = pb.slot2mgr.list_events(timestamp=from_time, next=80)
+    evts = controller.slot2mgr.list_events(timestamp=from_time, next=80)
     if not evts:
         await ctx.respond("Could not fetch any event :(")
         return None
@@ -299,15 +206,15 @@ def _when(event_type, from_time=None, count=5):
     names = ui.event_choices.get(event_type)
     evts = None
     if event_type == "Glitch 99":
-        mgr = pb.slot1mgr
+        mgr = controller.slot1mgr
         evts = mgr.when_event(names=names, count=count, timestamp=from_time)
         fmt_func = formatters.format_glitch_event
     elif event_type == "Secret League":
-        mgr = pb.slot2mgr
+        mgr = controller.slot2mgr
         evts = _when_secret_league(mgr, count, from_time)
         fmt_func = formatters.format_future_event
     else:
-        mgr = pb.slot2mgr
+        mgr = controller.slot2mgr
         evts = mgr.when_event(names=names, count=count, timestamp=from_time)
         fmt_func = formatters.format_future_event
     if not evts:
@@ -371,21 +278,21 @@ def _fetch_miniprix_events(event_type, from_time, private):
     """
     if event_type == "classicprix":
         if private:
-            mgr = pb.pcmp_mgr
+            mgr = controller.pcmp_mgr
         else:
-            mgr = pb.cmp_mgr
+            mgr = controller.cmp_mgr
     else:
         if private:
-            mgr = pb.pmp_mgr
+            mgr = controller.pmp_mgr
         else:
-            mgr = pb.mp_mgr
+            mgr = controller.mp_mgr
     evts = mgr.get_miniprix(timestamp=from_time)
-    if evts and event_type != "classicprix" and pb.is_shuffle_on():
-        if not pb.slot2mgr.is_weekday(evts[0].start_time):
+    if evts and event_type != "classicprix" and controller.is_shuffle_on():
+        if not controller.slot2mgr.is_weekday(evts[0].start_time):
             if private:
-                mgr = pb.psmp_mgr
+                mgr = controller.psmp_mgr
             else:
-                mgr = pb.smp_mgr
+                mgr = controller.smp_mgr
             evts = mgr.get_miniprix(timestamp=from_time)
     return evts
 
@@ -393,7 +300,7 @@ def _fetch_miniprix_events(event_type, from_time, private):
 def _build_mp_event_name(event_type, private, start_time):
     evt_name = formatters.event_display_names.get(event_type)
     if event_type != "classicprix":
-       if pb.is_shuffle_on() and not pb.slot2mgr.is_weekday(start_time):
+       if controller.is_shuffle_on() and not controller.slot2mgr.is_weekday(start_time):
            evt_name = "Machine Shuffle {0}".format(evt_name)
     if private:
         evt_name = "Private {0}".format(evt_name)
@@ -494,7 +401,7 @@ async def miniprix(
 def _ninetynine(timestamp=None):
     """
     """
-    return '\n'.join(pb.r99_mgr.get_formatted_events(timestamp))
+    return '\n'.join(controller.r99_mgr.get_formatted_events(timestamp))
 
 
 @bot.slash_command(name="ninetynine", description="List the track selection for the upcoming 99 races")
@@ -520,7 +427,7 @@ def get_missing_event_types(evts):
     results = []
     # we want to show the next Glitch GP if available
     if "glitchgp" not in present_evts:
-        extra = _when_secret_league(pb.slot2mgr, 1, None)
+        extra = _when_secret_league(controller.slot2mgr, 1, None)
         if extra:
             results.append(extra[0])
 
@@ -529,7 +436,7 @@ def get_missing_event_types(evts):
         if mprix[0] not in present_evts and mprix[1] not in present_evts:
             # for mirrored prix, we query both names but will only get the closest
             # that is not a glitch gp
-            extra = pb.slot2mgr.when_event(names=mprix, count=5)
+            extra = controller.slot2mgr.when_event(names=mprix, count=5)
             for item in extra:
                 if not item.glitch:
                     results.append(item)
@@ -538,7 +445,7 @@ def get_missing_event_types(evts):
     # now add other events that don't have a mirror version
     for name in ["miniprix", "classicprix"]:
         if name not in present_evts:
-            extra = pb.slot2mgr.when_event(names=[name], count=1)
+            extra = controller.slot2mgr.when_event(names=[name], count=1)
             if extra:
                 results.append(extra[0])
 
@@ -568,9 +475,9 @@ def kick_off_mp_update(mp_evt):
 
 async def _update_bot_status(bot):
     gps = ui.event_choices["Grand Prix"] + ["glitchgp"]
-    evt = pb.slot2mgr.get_current_event()
+    evt = controller.slot2mgr.get_current_event()
     if evt.name not in gps:
-        evts = pb.slot2mgr.get_events(names=gps, count=1)
+        evts = controller.slot2mgr.get_events(names=gps, count=1)
         evt = evts[0]
         evt_name = formatters.event_display_names.get(evt.name, evt.name)
         delta = (evt.start_time - datetime.now(timezone.utc)).seconds // 60
@@ -586,8 +493,8 @@ async def _update_bot_status(bot):
 
 def _create_schedule_message():
     glitch_evts = ui.event_choices.get("Glitch 99")
-    evts = pb.slot2mgr.list_events(next=119)
-    glitches = pb.slot1mgr.when_event(names=glitch_evts, count=5, limit=119)
+    evts = controller.slot2mgr.list_events(next=119)
+    glitches = controller.slot1mgr.when_event(names=glitch_evts, count=5, limit=119)
     if not evts:
         utils.log("Could not fetch any event :(")
         return []
@@ -652,7 +559,7 @@ async def edit_schedule_message():
 # these functions are currently unused
 
 def _create_track_selection_message():
-    response = pb.r99_mgr.get_formatted_events()
+    response = controller.r99_mgr.get_formatted_events()
     if not response:
         utils.log("Could not fetch track selection :(")
         return []
@@ -700,8 +607,8 @@ async def announce_schedule():
     await bot.wait_until_ready()
     channel = bot.get_channel(int(env["ANNOUNCE_CHANNEL"]))
     glitch_evts = ui.event_choices.get("Glitch 99")
-    evts = pb.slot2mgr.list_events(next=110)
-    glitches = pb.slot1mgr.when_event(names=glitch_evts, count=5, limit=110)
+    evts = controller.slot2mgr.list_events(next=110)
+    glitches = controller.slot1mgr.when_event(names=glitch_evts, count=5, limit=110)
     if not evts:
         print("Could not fetch any event :(")
         return None
@@ -719,7 +626,7 @@ async def announce_schedule():
         for glitch in glitches:
             response.append(formatters.format_glitch_event(glitch))
     if not has_king_gp:
-        king_evt = pb.slot2mgr.when_event(names=["king"], count=1)
+        king_evt = controller.slot2mgr.when_event(names=["king"], count=1)
         if king_evt:
             response.append("\nNext King League:")
             response.append(formatters.format_future_event(king_evt[0]))

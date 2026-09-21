@@ -70,11 +70,16 @@ TOPICS_BASE = {
 
 
 class Explainer(object):
-    def __init__(self, config, mgr):
+    def __init__(self, config, mgr_holder):
         self._topics = TOPICS_BASE
         self._initialize_topics(config)
-        # a slot2mgr instance used by GP rotation explainer
-        self._mgr = mgr
+        # a holder exposing the current slot2mgr, resolved lazily so that
+        # an event schedule switch is reflected at explain time.
+        self._holder = mgr_holder
+
+    @property
+    def _mgr(self):
+        return self._holder.slot2mgr
 
     def _initialize_topics(self, config):
         if config:

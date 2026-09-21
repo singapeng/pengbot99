@@ -5,7 +5,7 @@ import tempfile
 import unittest
 
 # Local imports
-from pengbot99 import schedule_controller, utils
+from pengbot99 import explain_cmd, schedule_controller, utils
 
 
 class ScheduleControllerTestCase(unittest.TestCase):
@@ -208,6 +208,23 @@ class ScheduleControllerTestCase(unittest.TestCase):
         env = utils.load_env(self._env_path)
         c = schedule_controller.ScheduleController(env, profile='default')
         self.assertEqual(c.name, 'default')
+
+    def test_explainer_reads_active_slot2mgr(self):
+        c = self.create_controller()
+        default_mgr = c.slot2mgr
+        explainer = explain_cmd.Explainer(None, c)
+        self.assertIs(explainer._mgr, default_mgr)
+        # the explainer holds the controller, so it follows a switch
+        c.switch('meteor')
+        self.assertIs(explainer._mgr, c.slot2mgr)
+        self.assertIsNot(explainer._mgr, default_mgr)
+
+    def test_explainer_gp_rotation_via_controller(self):
+        c = self.create_controller()
+        explainer = explain_cmd.Explainer(None, c)
+        result = explainer.explain('Grand Prix Rotation')
+        self.assertIsInstance(result, str)
+        self.assertTrue(result)
 
 
 if __name__ == "__main__":
