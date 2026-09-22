@@ -1,7 +1,59 @@
-from contextlib import contextmanager
-from datetime import datetime
-
+import logging
 import os
+import sys
+from contextlib import contextmanager
+
+logger = logging.getLogger("pengbot99")
+# Silent by default: test runs stay quiet, and callers opt into console
+# output by calling configure_logging() (see bot.py).
+logger.addHandler(logging.NullHandler())
+
+LOG_FORMAT = "%(asctime)s %(message)s"
+LOG_DATEFMT = "%Y-%m-%d %H:%M:%S"
+
+
+def configure_logging(level=logging.INFO):
+    """ Attaches a console handler to the pengbot99 logger.
+
+        Keeps the historical log() output: one timestamped line per
+        message on stdout. Idempotent; call once at bot startup.
+    """
+    logger.setLevel(level)
+    for handler in logger.handlers[:]:
+        if isinstance(handler, logging.StreamHandler):
+            logger.removeHandler(handler)
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setFormatter(logging.Formatter(LOG_FORMAT, datefmt=LOG_DATEFMT))
+    logger.addHandler(handler)
+
+
+@contextmanager
+def silence_logging():
+    """ Context manager that silences routine log output for its duration.
+
+        Only warnings (and above) reach the console while active, so
+        startup problems stay visible while construction logs are hidden.
+        Used at startup so the bot reports its decision, then lets a
+        schedule announce itself only when it is actually set active.
+    """
+    previous = logger.level
+    logger.setLevel(logging.WARNING)
+    try:
+        yield
+    finally:
+        logger.setLevel(previous)
+
+
+def log(text):
+    """ Log a message through the pengbot99 logger.
+
+        Messages starting with 'WARNING' are emitted at warning level,
+        so they survive silence_logging() and the quiet test default.
+    """
+    if text.startswith("WARNING"):
+        logger.warning(text)
+    else:
+        logger.info(text)
 
 
 def load_env(path=None):
@@ -96,37 +148,6 @@ def load_config(path=None, profile='default'):
     # and loads directly from the CONFIG_PATH root
     xpln = _sideload_data(env, 'EXPLAIN_FILE', env.get('CONFIG_PATH'))
     return env, csts, xpln
-
-
-_LOG_BLOCKED = False
-
-
-@contextmanager
-def silence_logging():
-    """ Context manager that silences log() output for its duration.
-
-        Lines starting with 'WARNING' still print, so startup problems
-        stay visible while routine construction logs are hidden.
-    """
-    global _LOG_BLOCKED
-    _LOG_BLOCKED = True
-    try:
-        yield
-    finally:
-        _LOG_BLOCKED = False
-
-
-def log(text):
-    """ Log to stdout with timestamp.
-    TODO: replace with logging
-    """
-    global _LOG_BLOCKED
-    if _LOG_BLOCKED and not text.startswith("WARNING"):
-        return
-    stamp = datetime.now()
-    ymd = "%04d-%02d-%02d" % (stamp.year, stamp.month, stamp.day)
-    hms = "%02d:%02d:%02d" % (stamp.hour, stamp.minute, stamp.second)
-    print("{0} {1} {2}".format(ymd, hms, text))
 
 
 MSG_ENV_PATH = ".msg_struct"

@@ -1,6 +1,7 @@
-import contextlib
 import io
+import logging
 import os
+import sys
 import tempfile
 import unittest
 
@@ -132,35 +133,66 @@ class TestScheduleConfigProfile(unittest.TestCase):
         self.assertFalse(utils.is_valid_profile(env, "not_a_profile"))
 
 
-class TestSilenceLogging(unittest.TestCase):
-    """ Verify that startup can silence routine log() output while keeping
-        warnings and later logging intact.
+class TestLogging(unittest.TestCase):
+    """ Verify that log() routes through the logging module, and that
+        silence_logging() toggles the effective log level.
     """
 
-    def capture_log(self, *texts):
-        stream = io.StringIO()
-        with contextlib.redirect_stdout(stream):
-            for text in texts:
-                utils.log(text)
-        return stream.getvalue()
+    def setUp(self):
+        self._logger = utils.logger
+        self._stream = io.StringIO()
+        self._handler = logging.StreamHandler(self._stream)
+        self._handler.setFormatter(
+            logging.Formatter(utils.LOG_FORMAT, datefmt=utils.LOG_DATEFMT))
+        self._handler.setLevel(logging.INFO)
+        self._previous_handlers = self._logger.handlers[:]
+        self._previous_level = self._logger.level
+        self._logger.handlers[:] = [self._handler]
+        self._logger.setLevel(logging.INFO)
 
-    def test_log_prints_by_default(self):
-        self.assertIn("hello", self.capture_log("hello"))
+    def tearDown(self):
+        self._logger.handlers[:] = self._previous_handlers
+        self._logger.setLevel(self._previous_level)
+
+    def captured(self, *texts):
+        for text in texts:
+            utils.log(text)
+        return self._stream.getvalue()
+
+    def test_log_prints_timestamped_line_by_default(self):
+        out = self.captured("hello")
+        self.assertRegex(out, r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} hello\n$")
 
     def test_silence_logging_hides_info_lines(self):
         with utils.silence_logging():
-            out = self.capture_log("hidden")
-        self.assertEqual(out, "")
+            self.assertEqual(self.captured("hidden"), "")
 
     def test_silence_logging_keeps_warnings(self):
         with utils.silence_logging():
-            out = self.capture_log("WARNING: something is off")
-        self.assertIn("WARNING: something is off", out)
+            out = self.captured("WARNING: something is off")
+        self.assertRegex(
+            out,
+            r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} WARNING: something is off\n$")
 
     def test_logging_restored_after_context(self):
         with utils.silence_logging():
-            self.assertEqual(self.capture_log("hidden"), "")
-        self.assertIn("visible", self.capture_log("visible"))
+            self.assertEqual(self.captured("hidden"), "")
+        self.assertIn("visible", self.captured("visible"))
+
+    def test_log_is_silent_by_default(self):
+        # with only the default null handler (as in the test suite),
+        # neither info nor warning output reaches the console
+        self._logger.handlers[:] = [logging.NullHandler()]
+        self._logger.setLevel(logging.NOTSET)
+        self.assertEqual(self.captured("hidden", "WARNING: also hidden"), "")
+
+    def test_configure_logging_adds_console_handler(self):
+        self._logger.handlers[:] = [logging.NullHandler()]
+        utils.configure_logging()
+        stream_handlers = [h for h in self._logger.handlers
+                           if isinstance(h, logging.StreamHandler)]
+        self.assertEqual(len(stream_handlers), 1)
+        self.assertIs(stream_handlers[0].stream, sys.stdout)
 
 
 if __name__ == "__main__":

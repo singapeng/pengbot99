@@ -17,6 +17,11 @@ from pengbot99 import ui
 from pengbot99 import utils
 
 
+# enable console logging (timestamps as before); the logger is otherwise
+# silent so importing the package never spews
+utils.configure_logging()
+
+
 parser = argparse.ArgumentParser(description='pengbot99 Discord bot')
 parser.add_argument('--profile', default=None,
     help="Schedule config profile to load, e.g. 'queen'. Using this "
