@@ -25,19 +25,19 @@ args = parser.parse_args()
 
 # Load tokens, ids, etc from an unversioned env file
 env = utils.load_env()
-# read the event switch config if present (server_events.csv in CONFIG_PATH)
-server_events = schedule_controller.load_server_events(env)
+# read the profile switch config if present (server_events.csv in CONFIG_PATH)
+profile_switch = schedule_controller.load_profile_switches(env)
 
 # Choose the startup profile: an explicit --profile always wins, then the
-# active event from server_events.csv, then the 'default' profile.
+# active profile from server_events.csv, then the 'default' profile.
 auto_switch = False
 if args.profile is not None:
     profile = args.profile
     utils.log("Using --profile '{0}' (manual override, auto-switch disabled).".format(profile))
-elif server_events is not None:
-    profile = server_events.active_on(datetime.now(timezone.utc).date())
+elif profile_switch is not None:
+    profile = profile_switch.active_on(datetime.now(timezone.utc).date())
     auto_switch = True
-    utils.log("server_events.csv found; active event '{0}'.".format(profile))
+    utils.log("server_events.csv found; active profile '{0}'.".format(profile))
 else:
     profile = 'default'
     utils.log("No --profile and no server_events.csv; using profile 'default'.")
@@ -59,21 +59,21 @@ if not utils.is_valid_profile(env, profile):
                   "falling back to 'default'.".format(profile))
         profile = 'default'
 
-# Load schedule constants and the event schedules, silently: startup
+# Load schedule constants and the schedule profiles, silently: startup
 # should only report its decision above and let a schedule announce
 # itself when it is actually set active.
 with utils.silence_logging():
     env, csts, xpln = utils.load_config(profile=profile)
 
     # The ScheduleController holds the shared slot 1 and a registry
-    # of event schedules. Reads such as controller.slot2mgr resolve
+    # of schedule profiles. Reads such as controller.slot2mgr resolve
     # against the currently active schedule at call time.
     controller = schedule_controller.ScheduleController(env, profile=profile, csts=csts)
 
-    # Preload the event schedules referenced by server_events.csv so that
+    # Preload the schedule profiles referenced by server_events.csv so that
     # any load failure is reported at startup.
     if auto_switch:
-        for name in server_events.events:
+        for name in profile_switch.profiles:
             if not utils.is_valid_profile(env, name):
                 utils.log("WARNING: server_events.csv references unknown profile "
                           "'{0}'; skipping.".format(name))
@@ -81,7 +81,7 @@ with utils.silence_logging():
             try:
                 controller.load(name)
             except Exception as exc:
-                utils.log("WARNING: could not preload event schedule '{0}': {1}".format(name, exc))
+                utils.log("WARNING: could not preload schedule profile '{0}': {1}".format(name, exc))
 
 bot = discord.Bot()
 
@@ -175,35 +175,35 @@ async def configure_schedule_edit(interval=10):
     start_schedule_edit.start()
 
 
-async def configure_server_events_switch():
-    """ Schedules the nightly event switch check at 23:54 UTC.
+async def configure_auto_switch():
+    """ Schedules the nightly profile switch check at 23:54 UTC.
         Runs only in auto mode (no explicit --profile).
     """
-    utils.log("Automatic event switching is active.")
+    utils.log("Automatic profile switching is active.")
 
     @tasks.loop(time=time(hour=23, minute=54, tzinfo=timezone.utc))
-    async def check_server_events():
-        event_config = schedule_controller.load_server_events(env)
-        if event_config is None:
+    async def check_profile_switch():
+        profile_switch = schedule_controller.load_profile_switches(env)
+        if profile_switch is None:
             return
         tomorrow = (datetime.now(timezone.utc) + timedelta(days=1)).date()
-        event = event_config.active_on(tomorrow)
-        if event == controller.name:
-            # tomorrow's event is the same as today
+        next_profile = profile_switch.active_on(tomorrow)
+        if next_profile == controller.name:
+            # tomorrow's profile is the same as today
             return
-        if not utils.is_valid_profile(env, event):
-            utils.log("WARNING: next event '{0}' in server_events.csv is an "
-                      "unknown profile; skipping automatic switch.".format(event))
+        if not utils.is_valid_profile(env, next_profile):
+            utils.log("WARNING: next profile '{0}' in server_events.csv is an "
+                      "unknown profile; skipping automatic switch.".format(next_profile))
             return
-        utils.log("Controller Switching to event schedule '{0}' ...".format(event))
-        controller.switch(event)
+        utils.log("Switching to schedule profile '{0}' ...".format(next_profile))
+        controller.switch(next_profile)
         for mp_type in ("miniprix", "classicprix"):
             await _edit_miniprix_message(mp_type)
         await _refresh_schedule_message()
         if not env.get("TICKER_OVERRIDE"):
             await _update_bot_status(bot)
 
-    check_server_events.start()
+    check_profile_switch.start()
 
 
 @bot.event
@@ -212,9 +212,9 @@ async def on_ready():
     # configure schedule edit task
     interval = int(env.get("REFRESH_INTERVAL"), 10)
     await configure_schedule_edit(interval)
-    # automatic event switching at midnight UTC (auto mode only)
+    # automatic profile switching at midnight UTC (auto mode only)
     if auto_switch:
-        await configure_server_events_switch()
+        await configure_auto_switch()
     # if ticker override is set, set description now.
     ticker = env.get("TICKER_OVERRIDE")
     if ticker:

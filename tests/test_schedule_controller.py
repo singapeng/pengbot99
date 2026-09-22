@@ -11,7 +11,7 @@ from pengbot99 import explain_cmd, schedule_controller, utils
 
 class ScheduleControllerTestCase(unittest.TestCase):
     """ Verify that the schedule controller loads, switches and unloads
-        event schedules, and that reads delegate to the active schedule
+        schedule profiles, and that reads delegate to the active schedule
         while the slot 1 schedule stays global.
     """
 
@@ -200,9 +200,9 @@ class ScheduleControllerTestCase(unittest.TestCase):
         c.unload('not_a_profile')
         self.assertEqual(c.list(), ['default'])
 
-    def test_event_schedule_loads_own_constants(self):
+    def test_profile_schedule_loads_own_constants(self):
         env, _ = self.load_default_csts()
-        sched = schedule_controller.EventSchedule(env, 'machine_shuffle')
+        sched = schedule_controller.ScheduleProfile(env, 'machine_shuffle')
         self.assertTrue(sched.is_shuffle_on())
 
     def test_controller_loads_own_constants(self):
@@ -228,8 +228,8 @@ class ScheduleControllerTestCase(unittest.TestCase):
         self.assertTrue(result)
 
 
-class EventSwitchConfigTestCase(unittest.TestCase):
-    """ Verify server_events.csv parsing and the event switch helper.
+class ProfileSwitchConfigTestCase(unittest.TestCase):
+    """ Verify server_events.csv parsing and the profile switch helper.
     """
 
     def setUp(self):
@@ -240,27 +240,27 @@ class EventSwitchConfigTestCase(unittest.TestCase):
     def tearDown(self):
         self._tmpdir.cleanup()
 
-    def write_server_events(self, text):
+    def write_switch_config(self, text):
         path = os.path.join(self.root, 'server_events.csv')
         with open(path, "w") as fd:
             fd.write(text)
         return path
 
     def test_active_before_first_switch_is_default(self):
-        cfg = schedule_controller.EventSwitchConfig(rows=[
+        cfg = schedule_controller.ProfileSwitchConfig(rows=[
             ['2025-06-01', 'meteor'],
         ])
         self.assertEqual(cfg.active_on(date(2025, 5, 31)), 'default')
 
     def test_active_on_switch_date(self):
-        cfg = schedule_controller.EventSwitchConfig(rows=[
+        cfg = schedule_controller.ProfileSwitchConfig(rows=[
             ['2025-06-01', 'meteor'],
         ])
         self.assertEqual(cfg.active_on(date(2025, 6, 1)), 'meteor')
         self.assertEqual(cfg.active_on(date(2025, 7, 1)), 'meteor')
 
     def test_latest_switch_up_to_date_wins(self):
-        cfg = schedule_controller.EventSwitchConfig(rows=[
+        cfg = schedule_controller.ProfileSwitchConfig(rows=[
             ['2025-05-01', 'meteor'],
             ['2025-06-01', 'default'],
             ['2025-07-01', 'machine_shuffle'],
@@ -269,58 +269,58 @@ class EventSwitchConfigTestCase(unittest.TestCase):
         self.assertEqual(cfg.active_on(date(2025, 7, 1)), 'machine_shuffle')
 
     def test_unsorted_rows_are_sorted(self):
-        cfg = schedule_controller.EventSwitchConfig(rows=[
+        cfg = schedule_controller.ProfileSwitchConfig(rows=[
             ['2025-07-01', 'machine_shuffle'],
             ['2025-05-01', 'meteor'],
         ])
         self.assertEqual(cfg.active_on(date(2025, 6, 1)), 'meteor')
 
-    def test_events_unique_in_order(self):
-        cfg = schedule_controller.EventSwitchConfig(rows=[
+    def test_profiles_unique_in_order(self):
+        cfg = schedule_controller.ProfileSwitchConfig(rows=[
             ['2025-05-01', 'meteor'],
             ['2025-06-01', 'default'],
             ['2025-07-01', 'meteor'],
         ])
-        self.assertEqual(cfg.events, ['meteor', 'default'])
+        self.assertEqual(cfg.profiles, ['meteor', 'default'])
 
     def test_comments_and_blank_rows_ignored(self):
-        cfg = schedule_controller.EventSwitchConfig(rows=[
+        cfg = schedule_controller.ProfileSwitchConfig(rows=[
             ['# a comment'],
             ['2025-06-01', 'meteor'],
             [],
         ])
-        self.assertEqual(cfg.events, ['meteor'])
+        self.assertEqual(cfg.profiles, ['meteor'])
         self.assertEqual(cfg.active_on(date(2025, 6, 1)), 'meteor')
 
     def test_malformed_date_rows_ignored(self):
-        cfg = schedule_controller.EventSwitchConfig(rows=[
+        cfg = schedule_controller.ProfileSwitchConfig(rows=[
             ['not-a-date', 'meteor'],
             ['2025-06-01', 'meteor'],
         ])
-        self.assertEqual(cfg.events, ['meteor'])
+        self.assertEqual(cfg.profiles, ['meteor'])
         self.assertEqual(cfg.active_on(date(2025, 6, 1)), 'meteor')
 
-    def test_row_with_missing_event_ignored(self):
-        cfg = schedule_controller.EventSwitchConfig(rows=[
+    def test_row_with_missing_profile_ignored(self):
+        cfg = schedule_controller.ProfileSwitchConfig(rows=[
             ['2025-06-01'],
             ['2025-06-02', 'meteor'],
         ])
         self.assertEqual(cfg.active_on(date(2025, 6, 1)), 'default')
         self.assertEqual(cfg.active_on(date(2025, 6, 2)), 'meteor')
 
-    def test_load_server_events_absent_returns_none(self):
-        self.assertIsNone(schedule_controller.load_server_events(self.env))
+    def test_load_profile_switches_absent_returns_none(self):
+        self.assertIsNone(schedule_controller.load_profile_switches(self.env))
 
-    def test_load_server_events_parses_file(self):
-        self.write_server_events("2025-06-01,meteor\n")
-        cfg = schedule_controller.load_server_events(self.env)
-        self.assertIsInstance(cfg, schedule_controller.EventSwitchConfig)
+    def test_load_profile_switches_parses_file(self):
+        self.write_switch_config("2025-06-01,meteor\n")
+        cfg = schedule_controller.load_profile_switches(self.env)
+        self.assertIsInstance(cfg, schedule_controller.ProfileSwitchConfig)
         self.assertEqual(cfg.active_on(date(2025, 6, 1)), 'meteor')
 
-    def test_load_server_events_ignores_comments(self):
-        self.write_server_events("# next event\n2025-06-01,meteor\n")
-        cfg = schedule_controller.load_server_events(self.env)
-        self.assertEqual(cfg.events, ['meteor'])
+    def test_load_profile_switches_ignores_comments(self):
+        self.write_switch_config("# next event\n2025-06-01,meteor\n")
+        cfg = schedule_controller.load_profile_switches(self.env)
+        self.assertEqual(cfg.profiles, ['meteor'])
 
 
 if __name__ == "__main__":

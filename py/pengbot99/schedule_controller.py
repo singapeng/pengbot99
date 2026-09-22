@@ -1,7 +1,7 @@
-""" Runtime event-schedule management.
+""" Runtime profile-schedule management.
 
-    Owns the shared slot 1 (99 races) schedule, and a registry of event
-    schedules (slot 2, one per profile), with exactly one active
+    Owns the shared slot 1 (99 races) schedule, and a registry of
+    schedule profiles (slot 2, one per profile), with exactly one active
     at any time. Reads on the controller delegate to the active schedule,
     so existing consumers resolve the currently loaded managers at call
     time.
@@ -37,8 +37,8 @@ def build_r99(env, glitch_mgr, csts, profile='default'):
             minutes_offset=r99_offset, profile=profile)
 
 
-class EventSchedule(object):
-    """ One loaded event schedule: Slot 2 for one event profile
+class ScheduleProfile(object):
+    """ One loaded schedule profile: Slot 2 for one profile
         along with Private MP and CMP rotations.
 
         For Slot 2, this covers:
@@ -46,7 +46,7 @@ class EventSchedule(object):
         - Secret League overlay, if enabled,
         - Mini-Prix and Classic Mini-Prix schedule,
         for weekday plus weekend, including weekend variations
-        (such as Shuffle Mini-Prix, if the event is active).
+        (such as Shuffle Mini-Prix, if the profile is active).
 
     """
     def __init__(self, env, name, csts=None):
@@ -146,23 +146,23 @@ class EventSchedule(object):
 
 
 class ScheduleController(object):
-    """ The registry of loaded event schedules plus the shared slot 1.
+    """ The registry of loaded schedule profiles plus the shared slot 1.
 
         Exactly one schedule is active at any time. Unknown attribute
-        reads delegate to the active EventSchedule so that consumers
+        reads delegate to the active ScheduleProfile so that consumers
         keep working and always resolve the currently active managers.
     """
     def __init__(self, env, profile='default', csts=None):
         super().__init__()
         self.env = env
-        self._schedules = {}
+        self._profiles = {}
         if csts is None:
             csts = utils.load_csts(env, profile)
         # Slot 1 schedule is built once from the startup profile and
         # never swapped, so 99 races query state is preserved.
         self.slot1mgr = build_slot1(env, profile)
         self.r99_mgr = build_r99(env, self.slot1mgr, csts, profile)
-        # load the startup profile schedule
+        # load the startup schedule profile
         self._active = self.load(profile, csts=csts)
 
     @property
@@ -173,25 +173,25 @@ class ScheduleController(object):
 
     @property
     def active(self):
-        """ The currently active EventSchedule.
+        """ The currently active ScheduleProfile.
         """
         return self._active
 
     def load(self, name, csts=None):
-        """ Builds and registers an event schedule without activating it.
+        """ Builds and registers a schedule profile without activating it.
             Returns the (possibly already-registered) schedule.
         """
-        if name not in self._schedules:
-            sched = EventSchedule(self.env, name, csts=csts)
-            self._schedules[name] = sched
-            utils.log("Loaded event schedule '{0}'.".format(name))
-        return self._schedules[name]
+        if name not in self._profiles:
+            sched = ScheduleProfile(self.env, name, csts=csts)
+            self._profiles[name] = sched
+            utils.log("Loaded schedule profile '{0}'.".format(name))
+        return self._profiles[name]
 
     def switch(self, name):
         """ Activates a loaded schedule by name, lazy-loading it on demand.
         """
         self._active = self.load(name)
-        utils.log("Switched to event schedule '{0}'.".format(name))
+        utils.log("Switched to schedule profile '{0}'.".format(name))
         return self._active
 
     def unload(self, name):
@@ -201,17 +201,17 @@ class ScheduleController(object):
         if name == self.name:
             raise ValueError(
                 "Cannot unload the active schedule '{0}'.".format(name))
-        if name in self._schedules:
-            del self._schedules[name]
-            utils.log("Unloaded event schedule '{0}'.".format(name))
+        if name in self._profiles:
+            del self._profiles[name]
+            utils.log("Unloaded schedule profile '{0}'.".format(name))
 
     def list(self):
         """ The names of all loaded schedules.
         """
-        return list(self._schedules)
+        return list(self._profiles)
 
     def __getattr__(self, name):
-        """ Delegate unknown attribute reads to the active EventSchedule.
+        """ Delegate unknown attribute reads to the active ScheduleProfile.
             Called only when normal attribute lookup fails.
         """
         active = self.__dict__.get('_active')
@@ -220,21 +220,21 @@ class ScheduleController(object):
         return getattr(active, name)
 
 
-def load_server_events(env):
-    """ Loads the event switch config from 'server_events.csv' in the
+def load_profile_switches(env):
+    """ Loads the profile switch config from 'server_events.csv' in the
         CONFIG_PATH root. Returns None if the file is absent.
     """
     path = os.path.join(env['CONFIG_PATH'], 'server_events.csv')
     if not os.path.isfile(path):
         return None
-    return EventSwitchConfig(path=path)
+    return ProfileSwitchConfig(path=path)
 
 
-class EventSwitchConfig(object):
+class ProfileSwitchConfig(object):
     """ Switch times read from a server_events.csv file.
 
-        Each row is '<YYYY-MM-DD>,<event>', meaning that the event
-        schedule profile named by '<event>' becomes active at 00:00
+        Each row is '<YYYY-MM-DD>,<profile>', meaning that the
+        profile named by '<profile>' becomes active at 00:00
         UTC on that date. Rows do not need to be sorted; they are
         sorted by date on load. Comments (lines starting with '#')
         and malformed rows are ignored with a warning.
@@ -254,7 +254,7 @@ class EventSwitchConfig(object):
         return rows
 
     def _parse(self, rows):
-        """ Turns raw csv rows into sorted (date, event) switches.
+        """ Turns raw csv rows into sorted (date, profile) switches.
         """
         switches = []
         for row in rows:
@@ -277,24 +277,24 @@ class EventSwitchConfig(object):
                 ','.join(row)))
 
     def active_on(self, day):
-        """ The event active at 00:00 UTC of the given date.
+        """ The profile active at 00:00 UTC of the given date.
             Falls back to 'default' for dates before the first switch.
         """
-        event = 'default'
+        profile = 'default'
         for switch_day, name in self._switches:
             if switch_day <= day:
-                event = name
+                profile = name
             else:
                 break
-        return event
+        return profile
 
     @property
-    def events(self):
-        """ The unique event profile names referenced by the config,
+    def profiles(self):
+        """ The unique profile names referenced by the config,
             in the order they first appear.
         """
-        events = []
+        profiles = []
         for _, name in self._switches:
-            if name not in events:
-                events.append(name)
-        return events
+            if name not in profiles:
+                profiles.append(name)
+        return profiles

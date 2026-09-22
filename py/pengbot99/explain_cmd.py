@@ -74,7 +74,7 @@ class Explainer(object):
         self._topics = TOPICS_BASE
         self._initialize_topics(config)
         # a holder exposing the current slot2mgr, resolved lazily so that
-        # an event schedule switch is reflected at explain time.
+        # a schedule profile switch is reflected at explain time.
         self._holder = mgr_holder
 
     @property

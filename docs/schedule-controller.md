@@ -1,15 +1,15 @@
-# Schedule controller (runtime event-schedule management)
+# Schedule controller (runtime schedule profile management)
 
 ## Goal
 
-Streamline switching between event schedules **without restarting the bot**.
+Streamline switching between schedule profiles **without restarting the bot**.
 
 The experimental implementation on `experimental_flip` proved timers can flip
 between the normal and Meteor/Mini World Tour schedules, but it hardcodes one
 toggle, two schedules, and the trigger logic. We want a flexible, reusable model
 instead:
 
-- preload as many event schedules as we wish,
+- preload as many schedule profiles as we wish,
 - unload schedules we no longer need,
 - make as many switch operations as we want, in any order,
 - trigger switches through **any** means (bot command, timer task, future API
@@ -64,14 +64,14 @@ The model lives in its own module (e.g. `py/pengbot99/schedule_controller.py`),
 **independent from the Discord bot**: no `discord`/`bot.py` imports, fully
 unit-testable. `bot.py` gets thinner, keeping only wiring.
 
-### `EventSchedule` — one loaded event schedule
+### `ScheduleProfile` — one loaded schedule profile
 
 Owns the **slot-2 world** for one event profile, built as a coherent set so
 internal bindings stay consistent (miniprix managers bind to their own
 `slot2mgr`):
 
 ```
-EventSchedule
+ScheduleProfile
   name                       # e.g. 'meteor', 'queen'
   slot2mgr, cmp_mgr, mp_mgr,
   pmp_mgr, pcmp_mgr,         # private managers bind to this schedule's publics
@@ -86,21 +86,21 @@ way.
 
 ### `ScheduleController` — the registry + active schedule
 
-Owns the shared **slot-1 world** and a registry of loaded `EventSchedule`s;
+Owns the shared **slot-1 world** and a registry of loaded `ScheduleProfile`s;
 exactly one schedule is active at any time:
 
 ```
 ScheduleController
   slot1mgr, r99_mgr          # global, built once, never swapped
-  load(name)                 # build + register an EventSchedule
+  load(name)                 # build + register a ScheduleProfile
   unload(name)               # free a schedule (semantics: TBD, see below)
   switch(name)               # lazy-load if needed, then activate
   name / active              # currently active schedule
   list()                     # loaded schedules
-  __getattr__ / descriptor   # delegate unknown attrs to the active EventSchedule
+  __getattr__ / descriptor   # delegate unknown attrs to the active ScheduleProfile
 ```
 
-The delegation is what lets every existing `pb.<mgr>` read keep working: reads
+The delegation is what lets every existing `<mgr>` read keep working: reads
 resolve against whatever schedule is active at the moment of the call.
 
 ### Lifecycle semantics
@@ -133,7 +133,7 @@ resolve against whatever schedule is active at the moment of the call.
 
 | Item | Status |
 | --- | --- |
-| One `EventSchedule` = the slot-2 world only | Decided (slot-1 stays global; avoids resetting `r99_mgr` state) |
+| One `ScheduleProfile` = the slot-2 world only | Decided (slot-1 stays global; avoids resetting `r99_mgr` state) |
 | `switch()` lazy-loads unloaded profiles | Decided |
 | Model independent from the Discord bot, own module | Decided |
 | Construction logic moved out of `bot.py` | Decided |
@@ -144,12 +144,12 @@ resolve against whatever schedule is active at the moment of the call.
 ## Future directions
 
 - **API access to multiple schedules**: a future API may let users access any
-  loaded event schedule, not only the active one. The registry keeps all loaded
+  loaded schedule profile, not only the active one. The registry keeps all loaded
   schedules around, so exposing read access to non-active schedules is a natural
   extension; the model should not assume only one schedule ever needs to be
   consulted.
 - Slot-1 scheduling may someday vary per event; if that happens, the shared
-  global scope can be revisited (an `EventSchedule` would then own
+  global scope can be revisited (a `ScheduleProfile` would then own
   `slot1mgr`/`r99_mgr` too).
 - Trigger examples to design when scope widens: `switch` slash command with
   autocomplete over loaded schedules, and a config-driven timer task.
