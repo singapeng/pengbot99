@@ -3,6 +3,7 @@ import os
 import shutil
 import tempfile
 import unittest
+from datetime import date
 
 # Local imports
 from pengbot99 import explain_cmd, schedule_controller, utils
@@ -225,6 +226,101 @@ class ScheduleControllerTestCase(unittest.TestCase):
         result = explainer.explain('Grand Prix Rotation')
         self.assertIsInstance(result, str)
         self.assertTrue(result)
+
+
+class EventSwitchConfigTestCase(unittest.TestCase):
+    """ Verify server_events.csv parsing and the event switch helper.
+    """
+
+    def setUp(self):
+        self._tmpdir = tempfile.TemporaryDirectory()
+        self.root = self._tmpdir.name
+        self.env = {'CONFIG_PATH': self.root}
+
+    def tearDown(self):
+        self._tmpdir.cleanup()
+
+    def write_server_events(self, text):
+        path = os.path.join(self.root, 'server_events.csv')
+        with open(path, "w") as fd:
+            fd.write(text)
+        return path
+
+    def test_active_before_first_switch_is_default(self):
+        cfg = schedule_controller.EventSwitchConfig(rows=[
+            ['2025-06-01', 'meteor'],
+        ])
+        self.assertEqual(cfg.active_on(date(2025, 5, 31)), 'default')
+
+    def test_active_on_switch_date(self):
+        cfg = schedule_controller.EventSwitchConfig(rows=[
+            ['2025-06-01', 'meteor'],
+        ])
+        self.assertEqual(cfg.active_on(date(2025, 6, 1)), 'meteor')
+        self.assertEqual(cfg.active_on(date(2025, 7, 1)), 'meteor')
+
+    def test_latest_switch_up_to_date_wins(self):
+        cfg = schedule_controller.EventSwitchConfig(rows=[
+            ['2025-05-01', 'meteor'],
+            ['2025-06-01', 'default'],
+            ['2025-07-01', 'machine_shuffle'],
+        ])
+        self.assertEqual(cfg.active_on(date(2025, 6, 15)), 'default')
+        self.assertEqual(cfg.active_on(date(2025, 7, 1)), 'machine_shuffle')
+
+    def test_unsorted_rows_are_sorted(self):
+        cfg = schedule_controller.EventSwitchConfig(rows=[
+            ['2025-07-01', 'machine_shuffle'],
+            ['2025-05-01', 'meteor'],
+        ])
+        self.assertEqual(cfg.active_on(date(2025, 6, 1)), 'meteor')
+
+    def test_events_unique_in_order(self):
+        cfg = schedule_controller.EventSwitchConfig(rows=[
+            ['2025-05-01', 'meteor'],
+            ['2025-06-01', 'default'],
+            ['2025-07-01', 'meteor'],
+        ])
+        self.assertEqual(cfg.events, ['meteor', 'default'])
+
+    def test_comments_and_blank_rows_ignored(self):
+        cfg = schedule_controller.EventSwitchConfig(rows=[
+            ['# a comment'],
+            ['2025-06-01', 'meteor'],
+            [],
+        ])
+        self.assertEqual(cfg.events, ['meteor'])
+        self.assertEqual(cfg.active_on(date(2025, 6, 1)), 'meteor')
+
+    def test_malformed_date_rows_ignored(self):
+        cfg = schedule_controller.EventSwitchConfig(rows=[
+            ['not-a-date', 'meteor'],
+            ['2025-06-01', 'meteor'],
+        ])
+        self.assertEqual(cfg.events, ['meteor'])
+        self.assertEqual(cfg.active_on(date(2025, 6, 1)), 'meteor')
+
+    def test_row_with_missing_event_ignored(self):
+        cfg = schedule_controller.EventSwitchConfig(rows=[
+            ['2025-06-01'],
+            ['2025-06-02', 'meteor'],
+        ])
+        self.assertEqual(cfg.active_on(date(2025, 6, 1)), 'default')
+        self.assertEqual(cfg.active_on(date(2025, 6, 2)), 'meteor')
+
+    def test_load_server_events_absent_returns_none(self):
+        self.assertIsNone(schedule_controller.load_server_events(self.env))
+
+    def test_load_server_events_parses_file(self):
+        self.write_server_events("2025-06-01,meteor\n")
+        cfg = schedule_controller.load_server_events(self.env)
+        self.assertIsInstance(cfg, schedule_controller.EventSwitchConfig)
+        self.assertEqual(cfg.active_on(date(2025, 6, 1)), 'meteor')
+
+    def test_load_server_events_ignores_comments(self):
+        self.write_server_events("# next event\n2025-06-01,meteor\n")
+        cfg = schedule_controller.load_server_events(self.env)
+        self.assertEqual(cfg.events, ['meteor'])
 
 
 if __name__ == "__main__":

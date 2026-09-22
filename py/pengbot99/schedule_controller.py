@@ -9,7 +9,9 @@
     See docs/schedule-controller.md for the design.
 """
 
-from datetime import timedelta
+import csv
+import os
+from datetime import datetime, timedelta
 
 # local imports
 from pengbot99 import choicerace, miniprix, schedule, secret_league, utils
@@ -144,12 +146,11 @@ class EventSchedule(object):
 
 
 class ScheduleController(object):
-    """ The registry of loaded event schedules plus the shared slot-1 world.
+    """ The registry of loaded event schedules plus the shared slot 1.
 
         Exactly one schedule is active at any time. Unknown attribute
-        reads delegate to the active EventSchedule so that pb.<mgr>
-        style consumers keep working and always resolve the currently
-        active managers.
+        reads delegate to the active EventSchedule so that consumers
+        keep working and always resolve the currently active managers.
     """
     def __init__(self, env, profile='default', csts=None):
         super().__init__()
@@ -157,11 +158,11 @@ class ScheduleController(object):
         self._schedules = {}
         if csts is None:
             csts = utils.load_csts(env, profile)
-        # the slot-1 world is built once from the startup profile and
+        # Slot 1 schedule is built once from the startup profile and
         # never swapped, so 99 races query state is preserved.
         self.slot1mgr = build_slot1(env, profile)
         self.r99_mgr = build_r99(env, self.slot1mgr, csts, profile)
-        # load the startup profile schedule (unchanged behaviour)
+        # load the startup profile schedule
         self._active = self.load(profile, csts=csts)
 
     @property
@@ -217,3 +218,83 @@ class ScheduleController(object):
         if active is None:
             raise AttributeError(name)
         return getattr(active, name)
+
+
+def load_server_events(env):
+    """ Loads the event switch config from 'server_events.csv' in the
+        CONFIG_PATH root. Returns None if the file is absent.
+    """
+    path = os.path.join(env['CONFIG_PATH'], 'server_events.csv')
+    if not os.path.isfile(path):
+        return None
+    return EventSwitchConfig(path=path)
+
+
+class EventSwitchConfig(object):
+    """ Switch times read from a server_events.csv file.
+
+        Each row is '<YYYY-MM-DD>,<event>', meaning that the event
+        schedule profile named by '<event>' becomes active at 00:00
+        UTC on that date. Rows do not need to be sorted; they are
+        sorted by date on load. Comments (lines starting with '#')
+        and malformed rows are ignored with a warning.
+    """
+    def __init__(self, path=None, rows=None):
+        super().__init__()
+        if rows is None:
+            rows = self._load(path)
+        self._switches = self._parse(rows)
+
+    def _load(self, path):
+        rows = []
+        with open(path, newline='') as fd:
+            reader = csv.reader(fd, delimiter=',')
+            for row in reader:
+                rows.append(row)
+        return rows
+
+    def _parse(self, rows):
+        """ Turns raw csv rows into sorted (date, event) switches.
+        """
+        switches = []
+        for row in rows:
+            if not row or row[0].startswith('#'):
+                continue
+            if len(row) < 2:
+                self._warn(row)
+                continue
+            try:
+                day = datetime.strptime(row[0], '%Y-%m-%d').date()
+            except ValueError:
+                self._warn(row)
+                continue
+            switches.append((day, row[1]))
+        switches.sort(key=lambda item: item[0])
+        return switches
+
+    def _warn(self, row):
+        utils.log("WARNING server_events.csv: ignoring malformed row '{0}'.".format(
+                ','.join(row)))
+
+    def active_on(self, day):
+        """ The event active at 00:00 UTC of the given date.
+            Falls back to 'default' for dates before the first switch.
+        """
+        event = 'default'
+        for switch_day, name in self._switches:
+            if switch_day <= day:
+                event = name
+            else:
+                break
+        return event
+
+    @property
+    def events(self):
+        """ The unique event profile names referenced by the config,
+            in the order they first appear.
+        """
+        events = []
+        for _, name in self._switches:
+            if name not in events:
+                events.append(name)
+        return events

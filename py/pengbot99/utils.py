@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 from datetime import datetime
 
 import os
@@ -97,10 +98,31 @@ def load_config(path=None, profile='default'):
     return env, csts, xpln
 
 
+_LOG_BLOCKED = False
+
+
+@contextmanager
+def silence_logging():
+    """ Context manager that silences log() output for its duration.
+
+        Lines starting with 'WARNING' still print, so startup problems
+        stay visible while routine construction logs are hidden.
+    """
+    global _LOG_BLOCKED
+    _LOG_BLOCKED = True
+    try:
+        yield
+    finally:
+        _LOG_BLOCKED = False
+
+
 def log(text):
     """ Log to stdout with timestamp.
     TODO: replace with logging
     """
+    global _LOG_BLOCKED
+    if _LOG_BLOCKED and not text.startswith("WARNING"):
+        return
     stamp = datetime.now()
     ymd = "%04d-%02d-%02d" % (stamp.year, stamp.month, stamp.day)
     hms = "%02d:%02d:%02d" % (stamp.hour, stamp.minute, stamp.second)

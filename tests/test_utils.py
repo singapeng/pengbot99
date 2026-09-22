@@ -1,3 +1,5 @@
+import contextlib
+import io
 import os
 import tempfile
 import unittest
@@ -128,6 +130,37 @@ class TestScheduleConfigProfile(unittest.TestCase):
     def test_is_valid_profile_false_for_unknown_event(self):
         env = {"CONFIG_PATH": self.root}
         self.assertFalse(utils.is_valid_profile(env, "not_a_profile"))
+
+
+class TestSilenceLogging(unittest.TestCase):
+    """ Verify that startup can silence routine log() output while keeping
+        warnings and later logging intact.
+    """
+
+    def capture_log(self, *texts):
+        stream = io.StringIO()
+        with contextlib.redirect_stdout(stream):
+            for text in texts:
+                utils.log(text)
+        return stream.getvalue()
+
+    def test_log_prints_by_default(self):
+        self.assertIn("hello", self.capture_log("hello"))
+
+    def test_silence_logging_hides_info_lines(self):
+        with utils.silence_logging():
+            out = self.capture_log("hidden")
+        self.assertEqual(out, "")
+
+    def test_silence_logging_keeps_warnings(self):
+        with utils.silence_logging():
+            out = self.capture_log("WARNING: something is off")
+        self.assertIn("WARNING: something is off", out)
+
+    def test_logging_restored_after_context(self):
+        with utils.silence_logging():
+            self.assertEqual(self.capture_log("hidden"), "")
+        self.assertIn("visible", self.capture_log("visible"))
 
 
 if __name__ == "__main__":
