@@ -229,13 +229,13 @@ class ScheduleControllerTestCase(unittest.TestCase):
 
 
 class ProfileSwitchConfigTestCase(unittest.TestCase):
-    """ Verify server_events.csv parsing and the profile switch helper.
+    """ Verify EVENT_SCHEDULE_FILE parsing and the profile switch helper.
     """
 
     def setUp(self):
         self._tmpdir = tempfile.TemporaryDirectory()
         self.root = self._tmpdir.name
-        self.env = {'CONFIG_PATH': self.root}
+        self.env = {'CONFIG_PATH': self.root, 'EVENT_SCHEDULE_FILE': 'server_events.csv'}
 
     def tearDown(self):
         self._tmpdir.cleanup()

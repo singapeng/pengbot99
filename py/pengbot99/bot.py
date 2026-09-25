@@ -25,16 +25,17 @@ utils.configure_logging()
 parser = argparse.ArgumentParser(description='pengbot99 Discord bot')
 parser.add_argument('--profile', default=None,
     help="Schedule config profile to load, e.g. 'queen'. Using this "
-         "overrides any server_events.csv config.")
+         "overrides any EVENT_SCHEDULE_FILE config.")
 args = parser.parse_args()
 
 # Load tokens, ids, etc from an unversioned env file
 env = utils.load_env()
-# read the profile switch config if present (server_events.csv in CONFIG_PATH)
+# read the profile switch config if present (EVENT_SCHEDULE_FILE in CONFIG_PATH)
 profile_switch = schedule_controller.load_profile_switches(env)
 
 # Choose the startup profile: an explicit --profile always wins, then the
-# active profile from server_events.csv, then the 'default' profile.
+# active profile from EVENT_SCHEDULE_FILE, then the 'default' profile.
+schedule_file = env.get('EVENT_SCHEDULE_FILE')
 auto_switch = False
 if args.profile is not None:
     profile = args.profile
@@ -42,10 +43,10 @@ if args.profile is not None:
 elif profile_switch is not None:
     profile = profile_switch.active_on(datetime.now(timezone.utc).date())
     auto_switch = True
-    utils.log("server_events.csv found; active profile '{0}'.".format(profile))
+    utils.log("Schedule loaded from '{0}'; active profile '{1}'.".format(schedule_file, profile))
 else:
     profile = 'default'
-    utils.log("No --profile and no server_events.csv; using profile 'default'.")
+    utils.log("No --profile and no EVENT_SCHEDULE_FILE; using profile 'default'.")
 
 # Active profile validation:
 # fail gracefully on an invalid profile. Explicit --profile values are
@@ -60,8 +61,8 @@ if not utils.is_valid_profile(env, profile):
                 env['CONFIG_PATH'],
             ))
     else:
-        utils.log("WARNING: profile '{0}' from server_events.csv is invalid; "
-                  "falling back to 'default'.".format(profile))
+        utils.log("WARNING: profile '{0}' from file '{1}' is invalid; "
+                  "falling back to 'default'.".format(profile, schedule_file))
         profile = 'default'
 
 # Load schedule constants and the schedule profiles, silently: startup
@@ -75,13 +76,13 @@ with utils.silence_logging():
     # against the currently active schedule at call time.
     controller = schedule_controller.ScheduleController(env, profile=profile, csts=csts)
 
-    # Preload the schedule profiles referenced by server_events.csv so that
+    # Preload the schedule profiles referenced by EVENT_SCHEDULE_FILE so that
     # any load failure is reported at startup.
     if auto_switch:
         for name in profile_switch.profiles:
             if not utils.is_valid_profile(env, name):
-                utils.log("WARNING: server_events.csv references unknown profile "
-                          "'{0}'; skipping.".format(name))
+                utils.log("WARNING: file '{0}' references unknown profile "
+                          "'{1}'; skipping.".format(schedule_file, name))
                 continue
             try:
                 controller.load(name)
@@ -197,7 +198,7 @@ async def configure_auto_switch():
             # tomorrow's profile is the same as today
             return
         if not utils.is_valid_profile(env, next_profile):
-            utils.log("WARNING: next profile '{0}' in server_events.csv is an "
+            utils.log("WARNING: next profile '{0}' in EVENT_SCHEDULE_FILE is an "
                       "unknown profile; skipping automatic switch.".format(next_profile))
             return
         utils.log("Switching to schedule profile '{0}' ...".format(next_profile))

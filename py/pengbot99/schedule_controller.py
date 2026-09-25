@@ -221,17 +221,19 @@ class ScheduleController(object):
 
 
 def load_profile_switches(env):
-    """ Loads the profile switch config from 'server_events.csv' in the
+    """ Loads the profile switch config from 'EVENT_SCHEDULE_FILE' in the
         CONFIG_PATH root. Returns None if the file is absent.
     """
-    path = os.path.join(env['CONFIG_PATH'], 'server_events.csv')
+    if not env.get('EVENT_SCHEDULE_FILE'):
+        return None
+    path = os.path.join(env['CONFIG_PATH'], env['EVENT_SCHEDULE_FILE'])
     if not os.path.isfile(path):
         return None
     return ProfileSwitchConfig(path=path)
 
 
 class ProfileSwitchConfig(object):
-    """ Switch times read from a server_events.csv file.
+    """ Switch times read from a EVENT_SCHEDULE_FILE file.
 
         Each row is '<YYYY-MM-DD>,<profile>', meaning that the
         profile named by '<profile>' becomes active at 00:00
@@ -273,7 +275,7 @@ class ProfileSwitchConfig(object):
         return switches
 
     def _warn(self, row):
-        utils.log("WARNING server_events.csv: ignoring malformed row '{0}'.".format(
+        utils.log("EVENT_SCHEDULE_FILE: ignoring malformed row '{0}'.".format(
                 ','.join(row)))
 
     def active_on(self, day):
