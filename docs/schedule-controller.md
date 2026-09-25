@@ -66,7 +66,7 @@ unit-testable. `bot.py` gets thinner, keeping only wiring.
 
 ### `ScheduleProfile` — one loaded schedule profile
 
-Owns the **slot-2 world** for one event profile, built as a coherent set so
+Owns the **slot 2 schedule** for one event profile, built as a coherent set so
 internal bindings stay consistent (miniprix managers bind to their own
 `slot2mgr`):
 
@@ -86,7 +86,7 @@ way.
 
 ### `ScheduleController` — the registry + active schedule
 
-Owns the shared **slot-1 world** and a registry of loaded `ScheduleProfile`s;
+Owns the shared **slot 1 schedule** and a registry of loaded `ScheduleProfile`s;
 exactly one schedule is active at any time:
 
 ```

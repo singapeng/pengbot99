@@ -60,9 +60,9 @@ Therefore, once you have created one, you are responsible for tracking changes t
 **SCHEDULE_EDIT_CHANNEL**: A Discord channel ID. The bot will post its schedule messages in this channel, and then will regularly update them (every 10 minutes or `REFRESH_INTERVAL` minutes).
 It is suggested that only the bot has permission to post to this channel so that the schedule remains the last message on the channel.
 
-**CONFIG_PATH**: The root path to the bot's configuration directory. Schedule configuration lives in profile subfolders, with the baseline schedule in `CONFIG_PATH/event_default`. A complete set of CSV schedule files is provided in the repository.
+**CONFIG_PATH**: The root path to the bot's configuration directory. Schedule configuration lives in profile subfolders, with the baseline schedule in `CONFIG_PATH/event_default`. A complete set of CSV schedule files and associated constants data is provided in the repository.
 
-**CONSTANTS_FILE**: This file holds constants that are used for fine-tuning the schedule. It resides in the schedule profile folder (i.e. `CONFIG_PATH/event_default` by default). A default constants file is provided in the repository.
+**CONSTANTS_FILE**: This file holds constants that are used for fine-tuning the schedule. It resides in the schedule profile folder (i.e. `CONFIG_PATH/event_default` by default). A constants file is provided in the repository for each event profile.
 
 ### Additional optional configuration
 
@@ -75,13 +75,18 @@ It is used to have the bot repeat a schedule message every hour in the given cha
 
 **REFRESH_INTERVAL**: How often the schedule and ticker message get refreshed, in minutes. If not specified, refresh every 10 minutes.
 
+**EVENT_SCHEDULE_FILE**: This file holds rows of dates at which specific game schedules become active. It resides in the config folder (`CONFIG_PATH/server_events.csv`
+by default). The content is read at startup time, if present, and no --profile flag is given. See how to run the bots below for details.
+
 If any other configuration key is defined (using the `NAME=value` scheme), it will be read but ignored by the bot.
 The configuration file may contain any number of comment lines starting with `#` character.
 
 ### Constants information
 
 Constants are used to conveniently offset the schedule rotation without having to edit the schedule files.
+All schedule-related constants are defined in the **CONSTANTS_FILE** that is referenced in the **.env** file.
 Constants are defined using `NAME=VALUE` syntax. Name is conventionally all-caps. Value is an integer that may be negative.
+
 The following constants are expected to be present:
 
 - CLASSIC_LINE_UP_OFFSET
@@ -92,7 +97,10 @@ The following constants are expected to be present:
 - PRIVATE_CMP_MINUTE_OFFSET
 - NINETYNINE_MINUTE_OFFSET
 
-To change the offset the bot is using, simply edit the Constant file and restart the bot.
+All constants are first read from the `event_default` constants file. If the currently-active event profile is not default, AND the event's profile own constants file
+also defines a constant, then this later value will override the default value. This means that event profiles outside default do not need to hold a constant's value,
+if this value would be identical to the default profile's.
+To change the offset the bot is using, simply edit the Constant file in the appropriate event profile and restart the bot.
 
 Some of the schedule features are activated through feature flag constants defined in the constants file.
 Flags are set to `1` to enable a feature, or `0` to disable it. Their associated tuning constants may remain defined regardless.
@@ -130,19 +138,41 @@ In cases where the schedule defines a separate Grand Prix rotation for the weeke
 The application can be started through the `bot.py` module.
 No assumption is made as to the target environment, therefore no shell script or similar is provided.
 
+There are two different ways to run the bot:
+
+**1. Automatic event profile switching mode**
+
+In this mode, the `EVENT_SCHEDULE_FILE` CSV is loaded at startup. To use this feature, simply supply a CSV file in the expected location. The repository provides an
+example event schedule file. 
+
+Each row is in the CSV should be '<YYYY-MM-DD>,<profile>', meaning that the profile named by '<profile>' becomes active at 00:00 UTC on that date. Rows do not need to
+be sorted; they are sorted by date on load. Comments (lines starting with '#') and malformed rows are ignored with a warning.
+
+Upon starting, the bot will search for the present date and set the referenced schedule as active. It will then check the CSV daily and switch schedule profiles when
+appropriate. It should be noted that the daily check involves reloading the CSV, therefore the event schedule may be modified without restarting the bot; however, any
+change will only come in effect at the time of the daily check. For a change to become effective immediately, simply restart the bot.
+
+When all event dates are in the past, the bot will remain on the last specified schedule indefinitely.
+
+To start in this mode, make sure the environment file specifies `EVENT_SCHEDULE_FILE=file_name` and that `<filename>` is found in the `CONFIG_PATH` folder.
+Then, start up the bot without specifying any flag.
+
 ```bash
 python -m pengbot99.bot
 ```
 
-The schedule profile to load can be selected with the `--profile` argument.
-The default profile is `default`; event profiles live in their own folder
-(prefixed `event_`) under `CONFIG_PATH` and overlay the default config.
-For example, to run with the Queen Leagues Weekend Event schedule (loaded
-from `CONFIG_PATH/event_queen`):
+**2. Single event profile mode**
+
+This mode is active if no EVENT_SCHEDULE_FILE constant is found, or if a --profile flag is given to the bot at start up. It is also in effect if the EVENT_SCHEDULE_FILE
+cannot be loaded.
+
+The schedule profile to load can be selected with the `--profile` argument. The default profile is `default`; event profiles live in their own folder (prefixed `event_`) under `CONFIG_PATH` and overlay the default config. For example, to run with the Queen Leagues Weekend Event schedule (loaded from `CONFIG_PATH/event_queen`):
 
 ```bash
 python -m pengbot99.bot --profile queen
 ```
+
+In this mode, the bot only ever runs the given event profile schedule. Any EVENT_SCHEDULE_FILE is ignored and there is no daily check.
 
 ## Running tests
 
