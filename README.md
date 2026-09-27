@@ -46,6 +46,8 @@ SCHEDULE_EDIT_CHANNEL=9876543210
 CONFIG_PATH=C:/Path/to/config
 # Schedule constants file name (in the schedule profile folder)
 CONSTANTS_FILE=constants.dat
+# Scheduled event profile switches file name (in config folder)
+EVENT_SCHEDULE_FILE=server_events.csv
 # Main refresh interval (for primary schedule and ticker) in minutes
 REFRESH_INTERVAL=5
 ```
@@ -145,7 +147,7 @@ There are two different ways to run the bot:
 In this mode, the `EVENT_SCHEDULE_FILE` CSV is loaded at startup. To use this feature, simply supply a CSV file in the expected location. The repository provides an
 example event schedule file. 
 
-Each row is in the CSV should be '<YYYY-MM-DD>,<profile>', meaning that the profile named by '<profile>' becomes active at 00:00 UTC on that date. Rows do not need to
+Each row is in the CSV should be `<YYYY-MM-DD>,<profile>`, meaning that the profile named by `<profile>` becomes active at 00:00 UTC on that date. Rows do not need to
 be sorted; they are sorted by date on load. Comments (lines starting with '#') and malformed rows are ignored with a warning.
 
 Upon starting, the bot will search for the present date and set the referenced schedule as active. It will then check the CSV daily and switch schedule profiles when
@@ -173,6 +175,95 @@ python -m pengbot99.bot --profile queen
 ```
 
 In this mode, the bot only ever runs the given event profile schedule. Any EVENT_SCHEDULE_FILE is ignored and there is no daily check.
+
+## Event profiles
+
+The following lists event profiles directories provided in the repository and what in-game event they correspond to.
+
+**1. Default Schedule**
+
+| Directory | Profile Name | In-Game name |
+|:----------|:-------------|:-------------|
+| event_default | default | Grand Prix Weekend Event |
+
+During weekdays, Grand Prix occur every hour at :00. Mini-Prix or Classic Mini-Prix occur at :30.
+During weekend days, Grand Prix occur every 30 minutes. Secret League is enabled.
+This schedule is also used for Lucky Weekend Events.
+
+**2. Leagues Weekend**
+
+| Directory | Profile Name | In-Game name |
+|:----------|:-------------|:-------------|
+| event_ace | ace | Ace Leagues Weekend Event |
+| event_king | king | King Leagues Weekend Event |
+| event_knight | knight | Knight Leagues Weekend Event |
+| event_queen | queen | Queen Leagues Weekend Event |
+| event_secret | secret | Secret League Weekend Event |
+
+During weekdays, Grand Prix occur every hour at :00. Mini-Prix or Classic Mini-Prix occur at :30.
+During weekend days, Grand Prix occur every 15 minutes. The event's namesake prix (Ace/Mirror Ace, King/Mirror King, Knight/Mirror Knight,
+Queen/Mirror Queen or Secret League) appear at :00 and :30, with the other leagues appearing in :15 and :45 time slots.
+Outside of Secret League Weekend Event, Secret League is still enabled, and during the weekend, it can only override the event's namesake
+prix.
+
+**3. Machine Shuffle Mini-Prix Weekend Event**
+
+| Directory | Profile Name | In-Game name |
+|:----------|:-------------|:-------------|
+| event_machine_shuffle | machine_shuffle | Machine Shuffle Mini-Prix Weekend Event |
+
+During weekdays, Grand Prix occur every hour at :00. Mini-Prix or Classic Mini-Prix occur at :30.
+During weekend days, Grand Prix occur every two hours. Machine Shuffle Mini-Prix occur every 30 minutes between Grand Prix.
+Private Mini-Prix ran during the weekend are all Shuffle Mini-Prix, but do not feature Mirror tracks, unless the lobbies are opened while
+a public Machine Shuffle Mini-Prix event is running.
+Secret League is enabled.
+
+**4. Team Battle Weekend Event**
+
+| Directory | Profile Name | In-Game name |
+|:----------|:-------------|:-------------|
+| event_team_battle | team_battle | Team Battle Weekend Event |
+
+During weekdays, Grand Prix occur every hour at :00. Mini-Prix or Classic Mini-Prix occur at :30.
+During weekend days, Grand Prix occur every hour at :00. Mini-Prix or Classic Mini-Prix occur at :30, but Classic Mini-Prix frequency is
+the same as Standard Mini-Prix, unlike during the week days where it is one to two like default. The :40 special event is always Team Battle.
+Secret League is enabled.
+
+**5. Mini World Tour Week**
+
+| Directory | Profile Name | In-Game name |
+|:----------|:-------------|:-------------|
+| event_mini_world_tour | mini_world_tour | Mini World Tour Week |
+
+This event runs the same schedule for weekdays and weekend days.
+A 7-races Mini World Tour slot runs every 40 minutes. Every 40 minutes in-between World Tour slots, a Prix takes place, alternating between
+the usual rotation of Grand Prix, or one of Mini-Prix or Classic Mini-Prix.
+There is no Secret League during Mini World Tour.
+
+**6. Festival World Tour/Frozen World Tour**
+
+| Directory | Profile Name | In-Game name |
+|:----------|:-------------|:-------------|
+| event_festival_world_tour | festival_world_tour | Festival World Tour/Frozen World Tour |
+
+Festival World Tour and Frozen World Tour use the same schedule.
+A 9-races World Tour slot runs every 40 minutes. Every 40 minutes in-between World Tour slots, a Prix takes place.
+During Weekdays, this alternates between the usual rotation of Grand Prix, or one of Mini-Prix or Classic Mini-Prix.
+During Weekend days, only Grand Prix run during the Prix slots.
+There is no Secret League during these events.
+Contrary to Mini World Tour, these events run for multiple weeks (normally five weeks), hence the schedule variation between weekdays and
+weekends.
+
+**7. Meteor Festival/Lightning Festival**
+
+| Directory | Profile Name | In-Game name |
+|:----------|:-------------|:-------------|
+| event_meteor | meteor | Meteor Festival/Lightning Festival |
+
+Both these events share the same schedule.
+The sequence of events is identical to the default schedule, but compressed to run in 40 minutes instead of 60 during weekdays, and 20
+minutes instead of 30 during weekends. Contrary to default schedule, Secret League is disabled during Meteor or Lightning Festival.
+
 
 ## Running tests
 
