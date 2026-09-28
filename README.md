@@ -289,3 +289,10 @@ python -m unittest discover -s tests
 - Event schedule could be written as a tree using anytree or bigtree
   - anytree <https://github.com/c0fec0de/anytree>
   - bigtree <https://bigtree.readthedocs.io/stable/>
+
+### Planning Documents
+
+These planning documents describe features that are now completed:
+
+- [Event profiles](docs/event-profiles.md)
+- [Schedule controller](docs/schedule-controller.md)
