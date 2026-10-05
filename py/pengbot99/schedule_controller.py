@@ -291,6 +291,11 @@ class ProfileSwitchConfig(object):
         return profile
 
     @property
+    def switches(self):
+        """Chronologically ordered (UTC date, profile) entries."""
+        return tuple(self._switches)
+
+    @property
     def profiles(self):
         """ The unique profile names referenced by the config,
             in the order they first appear.

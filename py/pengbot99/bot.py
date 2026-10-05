@@ -69,7 +69,7 @@ if not utils.is_valid_profile(env, profile):
 # should only report its decision above and let a schedule announce
 # itself when it is actually set active.
 with utils.silence_logging():
-    env, csts, xpln = utils.load_config(profile=profile)
+    env, csts = utils.load_config(profile=profile)
 
     # The ScheduleController holds the shared slot 1 and a registry
     # of schedule profiles. Reads such as controller.slot2mgr resolve
@@ -91,7 +91,7 @@ with utils.silence_logging():
 
 bot = discord.Bot()
 
-explainer = explain_cmd.Explainer(xpln, controller)
+explainer = explain_cmd.Explainer(controller, env=env, auto_switch=auto_switch)
 
 
 def _validate_utc_time(str_time):
@@ -719,7 +719,7 @@ async def announce_schedule():
     await channel.send('\n'.join(response))
 
 
-@bot.slash_command(name="explain", description="Explain a thing.")
+@bot.slash_command(name="explain", description="Explain a Grand Prix rotation or event schedule.")
 async def explain(
         ctx: discord.ApplicationContext,
         topic: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_topics)),

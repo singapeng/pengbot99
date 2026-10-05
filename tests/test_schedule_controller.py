@@ -213,7 +213,7 @@ class ScheduleControllerTestCase(unittest.TestCase):
     def test_explainer_reads_active_slot2mgr(self):
         c = self.create_controller()
         default_mgr = c.slot2mgr
-        explainer = explain_cmd.Explainer(None, c)
+        explainer = explain_cmd.Explainer(c)
         self.assertIs(explainer._mgr, default_mgr)
         # the explainer holds the controller, so it follows a switch
         c.switch('meteor')
@@ -222,7 +222,7 @@ class ScheduleControllerTestCase(unittest.TestCase):
 
     def test_explainer_gp_rotation_via_controller(self):
         c = self.create_controller()
-        explainer = explain_cmd.Explainer(None, c)
+        explainer = explain_cmd.Explainer(c)
         result = explainer.explain('Grand Prix Rotation')
         self.assertIsInstance(result, str)
         self.assertTrue(result)

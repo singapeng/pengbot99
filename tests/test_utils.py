@@ -58,14 +58,10 @@ class TestScheduleConfigProfile(unittest.TestCase):
         # a schedule file only present in default, to exercise fallback
         with open(os.path.join(default_dir, "classic_mp_schedule.csv"), "w") as fd:
             fd.write(self.CLASSIC_SCHEDULE)
-        # explainer data loads from the config root, not a profile folder
-        with open(os.path.join(self.root, "explain.dat"), "w") as fd:
-            fd.write("QUEEN_LEAGUE=often on weekends\n")
         self._env_path = os.path.join(self.root, ".env")
         with open(self._env_path, "w") as fd:
             fd.write("CONFIG_PATH={0}\n".format(self.root))
             fd.write("CONSTANTS_FILE=constants.dat\n")
-            fd.write("EXPLAIN_FILE=explain.dat\n")
 
     def tearDown(self):
         self._tmpdir.cleanup()
@@ -81,26 +77,22 @@ class TestScheduleConfigProfile(unittest.TestCase):
                          os.path.join(self.root, "event_queen"))
 
     def test_constants_loaded_from_default_profile(self):
-        env, csts, xpln = utils.load_config(path=self._env_path)
+        env, csts = utils.load_config(path=self._env_path)
         self.assertEqual(csts["SECRET_LEAGUE_OFFSET"], "21")
         self.assertEqual(csts["WEEKEND_SECRET_LEAGUE_ENABLED"], "0")
 
     def test_explicit_default_profile_is_unchanged(self):
-        env, csts, xpln = utils.load_config(path=self._env_path, profile="default")
+        env, csts = utils.load_config(path=self._env_path, profile="default")
         self.assertEqual(csts["SECRET_LEAGUE_OFFSET"], "21")
         self.assertEqual(csts["WEEKEND_SECRET_LEAGUE_ENABLED"], "0")
 
     def test_profile_constants_override_default(self):
-        env, csts, xpln = utils.load_config(path=self._env_path, profile="queen")
+        env, csts = utils.load_config(path=self._env_path, profile="queen")
         self.assertEqual(csts["SECRET_LEAGUE_OFFSET"], "30")
         self.assertEqual(csts["WEEKEND_SECRET_LEAGUE_ENABLED"], "1")
         # constants not overridden by the profile are inherited
         self.assertEqual(csts["SECRET_LEAGUE_ENABLED"], "1")
         self.assertEqual(csts["NINETYNINE_MINUTE_OFFSET"], "25")
-
-    def test_explain_loaded_from_config_root(self):
-        env, csts, xpln = utils.load_config(path=self._env_path, profile="queen")
-        self.assertEqual(xpln["QUEEN_LEAGUE"], "often on weekends")
 
     def test_profile_schedule_overrides_default(self):
         default_dir = os.path.join(self.root, "event_default")

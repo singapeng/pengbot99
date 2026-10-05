@@ -279,10 +279,11 @@ python -m unittest discover -s tests
 - Refactor schedule manager to more elegantly manage rotations
 - Bot Cogs
 - Migrate tests to Pytest and automate with Github Actions, add coverage report
-- Expand the /explain command to cover other topics than GP Rotation
 - Support for protracks/team battle as an upgrade to current /ninetynine command
 
 ## References
+
+### Possible investigations
 
 - Rotation may be simplified by using Python's own deque implementation, since it has a .rotate function
   - deque docs <https://docs.python.org/3/library/collections.html#collections.deque>

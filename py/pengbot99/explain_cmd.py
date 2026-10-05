@@ -1,8 +1,9 @@
-from datetime import datetime
+from datetime import datetime, time, timezone
 
+from pengbot99 import event_profiles
 from pengbot99 import formatters
+from pengbot99 import schedule_controller
 from pengbot99 import ui
-from pengbot99 import utils
 
 
 ### GRAND PRIX ROTATION METHODS ###
@@ -64,32 +65,90 @@ def _display_gp_rotation(evts, current, pre, post):
 
 ### Explainer Class definition ###
 
+MAX_SCHEDULE_LINES = 12
 TOPICS_BASE = {
-    'Grand Prix Rotation': 'explain_gp_rotation'
+    'Grand Prix Rotation': 'explain_gp_rotation',
+    'Current Schedule': 'explain_current_schedule',
+    'Current And Upcoming Events': 'explain_upcoming_events',
 }
 
 
 class Explainer(object):
-    def __init__(self, config, mgr_holder):
+    def __init__(self, mgr_holder, env=None, auto_switch=False):
         self._topics = TOPICS_BASE
-        self._initialize_topics(config)
         # a holder exposing the current slot2mgr, resolved lazily so that
         # a schedule profile switch is reflected at explain time.
         self._holder = mgr_holder
+        self._env = env
+        self._auto_switch = auto_switch
 
     @property
     def _mgr(self):
         return self._holder.slot2mgr
 
-    def _initialize_topics(self, config):
+    def _switch_config(self):
+        if self._auto_switch and self._env:
+            return schedule_controller.load_profile_switches(self._env)
+        return None
+
+    def _upcoming_switches(self, switches, now):
+        """Actual future profile changes, including at most one per UTC date."""
+        upcoming = []
+        active = self._holder.name
+        today = now.astimezone(timezone.utc).date()
+        for day, name in switches:
+            if day <= today:
+                continue
+            # On the same date the last CSV row wins, as in active_on().
+            if upcoming and day == upcoming[-1][0]:
+                upcoming.pop()
+                active = upcoming[-1][1] if upcoming else self._holder.name
+            if name != active:
+                upcoming.append((day, name))
+                active = name
+        return upcoming
+
+    def explain_current_schedule(self, now=None):
+        now = now or datetime.now(timezone.utc)
+        name = self._holder.name
+        title, description = event_profiles.PROFILE_INFO.get(
+            name, (event_profiles.display_name(name),
+                   "No description is available for this profile."))
+        response = ["The currently active schedule is **{0}**.".format(title), "", description]
+        config = self._switch_config()
         if config:
-            self._topics.update(config)
+            future = self._upcoming_switches(config.switches, now)
+            if future:
+                switch = datetime.combine(future[0][0], time.min, tzinfo=timezone.utc)
+                response += ["", "This schedule will remain active until <t:{0}:F>.".format(
+                    int(switch.timestamp()))]
+            else:
+                response += ["", "No upcoming schedule change is listed."]
+        return '\n'.join(response)
+
+    def explain_upcoming_events(self, now=None):
+        config = self._switch_config()
+        if config is None:
+            return "Sorry, the event schedule is not available."
+        now = now or datetime.now(timezone.utc)
+        response = ["Current and Expected Game Events:", "",
+                    "**Currently Active**: {0}".format(
+                        event_profiles.display_name(self._holder.name))]
+        for day, name in self._upcoming_switches(config.switches, now)[:MAX_SCHEDULE_LINES - len(response)]:
+            switch = datetime.combine(day, time.min, tzinfo=timezone.utc)
+            response.append("<t:{0}:F>   {1}".format(
+                int(switch.timestamp()), event_profiles.display_name(name)))
+        return '\n'.join(response)
 
     @property
     def topics(self):
         """ build a list of topics that can be auto-completed in the slash command
         """
-        return list(self._topics.keys())
+        topics = list(self._topics.keys())
+        if self._switch_config() is None:
+            # bot is operating with single --profile forever
+            topics.remove('Current And Upcoming Events')
+        return topics
 
     def explain_gp_rotation(self, timestamp=None):
         """
@@ -110,8 +169,10 @@ class Explainer(object):
     def explain(self, topic):
         if topic not in self._topics:
             return "Sorry, I cannot explain '%s'." % topic
-        if self._topics.get(topic) == 'explain_gp_rotation':
+        explanation = self._topics.get(topic)
+        if explanation == 'explain_gp_rotation':
             return self.explain_gp_rotation()
-        else:
-            # definition entry
-            return self._topics.get(topic)
+        elif explanation == 'explain_current_schedule':
+            return self.explain_current_schedule()
+        elif explanation == 'explain_upcoming_events':
+            return self.explain_upcoming_events()

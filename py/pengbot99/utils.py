@@ -140,14 +140,11 @@ def load_config(path=None, profile='default'):
         If the .env defines a constants file path, load that too.
         Schedule constants are read from the 'default' profile folder,
         then overlaid with any constants defined in the active profile.
-        Returns both as a tuple of dicts.
+        Returns the environment and constants as a tuple of dicts.
     """
     env = load_env(path)
     csts = load_csts(env, profile)
-    # explainer data is not part of the schedule profile structure
-    # and loads directly from the CONFIG_PATH root
-    xpln = _sideload_data(env, 'EXPLAIN_FILE', env.get('CONFIG_PATH'))
-    return env, csts, xpln
+    return env, csts
 
 
 MSG_ENV_PATH = ".msg_struct"
