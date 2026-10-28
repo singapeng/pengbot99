@@ -1,0 +1,1332 @@
+{
+  "EventAnnouncementTimes": [
+    {
+      "Begin": "2026-02-05T00:00",
+      "DisplayType": "Ticker",
+      "End": "2026-02-09T00:00",
+      "GameMode": "GrandPrix",
+      "LeagueName": "WorldTour7Races"
+    },
+    {
+      "Begin": "2026-03-26T00:00",
+      "DisplayType": "Ticker",
+      "End": "2026-03-30T00:00",
+      "GameMode": "GrandPrix",
+      "LeagueName": "WorldTour7Races"
+    },
+    {
+      "Begin": "2026-05-14T00:00",
+      "DisplayType": "Ticker",
+      "End": "2026-05-18T00:00",
+      "GameMode": "GrandPrix",
+      "LeagueName": "WorldTour7Races"
+    },
+    {
+      "Begin": "2026-08-06T00:00",
+      "DisplayType": "Ticker",
+      "End": "2026-08-10T00:00",
+      "GameMode": "GrandPrix",
+      "LeagueName": "WorldTour7Races"
+    },
+    {
+      "Begin": "2026-09-24T00:00",
+      "DisplayType": "Ticker",
+      "End": "2026-09-28T00:00",
+      "GameMode": "GrandPrix",
+      "LeagueName": "WorldTour7Races"
+    },
+    {
+      "Begin": "2026-11-12T00:00",
+      "DisplayType": "Ticker",
+      "End": "2026-11-16T00:00",
+      "GameMode": "GrandPrix",
+      "LeagueName": "WorldTour7Races"
+    },
+    {
+      "DisplayType": "Ticker2",
+      "GameMode": "GrandPrix",
+      "LeagueName": "WorldTour7Races"
+    }
+  ],
+  "Schedule": [
+    {
+      "EndTime": "2026-01-27T00:00",
+      "StartTime": "2026-01-21T00:00",
+      "WeekendScheduleID": "MysteryLeagueWeekend"
+    },
+    {
+      "EndTime": "2026-02-03T00:00",
+      "StartTime": "2026-01-28T00:00",
+      "WeekendScheduleID": "LuckyRank"
+    },
+    {
+      "AnnounceEndTime": "2026-02-09T00:00",
+      "AnnounceStartTime": "2026-02-02T00:00",
+      "EndTime": "2026-02-16T00:00",
+      "StartTime": "2026-02-09T00:00",
+      "WeekendScheduleID": "WorldTourWeek"
+    },
+    {
+      "EndTime": "2026-03-03T00:00",
+      "StartTime": "2026-02-25T00:00",
+      "WeekendScheduleID": "MachineShuffle"
+    },
+    {
+      "EndTime": "2026-03-17T00:00",
+      "StartTime": "2026-03-11T00:00",
+      "WeekendScheduleID": "Teams"
+    },
+    {
+      "EndTime": "2026-03-24T00:00",
+      "StartTime": "2026-03-18T00:00",
+      "WeekendScheduleID": "KingLeagueWeekend"
+    },
+    {
+      "AnnounceEndTime": "2026-03-30T00:00",
+      "AnnounceStartTime": "2026-03-23T00:00",
+      "EndTime": "2026-04-06T00:00",
+      "StartTime": "2026-03-30T00:00",
+      "WeekendScheduleID": "WorldTourWeek"
+    },
+    {
+      "EndTime": "2026-04-14T00:00",
+      "StartTime": "2026-04-08T00:00",
+      "WeekendScheduleID": "MachineShuffle"
+    },
+    {
+      "EndTime": "2026-04-28T00:00",
+      "StartTime": "2026-04-22T00:00",
+      "WeekendScheduleID": "LuckyRank"
+    },
+    {
+      "EndTime": "2026-05-12T00:00",
+      "StartTime": "2026-05-06T00:00",
+      "WeekendScheduleID": "Teams"
+    },
+    {
+      "AnnounceEndTime": "2026-05-18T00:00",
+      "AnnounceStartTime": "2026-05-11T00:00",
+      "EndTime": "2026-05-25T00:00",
+      "StartTime": "2026-05-18T00:00",
+      "WeekendScheduleID": "WorldTourWeek"
+    },
+    {
+      "EndTime": "2026-06-02T00:00",
+      "StartTime": "2026-05-27T00:00",
+      "WeekendScheduleID": "AceLeagueWeekend"
+    },
+    {
+      "EndTime": "2026-06-09T00:00",
+      "StartTime": "2026-06-03T00:00",
+      "WeekendScheduleID": "MachineShuffle"
+    },
+    {
+      "EndTime": "2026-07-28T00:00",
+      "StartTime": "2026-07-22T00:00",
+      "WeekendScheduleID": "KnightLeagueWeekend"
+    },
+    {
+      "EndTime": "2026-08-04T00:00",
+      "StartTime": "2026-07-29T00:00",
+      "WeekendScheduleID": "LuckyRank"
+    },
+    {
+      "AnnounceEndTime": "2026-08-10T00:00",
+      "AnnounceStartTime": "2026-08-03T00:00",
+      "EndTime": "2026-08-17T00:00",
+      "StartTime": "2026-08-10T00:00",
+      "WeekendScheduleID": "WorldTourWeek"
+    },
+    {
+      "EndTime": "2026-09-01T00:00",
+      "StartTime": "2026-08-26T00:00",
+      "WeekendScheduleID": "MachineShuffle"
+    },
+    {
+      "EndTime": "2026-09-15T00:00",
+      "StartTime": "2026-09-09T00:00",
+      "WeekendScheduleID": "Teams"
+    },
+    {
+      "EndTime": "2026-09-22T00:00",
+      "StartTime": "2026-09-16T00:00",
+      "WeekendScheduleID": "QueenLeagueWeekend"
+    },
+    {
+      "AnnounceEndTime": "2026-09-28T00:00",
+      "AnnounceStartTime": "2026-09-21T00:00",
+      "EndTime": "2026-10-05T00:00",
+      "StartTime": "2026-09-28T00:00",
+      "WeekendScheduleID": "WorldTourWeek"
+    },
+    {
+      "EndTime": "2026-10-13T00:00",
+      "StartTime": "2026-10-07T00:00",
+      "WeekendScheduleID": "MachineShuffle"
+    },
+    {
+      "EndTime": "2026-10-27T00:00",
+      "StartTime": "2026-10-21T00:00",
+      "WeekendScheduleID": "LuckyRank"
+    },
+    {
+      "EndTime": "2026-11-10T00:00",
+      "StartTime": "2026-11-04T00:00",
+      "WeekendScheduleID": "Teams"
+    },
+    {
+      "AnnounceEndTime": "2026-11-16T00:00",
+      "AnnounceStartTime": "2026-11-09T00:00",
+      "EndTime": "2026-11-23T00:00",
+      "StartTime": "2026-11-16T00:00",
+      "WeekendScheduleID": "WorldTourWeek"
+    },
+    {
+      "EndTime": "2026-12-01T00:00",
+      "StartTime": "2026-11-25T00:00",
+      "WeekendScheduleID": "KingLeagueWeekend"
+    },
+    {
+      "EndTime": "2026-12-08T00:00",
+      "StartTime": "2026-12-02T00:00",
+      "WeekendScheduleID": "MachineShuffle"
+    }
+  ],
+  "Version": 6,
+  "WeekendGameModeList": [
+    {
+      "Leagues": [
+        {
+          "Name": "WorldTour7Races"
+        }
+      ],
+      "Name": "MiniWorldTourFeatured",
+      "RotationInterval": 5,
+      "RotationOrder": [
+        1
+      ],
+      "Type": "GrandPrix"
+    },
+    {
+      "Leagues": [
+        {
+          "Name": "KnightLeague"
+        },
+        {
+          "Name": "QueenLeague"
+        },
+        {
+          "Name": "KingLeague"
+        },
+        {
+          "Name": "MirrorKnightLeague"
+        },
+        {
+          "Name": "MirrorQueenLeague"
+        },
+        {
+          "Name": "MirrorKingLeague"
+        },
+        {
+          "Name": "AceLeague"
+        },
+        {
+          "Name": "MirrorAceLeague"
+        },
+        {
+          "Name": "WorldTour7Races"
+        }
+      ],
+      "Name": "GrandPrixRotationFast",
+      "RotationInterval": 5,
+      "RotationOrder": [
+        8,
+        1,
+        5,
+        3,
+        4,
+        2,
+        6,
+        7,
+        5,
+        3,
+        8,
+        1,
+        6,
+        7,
+        4,
+        2
+      ],
+      "Type": "GrandPrix"
+    },
+    {
+      "Leagues": [
+        {
+          "Name": "KnightLeague"
+        },
+        {
+          "Name": "MirrorKnightLeague"
+        },
+        {
+          "Name": "QueenLeague"
+        },
+        {
+          "Name": "MirrorQueenLeague"
+        },
+        {
+          "Name": "KingLeague"
+        },
+        {
+          "Name": "MirrorKingLeague"
+        },
+        {
+          "Name": "AceLeague"
+        },
+        {
+          "Name": "MirrorAceLeague"
+        }
+      ],
+      "Name": "GrandPrixKnightLeagueFocus",
+      "RotationInterval": 5,
+      "RotationOrder": [
+        1,
+        3,
+        2,
+        4,
+        1,
+        5,
+        2,
+        6,
+        1,
+        7,
+        2,
+        8
+      ],
+      "Type": "GrandPrix"
+    },
+    {
+      "Leagues": [
+        {
+          "Name": "QueenLeague"
+        },
+        {
+          "Name": "MirrorQueenLeague"
+        },
+        {
+          "Name": "KnightLeague"
+        },
+        {
+          "Name": "MirrorKnightLeague"
+        },
+        {
+          "Name": "KingLeague"
+        },
+        {
+          "Name": "MirrorKingLeague"
+        },
+        {
+          "Name": "AceLeague"
+        },
+        {
+          "Name": "MirrorAceLeague"
+        }
+      ],
+      "Name": "GrandPrixQueenLeagueFocus",
+      "RotationInterval": 5,
+      "RotationOrder": [
+        1,
+        3,
+        2,
+        4,
+        1,
+        5,
+        2,
+        6,
+        1,
+        7,
+        2,
+        8
+      ],
+      "Type": "GrandPrix"
+    },
+    {
+      "Leagues": [
+        {
+          "Name": "KingLeague"
+        },
+        {
+          "Name": "MirrorKingLeague"
+        },
+        {
+          "Name": "KnightLeague"
+        },
+        {
+          "Name": "MirrorKnightLeague"
+        },
+        {
+          "Name": "QueenLeague"
+        },
+        {
+          "Name": "MirrorQueenLeague"
+        },
+        {
+          "Name": "AceLeague"
+        },
+        {
+          "Name": "MirrorAceLeague"
+        }
+      ],
+      "Name": "GrandPrixKingLeagueFocus",
+      "RotationInterval": 5,
+      "RotationOrder": [
+        1,
+        3,
+        2,
+        4,
+        1,
+        5,
+        2,
+        6,
+        1,
+        7,
+        2,
+        8
+      ],
+      "Type": "GrandPrix"
+    },
+    {
+      "Leagues": [
+        {
+          "Name": "AceLeague"
+        },
+        {
+          "Name": "MirrorAceLeague"
+        },
+        {
+          "Name": "KnightLeague"
+        },
+        {
+          "Name": "MirrorKnightLeague"
+        },
+        {
+          "Name": "QueenLeague"
+        },
+        {
+          "Name": "MirrorQueenLeague"
+        },
+        {
+          "Name": "KingLeague"
+        },
+        {
+          "Name": "MirrorKingLeague"
+        }
+      ],
+      "Name": "GrandPrixAceLeagueFocus",
+      "RotationInterval": 5,
+      "RotationOrder": [
+        1,
+        3,
+        2,
+        4,
+        1,
+        5,
+        2,
+        6,
+        1,
+        7,
+        2,
+        8
+      ],
+      "Type": "GrandPrix"
+    },
+    {
+      "Leagues": [
+        {
+          "Name": "KnightLeague"
+        },
+        {
+          "Name": "QueenLeague"
+        },
+        {
+          "Name": "KingLeague"
+        },
+        {
+          "Name": "MirrorKnightLeague"
+        },
+        {
+          "Name": "MirrorQueenLeague"
+        },
+        {
+          "Name": "MirrorKingLeague"
+        },
+        {
+          "Name": "AceLeague"
+        },
+        {
+          "Name": "MirrorAceLeague"
+        }
+      ],
+      "Name": "GrandPrixMysteryLeagueFocus",
+      "RotationInterval": 5,
+      "RotationOrder": [
+        8,
+        8,
+        1,
+        1,
+        5,
+        5,
+        3,
+        3,
+        4,
+        4,
+        2,
+        2,
+        6,
+        6,
+        7,
+        7,
+        5,
+        5,
+        3,
+        3,
+        8,
+        8,
+        1,
+        1,
+        6,
+        6,
+        7,
+        7,
+        4,
+        4,
+        2,
+        2
+      ],
+      "Type": "GrandPrix"
+    }
+  ],
+  "WeekendSchedule": {
+    "ActiveBonus": {
+      "Type": 0,
+      "Value": 0
+    },
+    "IntervalWeekend": [
+      {
+        "Duration": 10,
+        "SetName": "GrandPrixRotation"
+      },
+      {
+        "Duration": 20,
+        "SetName": "Teams"
+      },
+      {
+        "Duration": 10,
+        "SetName": "GrandPrixRotation"
+      },
+      {
+        "Duration": 20,
+        "SetName": "HardTracks"
+      },
+      {
+        "Duration": 10,
+        "SetName": "GrandPrixRotation"
+      },
+      {
+        "Duration": 20,
+        "SetName": "Classic"
+      },
+      {
+        "Duration": 10,
+        "SetName": "GrandPrixRotation"
+      },
+      {
+        "Duration": 20,
+        "SetName": "Teams"
+      },
+      {
+        "Duration": 10,
+        "SetName": "GrandPrixRotation"
+      },
+      {
+        "Duration": 20,
+        "SetName": "HardTracks"
+      },
+      {
+        "Duration": 10,
+        "SetName": "GrandPrixRotation"
+      },
+      {
+        "Duration": 20,
+        "SetName": "Classic"
+      }
+    ],
+    "PrivateLobbyHasWorldTour": false,
+    "Weekend": "SAT,SUN",
+    "WeekendEventAnnouncement": "THU,FRI,SAT,SUN",
+    "WeekendEventAnnouncementReset": "MON",
+    "WeekendHourOffset": 0
+  },
+  "WeekendSchedules": [
+    {
+      "ActiveBonus": {
+        "Type": 0,
+        "Value": 0
+      },
+      "FeaturedLeagues": [
+        "WorldTour7Races"
+      ],
+      "ID": "WorldTourWeek",
+      "IntervalWeekend": [
+        {
+          "Duration": 5,
+          "SetName": "MiniWorldTourFeatured"
+        },
+        {
+          "Duration": 15,
+          "SetName": "Teams"
+        },
+        {
+          "Duration": 5,
+          "SetName": "GrandPrixRotationFast"
+        },
+        {
+          "Duration": 15,
+          "SetName": "HardTracks"
+        },
+        {
+          "Duration": 5,
+          "SetName": "MiniWorldTourFeatured"
+        },
+        {
+          "Duration": 15,
+          "SetName": "Classic"
+        },
+        {
+          "Duration": 5,
+          "SetName": "MiniPrixRotation"
+        },
+        {
+          "Duration": 15,
+          "SetName": "Teams"
+        },
+        {
+          "Duration": 5,
+          "SetName": "MiniWorldTourFeatured"
+        },
+        {
+          "Duration": 15,
+          "SetName": "HardTracks"
+        },
+        {
+          "Duration": 5,
+          "SetName": "GrandPrixRotationFast"
+        },
+        {
+          "Duration": 15,
+          "SetName": "Classic"
+        },
+        {
+          "Duration": 5,
+          "SetName": "MiniWorldTourFeatured"
+        },
+        {
+          "Duration": 15,
+          "SetName": "Teams"
+        },
+        {
+          "Duration": 5,
+          "SetName": "ClassicMiniPrixRotation"
+        },
+        {
+          "Duration": 15,
+          "SetName": "HardTracks"
+        },
+        {
+          "Duration": 5,
+          "SetName": "MiniWorldTourFeatured"
+        },
+        {
+          "Duration": 15,
+          "SetName": "Classic"
+        },
+        {
+          "Duration": 5,
+          "SetName": "GrandPrixRotationFast"
+        },
+        {
+          "Duration": 15,
+          "SetName": "Teams"
+        },
+        {
+          "Duration": 5,
+          "SetName": "MiniWorldTourFeatured"
+        },
+        {
+          "Duration": 15,
+          "SetName": "HardTracks"
+        },
+        {
+          "Duration": 5,
+          "SetName": "MiniPrixRotation"
+        },
+        {
+          "Duration": 15,
+          "SetName": "Classic"
+        },
+        {
+          "Duration": 5,
+          "SetName": "MiniWorldTourFeatured"
+        },
+        {
+          "Duration": 15,
+          "SetName": "Teams"
+        },
+        {
+          "Duration": 5,
+          "SetName": "GrandPrixRotationFast"
+        },
+        {
+          "Duration": 15,
+          "SetName": "HardTracks"
+        },
+        {
+          "Duration": 5,
+          "SetName": "MiniWorldTourFeatured"
+        },
+        {
+          "Duration": 15,
+          "SetName": "Classic"
+        },
+        {
+          "Duration": 5,
+          "SetName": "ClassicMiniPrixRotation"
+        },
+        {
+          "Duration": 15,
+          "SetName": "Teams"
+        },
+        {
+          "Duration": 5,
+          "SetName": "MiniWorldTourFeatured"
+        },
+        {
+          "Duration": 15,
+          "SetName": "HardTracks"
+        },
+        {
+          "Duration": 5,
+          "SetName": "GrandPrixRotationFast"
+        },
+        {
+          "Duration": 15,
+          "SetName": "Classic"
+        },
+        {
+          "Duration": 5,
+          "SetName": "MiniWorldTourFeatured"
+        },
+        {
+          "Duration": 15,
+          "SetName": "Teams"
+        },
+        {
+          "Duration": 5,
+          "SetName": "MiniPrixRotation"
+        },
+        {
+          "Duration": 15,
+          "SetName": "HardTracks"
+        },
+        {
+          "Duration": 5,
+          "SetName": "MiniWorldTourFeatured"
+        },
+        {
+          "Duration": 15,
+          "SetName": "Classic"
+        },
+        {
+          "Duration": 5,
+          "SetName": "GrandPrixRotationFast"
+        },
+        {
+          "Duration": 15,
+          "SetName": "Teams"
+        },
+        {
+          "Duration": 5,
+          "SetName": "MiniWorldTourFeatured"
+        },
+        {
+          "Duration": 15,
+          "SetName": "HardTracks"
+        },
+        {
+          "Duration": 5,
+          "SetName": "ClassicMiniPrixRotation"
+        },
+        {
+          "Duration": 15,
+          "SetName": "Classic"
+        }
+      ],
+      "MysteryPrixSchedule": {
+        "AvailabilityInterval": 5,
+        "InactivePeriods": [
+          55,
+          30,
+          35,
+          15,
+          40,
+          20
+        ],
+        "Leagues": [
+          {
+            "Name": "MysteryLeague"
+          }
+        ]
+      },
+      "PrivateLobbyHasWorldTour": false,
+      "Sets": [
+        {
+          "Game Modes": [
+            {
+              "Name": "MiniWorldTourFeatured"
+            }
+          ]
+        },
+        {
+          "Game Modes": [
+            {
+              "Name": "GrandPrixRotationFast"
+            }
+          ]
+        }
+      ],
+      "Weekend": "SUN,MON,TUE,WED,THU,FRI,SAT",
+      "WeekendEventAnnouncement": "SUN,MON,TUE,WED,THU,FRI,SAT",
+      "WeekendEventAnnouncementReset": "NONE",
+      "WeekendHourOffset": 0
+    },
+    {
+      "ActiveBonus": {
+        "Type": 0,
+        "Value": 0
+      },
+      "FeaturedLeagues": [
+        "KnightLeague",
+        "MirrorKnightLeague"
+      ],
+      "ID": "KnightLeagueWeekend",
+      "IntervalWeekend": [
+        {
+          "Duration": 5,
+          "SetName": "GrandPrixKnightLeagueFocus"
+        },
+        {
+          "Duration": 10,
+          "SetName": "Teams"
+        },
+        {
+          "Duration": 5,
+          "SetName": "GrandPrixKnightLeagueFocus"
+        },
+        {
+          "Duration": 10,
+          "SetName": "HardTracks"
+        },
+        {
+          "Duration": 5,
+          "SetName": "GrandPrixKnightLeagueFocus"
+        },
+        {
+          "Duration": 10,
+          "SetName": "Classic"
+        }
+      ],
+      "MysteryPrixSchedule": {
+        "AvailabilityInterval": 5,
+        "InactivePeriods": [
+          110,
+          60,
+          70,
+          30,
+          80,
+          40
+        ],
+        "Leagues": [
+          {
+            "Name": "MysteryLeague"
+          }
+        ]
+      },
+      "PrivateLobbyHasWorldTour": false,
+      "Sets": [
+        {
+          "Game Modes": [
+            {
+              "Name": "GrandPrixKnightLeagueFocus"
+            }
+          ]
+        }
+      ],
+      "Weekend": "SAT,SUN",
+      "WeekendEventAnnouncement": "THU,FRI,SAT,SUN",
+      "WeekendEventAnnouncementReset": "MON",
+      "WeekendHourOffset": 0
+    },
+    {
+      "ActiveBonus": {
+        "Type": 0,
+        "Value": 0
+      },
+      "FeaturedLeagues": [
+        "QueenLeague",
+        "MirrorQueenLeague"
+      ],
+      "ID": "QueenLeagueWeekend",
+      "IntervalWeekend": [
+        {
+          "Duration": 5,
+          "SetName": "GrandPrixQueenLeagueFocus"
+        },
+        {
+          "Duration": 10,
+          "SetName": "Teams"
+        },
+        {
+          "Duration": 5,
+          "SetName": "GrandPrixQueenLeagueFocus"
+        },
+        {
+          "Duration": 10,
+          "SetName": "HardTracks"
+        },
+        {
+          "Duration": 5,
+          "SetName": "GrandPrixQueenLeagueFocus"
+        },
+        {
+          "Duration": 10,
+          "SetName": "Classic"
+        }
+      ],
+      "MysteryPrixSchedule": {
+        "AvailabilityInterval": 5,
+        "InactivePeriods": [
+          110,
+          60,
+          70,
+          30,
+          80,
+          40
+        ],
+        "Leagues": [
+          {
+            "Name": "MysteryLeague"
+          }
+        ]
+      },
+      "PrivateLobbyHasWorldTour": false,
+      "Sets": [
+        {
+          "Game Modes": [
+            {
+              "Name": "GrandPrixQueenLeagueFocus"
+            }
+          ]
+        }
+      ],
+      "Weekend": "SAT,SUN",
+      "WeekendEventAnnouncement": "THU,FRI,SAT,SUN",
+      "WeekendEventAnnouncementReset": "MON",
+      "WeekendHourOffset": 0
+    },
+    {
+      "ActiveBonus": {
+        "Type": 0,
+        "Value": 0
+      },
+      "FeaturedLeagues": [
+        "KingLeague",
+        "MirrorKingLeague"
+      ],
+      "ID": "KingLeagueWeekend",
+      "IntervalWeekend": [
+        {
+          "Duration": 5,
+          "SetName": "GrandPrixKingLeagueFocus"
+        },
+        {
+          "Duration": 10,
+          "SetName": "Teams"
+        },
+        {
+          "Duration": 5,
+          "SetName": "GrandPrixKingLeagueFocus"
+        },
+        {
+          "Duration": 10,
+          "SetName": "HardTracks"
+        },
+        {
+          "Duration": 5,
+          "SetName": "GrandPrixKingLeagueFocus"
+        },
+        {
+          "Duration": 10,
+          "SetName": "Classic"
+        }
+      ],
+      "MysteryPrixSchedule": {
+        "AvailabilityInterval": 5,
+        "InactivePeriods": [
+          110,
+          60,
+          70,
+          30,
+          80,
+          40
+        ],
+        "Leagues": [
+          {
+            "Name": "MysteryLeague"
+          }
+        ]
+      },
+      "PrivateLobbyHasWorldTour": false,
+      "Sets": [
+        {
+          "Game Modes": [
+            {
+              "Name": "GrandPrixKingLeagueFocus"
+            }
+          ]
+        }
+      ],
+      "Weekend": "SAT,SUN",
+      "WeekendEventAnnouncement": "THU,FRI,SAT,SUN",
+      "WeekendEventAnnouncementReset": "MON",
+      "WeekendHourOffset": 0
+    },
+    {
+      "ActiveBonus": {
+        "Type": 0,
+        "Value": 0
+      },
+      "FeaturedLeagues": [
+        "AceLeague",
+        "MirrorAceLeague"
+      ],
+      "ID": "AceLeagueWeekend",
+      "IntervalWeekend": [
+        {
+          "Duration": 5,
+          "SetName": "GrandPrixAceLeagueFocus"
+        },
+        {
+          "Duration": 10,
+          "SetName": "Teams"
+        },
+        {
+          "Duration": 5,
+          "SetName": "GrandPrixAceLeagueFocus"
+        },
+        {
+          "Duration": 10,
+          "SetName": "HardTracks"
+        },
+        {
+          "Duration": 5,
+          "SetName": "GrandPrixAceLeagueFocus"
+        },
+        {
+          "Duration": 10,
+          "SetName": "Classic"
+        }
+      ],
+      "MysteryPrixSchedule": {
+        "AvailabilityInterval": 5,
+        "InactivePeriods": [
+          110,
+          60,
+          70,
+          30,
+          80,
+          40
+        ],
+        "Leagues": [
+          {
+            "Name": "MysteryLeague"
+          }
+        ]
+      },
+      "PrivateLobbyHasWorldTour": false,
+      "Sets": [
+        {
+          "Game Modes": [
+            {
+              "Name": "GrandPrixAceLeagueFocus"
+            }
+          ]
+        }
+      ],
+      "Weekend": "SAT,SUN",
+      "WeekendEventAnnouncement": "THU,FRI,SAT,SUN",
+      "WeekendEventAnnouncementReset": "MON",
+      "WeekendHourOffset": 0
+    },
+    {
+      "ActiveBonus": {
+        "Type": 0,
+        "Value": 0
+      },
+      "FeaturedLeagues": [
+        "MysteryLeague"
+      ],
+      "ID": "MysteryLeagueWeekend",
+      "IntervalWeekend": [
+        {
+          "Duration": 5,
+          "SetName": "GrandPrixMysteryLeagueFocus"
+        },
+        {
+          "Duration": 10,
+          "SetName": "Teams"
+        },
+        {
+          "Duration": 5,
+          "SetName": "GrandPrixMysteryLeagueFocus"
+        },
+        {
+          "Duration": 10,
+          "SetName": "HardTracks"
+        },
+        {
+          "Duration": 5,
+          "SetName": "GrandPrixMysteryLeagueFocus"
+        },
+        {
+          "Duration": 10,
+          "SetName": "Classic"
+        }
+      ],
+      "MysteryPrixSchedule": {
+        "AvailabilityInterval": 5,
+        "InactivePeriods": [
+          10
+        ],
+        "Leagues": [
+          {
+            "Name": "MysteryLeague"
+          }
+        ]
+      },
+      "PrivateLobbyHasWorldTour": false,
+      "Sets": [
+        {
+          "Game Modes": [
+            {
+              "Name": "GrandPrixMysteryLeagueFocus"
+            }
+          ]
+        }
+      ],
+      "Weekend": "SAT,SUN",
+      "WeekendEventAnnouncement": "THU,FRI,SAT,SUN",
+      "WeekendEventAnnouncementReset": "MON",
+      "WeekendHourOffset": 0
+    },
+    {
+      "ActiveBonus": {
+        "Type": 2,
+        "Value": 4
+      },
+      "ID": "LuckyRank",
+      "IntervalWeekend": [
+        {
+          "Duration": 10,
+          "SetName": "GrandPrixRotation"
+        },
+        {
+          "Duration": 20,
+          "SetName": "Teams"
+        },
+        {
+          "Duration": 10,
+          "SetName": "GrandPrixRotation"
+        },
+        {
+          "Duration": 20,
+          "SetName": "HardTracks"
+        },
+        {
+          "Duration": 10,
+          "SetName": "GrandPrixRotation"
+        },
+        {
+          "Duration": 20,
+          "SetName": "Classic"
+        }
+      ],
+      "Weekend": "SAT,SUN",
+      "WeekendEventAnnouncement": "THU,FRI,SAT,SUN",
+      "WeekendEventAnnouncementReset": "MON",
+      "WeekendHourOffset": 0
+    },
+    {
+      "ActiveBonus": {
+        "Type": 1,
+        "Value": 0
+      },
+      "ID": "MachineShuffle",
+      "IntervalWeekend": [
+        {
+          "Duration": 10,
+          "SetName": "GrandPrixRotation"
+        },
+        {
+          "Duration": 20,
+          "SetName": "Teams"
+        },
+        {
+          "Duration": 10,
+          "SetName": "MiniPrixRotation"
+        },
+        {
+          "Duration": 20,
+          "SetName": "HardTracks"
+        },
+        {
+          "Duration": 10,
+          "SetName": "MiniPrixRotation"
+        },
+        {
+          "Duration": 20,
+          "SetName": "Classic"
+        },
+        {
+          "Duration": 10,
+          "SetName": "MiniPrixRotation"
+        },
+        {
+          "Duration": 20,
+          "SetName": "Teams"
+        },
+        {
+          "Duration": 10,
+          "SetName": "GrandPrixRotation"
+        },
+        {
+          "Duration": 20,
+          "SetName": "HardTracks"
+        },
+        {
+          "Duration": 10,
+          "SetName": "MiniPrixRotation"
+        },
+        {
+          "Duration": 20,
+          "SetName": "Classic"
+        },
+        {
+          "Duration": 10,
+          "SetName": "MiniPrixRotation"
+        },
+        {
+          "Duration": 20,
+          "SetName": "Teams"
+        },
+        {
+          "Duration": 10,
+          "SetName": "MiniPrixRotation"
+        },
+        {
+          "Duration": 20,
+          "SetName": "HardTracks"
+        },
+        {
+          "Duration": 10,
+          "SetName": "GrandPrixRotation"
+        },
+        {
+          "Duration": 20,
+          "SetName": "Classic"
+        },
+        {
+          "Duration": 10,
+          "SetName": "MiniPrixRotation"
+        },
+        {
+          "Duration": 20,
+          "SetName": "Teams"
+        },
+        {
+          "Duration": 10,
+          "SetName": "MiniPrixRotation"
+        },
+        {
+          "Duration": 20,
+          "SetName": "HardTracks"
+        },
+        {
+          "Duration": 10,
+          "SetName": "MiniPrixRotation"
+        },
+        {
+          "Duration": 20,
+          "SetName": "Classic"
+        }
+      ],
+      "Weekend": "SAT,SUN",
+      "WeekendEventAnnouncement": "THU,FRI,SAT,SUN",
+      "WeekendEventAnnouncementReset": "MON",
+      "WeekendHourOffset": 0
+    },
+    {
+      "ActiveBonus": {
+        "Type": 3,
+        "Value": 200
+      },
+      "ID": "Teams",
+      "IntervalWeekend": [
+        {
+          "Duration": 10,
+          "SetName": "GrandPrixRotation"
+        },
+        {
+          "Duration": 20,
+          "SetName": "Teams"
+        },
+        {
+          "Duration": 10,
+          "SetName": "MiniPrixRotation"
+        },
+        {
+          "Duration": 20,
+          "SetName": "Teams"
+        },
+        {
+          "Duration": 10,
+          "SetName": "GrandPrixRotation"
+        },
+        {
+          "Duration": 20,
+          "SetName": "Teams"
+        },
+        {
+          "Duration": 10,
+          "SetName": "ClassicMiniPrixRotation"
+        },
+        {
+          "Duration": 20,
+          "SetName": "Teams"
+        }
+      ],
+      "Weekend": "SAT,SUN",
+      "WeekendEventAnnouncement": "THU,FRI,SAT,SUN",
+      "WeekendEventAnnouncementReset": "MON",
+      "WeekendHourOffset": 0
+    }
+  ]
+}

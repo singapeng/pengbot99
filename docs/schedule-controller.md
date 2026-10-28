@@ -1,5 +1,9 @@
 # Schedule controller (runtime schedule profile management)
 
+> Profiles are now built from the game's own schedule files, and the 99-race
+> managers belong to the profile like every other manager; see
+> [game-schedule.md](game-schedule.md).
+
 ## Goal
 
 Streamline switching between schedule profiles **without restarting the bot**.

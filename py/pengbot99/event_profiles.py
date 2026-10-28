@@ -1,4 +1,4 @@
-"""Titles and explanations of schedule profiles for /explain."""
+"""Titles and explanations of schedule profiles and weekend events for /explain."""
 
 from pengbot99 import formatters
 
@@ -88,7 +88,35 @@ PROFILE_INFO = {
 for _name in ('knight', 'queen', 'king', 'ace'):
     PROFILE_INFO[_name] = _league_profile(_name)
 
+# the game's WeekendScheduleID of each weekend event, to the profile whose
+# text describes it
+WEEKEND_EVENTS = {
+    'KnightLeagueWeekend': 'knight',
+    'QueenLeagueWeekend': 'queen',
+    'KingLeagueWeekend': 'king',
+    'AceLeagueWeekend': 'ace',
+    'MysteryLeagueWeekend': 'secret',
+    'MachineShuffle': 'machine_shuffle',
+    'Teams': 'team_battle',
+    'WorldTourWeek': 'mini_world_tour',
+    'LuckyRank': 'default',
+}
+
+NO_DESCRIPTION = "No description is available for this schedule."
+
 
 def display_name(name):
     """Readable title, including for profiles without a description."""
     return PROFILE_INFO.get(name, (name.replace('_', ' ').title(), None))[0]
+
+
+def profile_info(name):
+    """(title, description) of a profile."""
+    return PROFILE_INFO.get(name, (display_name(name), NO_DESCRIPTION))
+
+
+def weekend_event_info(event_id):
+    """(title, description) of a weekend event, by the game's ID."""
+    if event_id in WEEKEND_EVENTS:
+        return profile_info(WEEKEND_EVENTS[event_id])
+    return event_id, NO_DESCRIPTION

@@ -267,22 +267,6 @@ async def showevents(
     await ctx.respond('\n'.join(response))
 
 
-def _when_secret_league(mgr, count, from_time):
-    if not mgr.is_secret_league_on():
-        return None
-    # let's look for all Grand Prix first.
-    names = ui.event_choices.get("Grand Prix")
-    # We need to query enough GPs for the secret league pattern to generate matches
-    # This might result in more results than we need so we will trim later.
-    gp_count = ((count // mgr._secret_cfg.interval_count) + 1) * mgr._secret_cfg.length
-    gp_evts = mgr.when_event(names=names, count=gp_count, timestamp=from_time)
-    # only keep glitch GPs
-    evts = [evt for evt in gp_evts if evt.glitch]
-    if len(evts) > count:
-        return evts[:count]
-    return evts
-
-
 def _when(event_type, from_time=None, count=5):
     names = ui.event_choices.get(event_type)
     evts = None
@@ -290,10 +274,6 @@ def _when(event_type, from_time=None, count=5):
         mgr = controller.slot1mgr
         evts = mgr.when_event(names=names, count=count, timestamp=from_time)
         fmt_func = formatters.format_glitch_event
-    elif event_type == "Secret League":
-        mgr = controller.slot2mgr
-        evts = _when_secret_league(mgr, count, from_time)
-        fmt_func = formatters.format_future_event
     else:
         mgr = controller.slot2mgr
         evts = mgr.when_event(names=names, count=count, timestamp=from_time)
@@ -367,22 +347,13 @@ def _fetch_miniprix_events(event_type, from_time, private):
             mgr = controller.pmp_mgr
         else:
             mgr = controller.mp_mgr
-    evts = mgr.get_miniprix(timestamp=from_time)
-    if evts and event_type != "classicprix" and controller.is_shuffle_on():
-        if not controller.slot2mgr.is_weekday(evts[0].start_time):
-            if private:
-                mgr = controller.psmp_mgr
-            else:
-                mgr = controller.smp_mgr
-            evts = mgr.get_miniprix(timestamp=from_time)
-    return evts
+    return mgr.get_miniprix(timestamp=from_time)
 
 
-def _build_mp_event_name(event_type, private, start_time):
+def _build_mp_event_name(event_type, private, evt):
     evt_name = formatters.event_display_names.get(event_type)
-    if event_type != "classicprix":
-       if controller.is_shuffle_on() and not controller.slot2mgr.is_weekday(start_time):
-           evt_name = "Machine Shuffle {0}".format(evt_name)
+    if event_type != "classicprix" and evt.shuffle:
+        evt_name = "Machine Shuffle {0}".format(evt_name)
     if private:
         evt_name = "Private {0}".format(evt_name)
     return evt_name
@@ -402,7 +373,7 @@ def _create_miniprix_message(event_type, track_filter, utc_time, verbose, privat
 
         evts = _fetch_miniprix_events(event_type, from_time, private)
         if evts:
-            evt_name = _build_mp_event_name(event_type, private, evts[0].start_time)
+            evt_name = _build_mp_event_name(event_type, private, evts[0])
             start = int(evts[0].start_time.timestamp())
             header = "Track selection for {0} scheduled <t:{1}:R>".format(evt_name, start)
             response = [header]
@@ -479,6 +450,51 @@ async def miniprix(
     await ctx.respond(err or response)
 
 
+def _lineup(event_type, timestamp=None):
+    """ The track pairs of a Team Battle, Pro-Tracks or Classic slot, or
+        of a private lobby of that mode opened at the timestamp.
+    """
+    name, private = ui.lineup_event_choices[event_type]
+    mgr = controller.lineup_mgrs[(name, private)]
+    evts = mgr.list_events(timestamp)
+    if not evts:
+        return "POWER DOWN! No {0} slot in the coming week :(".format(event_type)
+    if private:
+        opened = formatters.format_discord_timestamp(evts[0].start_time, inline=True)
+        header = "Track pairs for a {0} lobby opened {1} (local time):".format(
+                event_type, opened)
+    else:
+        start = int(evts[0].start_time.timestamp())
+        header = "Track pairs for {0} scheduled <t:{1}:R>:".format(event_type, start)
+    response = [header]
+    for evt in evts:
+        response.append(formatters.format_track_choice(evt))
+    return '\n'.join(response)
+
+
+async def get_lineup_types(ctx: discord.AutocompleteContext):
+    return list(ui.lineup_event_choices.keys())
+
+
+@bot.slash_command(name="lineup",
+                   description="List the track pairs of Team Battle, Pro-Tracks or Classic")
+async def lineup(
+        ctx: discord.ApplicationContext,
+        event_type: discord.Option(
+            str, autocomplete=discord.utils.basic_autocomplete(get_lineup_types)),
+        utc_time: discord.Option(str, required=False, description=TIP_WHEN_FROM_TIME),
+        ):
+    utils.log(f"{ctx.author.name} used {ctx.command}.")
+    response = None
+    err, from_time = _validate_utc_time(utc_time)
+    if not err:
+        if event_type not in ui.lineup_event_choices:
+            err = "Disqualified! Unknown event type '{0}'.".format(event_type)
+        else:
+            response = _lineup(event_type, from_time)
+    await ctx.respond(err or response)
+
+
 def _ninetynine(timestamp=None):
     """
     """
@@ -508,7 +524,7 @@ def get_missing_event_types(evts):
     results = []
     # we want to show the next Glitch GP if available
     if "glitchgp" not in present_evts:
-        extra = _when_secret_league(controller.slot2mgr, 1, None)
+        extra = controller.slot2mgr.when_event(names=["glitchgp"], count=1)
         if extra:
             results.append(extra[0])
 

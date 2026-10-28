@@ -1,0 +1,66 @@
+{
+  "ActiveEndTime": "2026-01-19T00:00",
+  "ActiveStartTime": "2025-12-15T00:00",
+  "Version": 6,
+  "WeekendSchedule": {
+    "ActiveBonus": {
+      "Type": 0,
+      "Value": 0
+    },
+    "IntervalWeekend": [
+      {
+        "Duration": 5,
+        "SetName": "WorldTourRotation"
+      },
+      {
+        "Duration": 15,
+        "SetName": "Teams"
+      },
+      {
+        "Duration": 5,
+        "SetName": "GrandPrixRotation"
+      },
+      {
+        "Duration": 15,
+        "SetName": "HardTracks"
+      },
+      {
+        "Duration": 5,
+        "SetName": "WorldTourRotation"
+      },
+      {
+        "Duration": 15,
+        "SetName": "Classic"
+      },
+      {
+        "Duration": 5,
+        "SetName": "GrandPrixRotation"
+      },
+      {
+        "Duration": 15,
+        "SetName": "Teams"
+      },
+      {
+        "Duration": 5,
+        "SetName": "WorldTourRotation"
+      },
+      {
+        "Duration": 15,
+        "SetName": "HardTracks"
+      },
+      {
+        "Duration": 5,
+        "SetName": "GrandPrixRotation"
+      },
+      {
+        "Duration": 15,
+        "SetName": "Classic"
+      }
+    ],
+    "PrivateLobbyHasWorldTour": false,
+    "Weekend": "SAT,SUN",
+    "WeekendEventAnnouncement": "THU,FRI,SAT,SUN",
+    "WeekendEventAnnouncementReset": "MON",
+    "WeekendHourOffset": 0
+  }
+}

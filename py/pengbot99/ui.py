@@ -26,6 +26,18 @@ event_choices = {
 }
 
 
+# Internal track-pair modes to look up upon user selection,
+# as (event name, private lobby)
+lineup_event_choices = {
+    "Team Battle": ("teambattle", False),
+    "Pro-Tracks": ("protracks", False),
+    "Classic": ("classic", False),
+    "Private Team Battle": ("teambattle", True),
+    "Private Pro-Tracks": ("protracks", True),
+    "Private Classic": ("classic", True),
+}
+
+
 # Internal mini-prix types to look up upon user selection
 mp_event_choices = {
     "Classic Mini-Prix": "classicprix",

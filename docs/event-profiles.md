@@ -1,5 +1,10 @@
 # Event Profiles (schedule config overlays)
 
+> Profiles now hold the game's own schedule files instead of CSV rotations and
+> offset constants; see [game-schedule.md](game-schedule.md). The folder layout,
+> the inherit-from-default rule and the constants overlay described below still
+> apply.
+
 ## Goal
 
 Replace the current "one branch per event" scheduling strategy with a

@@ -3,88 +3,35 @@ import os
 import shutil
 import tempfile
 import unittest
-from datetime import date
+from datetime import date, datetime, timezone
 
 # Local imports
-from pengbot99 import explain_cmd, schedule_controller, utils
+from pengbot99 import explain_cmd, gameevents, schedule_controller, utils
+
+CONFIG = os.path.join(os.path.dirname(__file__), '..', 'config')
+UTC = timezone.utc
 
 
 class ScheduleControllerTestCase(unittest.TestCase):
     """ Verify that the schedule controller loads, switches and unloads
-        schedule profiles, and that reads delegate to the active schedule
-        while the slot 1 schedule stays global.
+        schedule profiles built from the game's schedule files, and that
+        reads delegate to the active profile.
     """
-
-    DEFAULT_CONSTANTS = (
-        "CLASSIC_LINE_UP_OFFSET=0\n"
-        "MINIPRIX_LINE_UP_OFFSET=23\n"
-        "MIRROR_LINE_UP_OFFSET=1\n"
-        "PRIVATE_MP_MINUTE_OFFSET=17\n"
-        "PRIVATE_MP_MIRROR_MINUTE_OFFSET=0\n"
-        "PRIVATE_CMP_MINUTE_OFFSET=8\n"
-        "NINETYNINE_MINUTE_OFFSET=25\n"
-        "SECRET_LEAGUE_ENABLED=1\n"
-        "SECRET_LEAGUE_INTERVALS=11,6,7,3,8,4\n"
-        "SECRET_LEAGUE_OFFSET=21\n"
-        "WEEKEND_SECRET_LEAGUE_ENABLED=0\n"
-        "WEEKEND_SECRET_LEAGUE_INTERVALS=22,12,14,6,16,8\n"
-        "WEEKEND_SECRET_LEAGUE_OFFSET=60\n"
-        "SHUFFLE_ENABLED=0\n"
-        "SHUFFLE_MINIPRIX_LINE_UP_OFFSET=19\n"
-        "SHUFFLE_MIRROR_LINE_UP_OFFSET=1\n"
-        "PRIVATE_SHUFFLE_MP_MINUTE_OFFSET=12\n"
-        "PRIVATE_SHUFFLE_MP_MIRROR_MINUTE_OFFSET=0\n"
-    )
-    SHUFFLE_CONSTANTS = (
-        "# Machine Shuffle event overrides\n"
-        "SHUFFLE_ENABLED=1\n"
-        "SHUFFLE_MINIPRIX_LINE_UP_OFFSET=14\n"
-        "SECRET_LEAGUE_OFFSET=18\n"
-    )
-    METEOR_CONSTANTS = (
-        "# Meteor Festival event overrides\n"
-        "SECRET_LEAGUE_ENABLED=0\n"
-        "CLASSIC_LINE_UP_OFFSET=3\n"
-    )
-    # files copied verbatim from the tests fixtures into the default
-    # profile folder, so schedules are valid and need no handcrafting.
-    DEFAULT_CSVS = (
-        "slot2_schedule.csv",
-        "slot2_schedule_weekend.csv",
-        "miniprix_schedule.csv",
-        "miniprix_mirroring_schedule.csv",
-        "private_miniprix_schedule.csv",
-        "slot1_schedule.csv",
-        "ninetynine_schedule.csv",
-    )
-    PRIVATE_CLASSIC_MP = (
-        "0,Silence,White_Land_II,Fire_Field\n"
-        "15,next\n"
-    )
-    CLASSIC_MP = (
-        "0,Silence > White_Land_II > Fire_Field\n"
-        "15,next\n"
-    )
 
     def setUp(self):
         self._tmpdir = tempfile.TemporaryDirectory()
         self.root = self._tmpdir.name
-        self.fixtures = os.path.join(os.path.dirname(__file__), 'fixtures')
-        default_dir = os.path.join(self.root, "event_default")
-        os.makedirs(default_dir)
-        for name in self.DEFAULT_CSVS:
-            shutil.copy(os.path.join(self.fixtures, name), default_dir)
-        with open(os.path.join(default_dir, "private_classic_mp_schedule.csv"),
-                  "w") as fd:
-            fd.write(self.PRIVATE_CLASSIC_MP)
-        with open(os.path.join(default_dir, "classic_mp_schedule.csv"), "w") as fd:
-            fd.write(self.CLASSIC_MP)
-        with open(os.path.join(default_dir, "constants.dat"), "w") as fd:
-            fd.write(self.DEFAULT_CONSTANTS)
-        # profile folders only override constants; all schedules fall
-        # back to the default profile folder.
-        for profile, constants in (("machine_shuffle", self.SHUFFLE_CONSTANTS),
-                                   ("meteor", self.METEOR_CONSTANTS)):
+        shutil.copy(os.path.join(CONFIG, 'StageList.json'), self.root)
+        shutil.copytree(os.path.join(CONFIG, 'event_default'),
+                        os.path.join(self.root, "event_default"))
+        # a profile with its own drop of the schedule files and no constants
+        shutil.copytree(os.path.join(CONFIG, 'event_meteor'),
+                        os.path.join(self.root, "event_meteor"))
+        # profiles pinning a weekend event of the default files
+        pinned = (("queen", "WEEKEND_SCHEDULE_ID=QueenLeagueWeekend\n"),
+                  ("plain", "WEEKEND_SCHEDULE_ID=none\n"),
+                  ("bogus", "WEEKEND_SCHEDULE_ID=NoSuchWeekend\n"))
+        for profile, constants in pinned:
             profile_dir = os.path.join(self.root, "event_{0}".format(profile))
             os.makedirs(profile_dir)
             with open(os.path.join(profile_dir, "constants.dat"), "w") as fd:
@@ -101,10 +48,6 @@ class ScheduleControllerTestCase(unittest.TestCase):
         env = utils.load_env(self._env_path)
         return schedule_controller.ScheduleController(env, profile=profile, csts=csts)
 
-    def load_default_csts(self, profile='default'):
-        env = utils.load_env(self._env_path)
-        return env, utils.load_csts(env, profile)
-
     def test_startup_profile_is_active(self):
         c = self.create_controller()
         self.assertEqual(c.name, 'default')
@@ -113,28 +56,64 @@ class ScheduleControllerTestCase(unittest.TestCase):
 
     def test_reads_delegate_to_active_schedule(self):
         c = self.create_controller()
-        self.assertIs(c.slot2mgr, c.active.slot2mgr)
-        for mgr in ("cmp_mgr", "mp_mgr", "pmp_mgr", "pcmp_mgr", "smp_mgr", "psmp_mgr"):
+        for mgr in ("slot1mgr", "slot2mgr", "r99_mgr", "cmp_mgr", "mp_mgr", "pmp_mgr",
+                    "pcmp_mgr", "lineup_mgrs"):
             self.assertIs(getattr(c, mgr), getattr(c.active, mgr))
 
-    def test_is_shuffle_on_reflects_active_schedule(self):
+    def test_profile_builds_every_manager(self):
         c = self.create_controller()
-        self.assertFalse(c.is_shuffle_on())
-        c.switch('machine_shuffle')
-        self.assertTrue(c.is_shuffle_on())
-        self.assertIsNotNone(c.smp_mgr)
-        self.assertIsNotNone(c.psmp_mgr)
+        self.assertIsInstance(c.slot2mgr, gameevents.SlotScheduleManager)
+        self.assertIsInstance(c.slot1mgr, gameevents.MysteryTrackManager)
+        self.assertIsInstance(c.r99_mgr, gameevents.NinetyNineManager)
+        self.assertFalse(c.mp_mgr.private)
+        self.assertTrue(c.pmp_mgr.private)
+        self.assertFalse(c.cmp_mgr.private)
+        self.assertTrue(c.pcmp_mgr.private)
+        self.assertEqual(sorted(c.lineup_mgrs),
+                         [(mode, private)
+                          for mode in ('classic', 'protracks', 'teambattle')
+                          for private in (False, True)])
 
-    def test_global_slot1_schedule(self):
+    def test_default_profile_follows_the_calendar(self):
         c = self.create_controller()
-        self.assertIsNotNone(c.slot1mgr)
-        self.assertIs(c.r99_mgr.glitch_manager, c.slot1mgr)
+        self.assertEqual(c.weekend_event(datetime(2026, 9, 19, tzinfo=UTC)),
+                         'QueenLeagueWeekend')
+        self.assertIsNone(c.weekend_event(datetime(2026, 10, 15, tzinfo=UTC)))
+        self.assertEqual(len(c.calendar()), 26)
+
+    def test_pinned_profile_runs_its_event_at_any_time(self):
+        c = self.create_controller()
+        c.switch('queen')
+        for when in (datetime(2026, 9, 19, tzinfo=UTC),
+                     datetime(2026, 10, 15, tzinfo=UTC)):
+            self.assertEqual(c.weekend_event(when), 'QueenLeagueWeekend')
+        self.assertEqual(c.calendar(), [])
+
+    def test_none_profile_ignores_the_calendar(self):
+        c = self.create_controller()
+        c.switch('plain')
+        self.assertIsNone(c.weekend_event(datetime(2026, 9, 19, tzinfo=UTC)))
+
+    def test_unknown_pinned_event_fails_to_load(self):
+        c = self.create_controller()
+        with self.assertRaises(KeyError):
+            c.load('bogus')
+
+    def test_profile_with_own_files_and_no_constants(self):
+        c = self.create_controller()
+        c.switch('meteor')
+        self.assertEqual(c.name, 'meteor')
+        start, end = c.data.active_window
+        self.assertEqual(gameevents.from_unix(start),
+                         datetime(2026, 10, 19, tzinfo=UTC))
+        self.assertEqual(gameevents.from_unix(end), datetime(2026, 11, 9, tzinfo=UTC))
+        self.assertIsNone(c.weekend_event(datetime(2026, 10, 24, tzinfo=UTC)))
 
     def test_load_registers_without_activating(self):
         c = self.create_controller()
-        c.load('machine_shuffle')
+        c.load('queen')
         self.assertEqual(c.name, 'default')
-        self.assertIn('machine_shuffle', c.list())
+        self.assertIn('queen', c.list())
 
     def test_load_is_idempotent(self):
         c = self.create_controller()
@@ -144,9 +123,9 @@ class ScheduleControllerTestCase(unittest.TestCase):
     def test_switch_activates_loaded_schedule(self):
         c = self.create_controller()
         default = c.active
-        c.load('machine_shuffle')
-        c.switch('machine_shuffle')
-        self.assertEqual(c.name, 'machine_shuffle')
+        c.load('queen')
+        c.switch('queen')
+        self.assertEqual(c.name, 'queen')
         self.assertIsNot(c.slot2mgr, default.slot2mgr)
         self.assertIs(c.slot2mgr, c.active.slot2mgr)
 
@@ -156,11 +135,13 @@ class ScheduleControllerTestCase(unittest.TestCase):
         self.assertEqual(c.name, 'meteor')
         self.assertIn('meteor', c.list())
 
-    def test_switch_uses_profile_constants(self):
+    def test_switch_uses_profile_data(self):
         c = self.create_controller()
+        when = datetime(2026, 10, 24, 12, tzinfo=UTC)
+        self.assertTrue(c.slot2mgr.is_secret_league_on(when))
         c.switch('meteor')
-        # Meteor disables Secret League, so its slot2 mananger must too
-        self.assertFalse(c.slot2mgr.is_secret_league_on())
+        # the meteor drop lists no Secret League windows
+        self.assertFalse(c.slot2mgr.is_secret_league_on(when))
 
     def test_switching_back_preserves_managers(self):
         c = self.create_controller()
@@ -168,14 +149,14 @@ class ScheduleControllerTestCase(unittest.TestCase):
         c.switch('meteor')
         c.switch('default')
         self.assertIs(c.slot2mgr, default.slot2mgr)
-        self.assertIs(c.r99_mgr, c.r99_mgr)
+        self.assertIs(c.r99_mgr, default.r99_mgr)
 
     def test_unload_active_forbidden(self):
         c = self.create_controller()
-        c.switch('machine_shuffle')
+        c.switch('queen')
         with self.assertRaises(ValueError):
-            c.unload('machine_shuffle')
-        self.assertIn('machine_shuffle', c.list())
+            c.unload('queen')
+        self.assertIn('queen', c.list())
 
     def test_unload_loaded_schedule(self):
         c = self.create_controller()
@@ -201,9 +182,10 @@ class ScheduleControllerTestCase(unittest.TestCase):
         self.assertEqual(c.list(), ['default'])
 
     def test_profile_schedule_loads_own_constants(self):
-        env, _ = self.load_default_csts()
-        sched = schedule_controller.ScheduleProfile(env, 'machine_shuffle')
-        self.assertTrue(sched.is_shuffle_on())
+        env = utils.load_env(self._env_path)
+        sched = schedule_controller.ScheduleProfile(env, 'queen')
+        self.assertEqual(sched.weekend_event(datetime(2026, 10, 15, tzinfo=UTC)),
+                         'QueenLeagueWeekend')
 
     def test_controller_loads_own_constants(self):
         env = utils.load_env(self._env_path)
@@ -225,7 +207,20 @@ class ScheduleControllerTestCase(unittest.TestCase):
         explainer = explain_cmd.Explainer(c)
         result = explainer.explain('Grand Prix Rotation')
         self.assertIsInstance(result, str)
-        self.assertTrue(result)
+        self.assertIn('16 Grand Prix-long', result)
+
+    def test_explainer_describes_the_weekend_event(self):
+        c = self.create_controller()
+        explainer = explain_cmd.Explainer(c)
+        now = datetime(2026, 9, 19, 12, tzinfo=UTC)
+        current = explainer.explain_current_schedule(now)
+        self.assertIn('Queen Leagues Weekend Event** weekend event', current)
+        self.assertIn('This event ends <t:1790035200:F>', current)  # Sep 22 00:00 UTC
+        upcoming = explainer.explain_upcoming_events(now)
+        self.assertIn('Queen Leagues Weekend Event (Default Schedule', upcoming)
+        self.assertIn('<t:1790553600:F>   <:WTMini:1462608159913934881> '
+                      'Mini World Tour Week', upcoming)  # Sep 28 00:00 UTC
+        self.assertIn('Current And Upcoming Events', explainer.topics)
 
 
 class ProfileSwitchConfigTestCase(unittest.TestCase):
@@ -235,7 +230,8 @@ class ProfileSwitchConfigTestCase(unittest.TestCase):
     def setUp(self):
         self._tmpdir = tempfile.TemporaryDirectory()
         self.root = self._tmpdir.name
-        self.env = {'CONFIG_PATH': self.root, 'EVENT_SCHEDULE_FILE': 'server_events.csv'}
+        self.env = {'CONFIG_PATH': self.root,
+                    'EVENT_SCHEDULE_FILE': 'server_events.csv'}
 
     def tearDown(self):
         self._tmpdir.cleanup()

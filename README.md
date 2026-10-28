@@ -2,6 +2,8 @@
 
 A library and Discord bot for useful F-Zero 99 schedule info
 
+The bot answers slash commands about the public schedule (`/showevents`, `/when`, `/utc_when`, `/explain`), the Mini-Prix and Classic Mini-Prix track selections of public and private lobbies (`/miniprix`), the 99-race track pairs (`/ninetynine`), and the Team Battle, Pro-Tracks and Classic track pairs of public and private lobbies (`/lineup`). It also keeps a schedule message up to date in a channel.
+
 ## Setup
 
 This project uses `uv` for dependency management.
@@ -62,9 +64,9 @@ Therefore, once you have created one, you are responsible for tracking changes t
 **SCHEDULE_EDIT_CHANNEL**: A Discord channel ID. The bot will post its schedule messages in this channel, and then will regularly update them (every 10 minutes or `REFRESH_INTERVAL` minutes).
 It is suggested that only the bot has permission to post to this channel so that the schedule remains the last message on the channel.
 
-**CONFIG_PATH**: The root path to the bot's configuration directory. Schedule configuration lives in profile subfolders, with the baseline schedule in `CONFIG_PATH/event_default`. A complete set of CSV schedule files and associated constants data is provided in the repository.
+**CONFIG_PATH**: The root path to the bot's configuration directory. Schedule configuration lives in profile subfolders, with the baseline schedule in `CONFIG_PATH/event_default`. The game's own schedule files, dumped to JSON, are provided in the repository (see "Schedule data").
 
-**CONSTANTS_FILE**: This file holds constants that are used for fine-tuning the schedule. It resides in the schedule profile folder (i.e. `CONFIG_PATH/event_default` by default). A constants file is provided in the repository for each event profile.
+**CONSTANTS_FILE**: This file names the weekend event a profile runs (see "Schedule data"). It resides in the schedule profile folder (i.e. `CONFIG_PATH/event_default` by default) and may be absent from a profile folder.
 
 ### Additional optional configuration
 
@@ -83,57 +85,21 @@ by default). The content is read at startup time, if present, and no --profile f
 If any other configuration key is defined (using the `NAME=value` scheme), it will be read but ignored by the bot.
 The configuration file may contain any number of comment lines starting with `#` character.
 
-### Constants information
+### Schedule data
 
-Constants are used to conveniently offset the schedule rotation without having to edit the schedule files.
-All schedule-related constants are defined in the **CONSTANTS_FILE** that is referenced in the **.env** file.
-Constants are defined using `NAME=VALUE` syntax. Name is conventionally all-caps. Value is an integer that may be negative.
+The bot computes every schedule the way the game does, from the game's own schedule files: the rotation position of a mode is the number of minutes that mode has been active since the Unix epoch, assuming the current tables had always been in force. Nothing is fitted; see [docs/game-schedule.md](docs/game-schedule.md) for the model.
 
-The following constants are expected to be present:
+A profile folder holds the JSON dumps of the two files the game reads, `GameScheduleV1.json` and `WeekendSchedule.json`, and optionally a constants file. A profile missing a file inherits it from `event_default`. The leagues' track lists come from `StageList.json` in the `CONFIG_PATH` root.
 
-- CLASSIC_LINE_UP_OFFSET
-- MINIPRIX_LINE_UP_OFFSET
-- MIRROR_LINE_UP_OFFSET
-- PRIVATE_MP_MINUTE_OFFSET
-- PRIVATE_MP_MIRROR_MINUTE_OFFSET
-- PRIVATE_CMP_MINUTE_OFFSET
-- NINETYNINE_MINUTE_OFFSET
+- `event_default` holds the game's built-in schedule (the 10/20-minute cycle) and its `WeekendSchedule` file, which lists every weekend event (Leagues Weekends, Machine Shuffle, Team Battle, Mini World Tour, Lucky Rank) with a calendar of when each one is in force.
+- `event_meteor` and `event_festival_world_tour` hold the files of their respective BCAT drops, which replace the weekday cycle for the duration of the event.
+- The other profiles pin one weekend event of the default files.
 
-All constants are first read from the `event_default` constants file. If the currently-active event profile is not default, AND the event's profile own constants file
-also defines a constant, then this later value will override the default value. This means that event profiles outside default do not need to hold a constant's value,
-if this value would be identical to the default profile's.
-To change the offset the bot is using, simply edit the Constant file in the appropriate event profile and restart the bot.
+The constants file holds a single key:
 
-Some of the schedule features are activated through feature flag constants defined in the constants file.
-Flags are set to `1` to enable a feature, or `0` to disable it. Their associated tuning constants may remain defined regardless.
+- `WEEKEND_SCHEDULE_ID`: `auto` to follow the calendar of the `WeekendSchedule` file, `none` to ignore it, or a `WeekendScheduleID` from the file (e.g. `QueenLeagueWeekend`, `Teams`, `MachineShuffle`, `WorldTourWeek`) to run that event on every weekend for as long as the profile is active.
 
-The bot activates the Machine Shuffle Weekend event when the `SHUFFLE_ENABLED` flag is set to `1`.
-In that case, it will use the specified offsets for Miniprix events occuring at weekend time (UTC):
-
-- SHUFFLE_MINIPRIX_LINE_UP_OFFSET
-- SHUFFLE_MIRROR_LINE_UP_OFFSET
-- PRIVATE_SHUFFLE_MP_MINUTE_OFFSET
-- PRIVATE_SHUFFLE_MP_MIRROR_MINUTE_OFFSET
-
-If there is no Machine Shuffle event, set the flag to `0`.
-As of F-Zero 99 version 1.6.1, there is no mirroring in Private Machine Shuffle-Miniprix, unless the lobby is started at the time of a public Machine Shuffle event. In this later case, the track selection will follow the public event's setting. In any case, the mirroring constant currently does not affect the results in any way.
-
-The Secret League feature can be activated by setting the `SECRET_LEAGUE_ENABLED` flag to `1`:
-
-- `SECRET_LEAGUE_INTERVALS`
-
-The value of SECRET_LEAGUE_INTERVALS is a comma-separated list of integers. Each integer represents an interval between Secret League Grand Prix. When enabled, the Grand Prix rotation proceeds as defined per the schedule, but some Grand Prix are replaced by Secret League as defined per the intervals. When this will happen, the Grand Prix will appear as `Secret League (replaces <replaced GP>)`, and the ticker will display Secret League instead of the replaced Grand Prix.
-Once all intervals in the list have elapsed, the process repeats from the start of the list.
-
-- SECRET_LEAGUE_OFFSET
-
-This may optionally be defined, as an integer value, to change the start Grand Prix of the Secret League intervals sequence. If not defined, it is set to zero.
-
-- WEEKEND_SECRET_LEAGUE_ENABLED
-- WEEKEND_SECRET_LEAGUE_INTERVALS
-- WEEKEND_SECRET_LEAGUE_OFFSET
-
-In cases where the schedule defines a separate Grand Prix rotation for the weekend, the `WEEKEND_SECRET_LEAGUE_ENABLED` flag (along with the `SECRET_LEAGUE_ENABLED` flag) can be used to apply a separate intervals list and a separate offset applying to the weekend schedule. For v1.7, this is useful for Leagues weekend events. `WEEKEND_SECRET_LEAGUE_OFFSET` is set to zero if the constant is left undefined.
+With `auto`, the `default` profile already runs the weekend events on the dates the game lists, so `EVENT_SCHEDULE_FILE` only needs rows for drops that replace the weekday cycle. A weekend event the calendar lacks can be added as a row of `Schedule` in `WeekendSchedule.json`, or pinned through a profile and a switch date. A new drop is a new profile folder holding its two files.
 
 ## Running the application
 
@@ -184,7 +150,7 @@ The following lists event profiles directories provided in the repository and wh
 
 | Directory | Profile Name | In-Game name |
 |:----------|:-------------|:-------------|
-| event_default | default | Grand Prix Weekend Event |
+| event_default | default | Grand Prix Weekend Event (and, by calendar, every weekend event below) |
 
 During weekdays, Grand Prix occur every hour at :00. Mini-Prix or Classic Mini-Prix occur at :30.
 During weekend days, Grand Prix occur every 30 minutes. Secret League is enabled.
@@ -226,7 +192,7 @@ Secret League is enabled.
 
 During weekdays, Grand Prix occur every hour at :00. Mini-Prix or Classic Mini-Prix occur at :30.
 During weekend days, Grand Prix occur every hour at :00. Mini-Prix or Classic Mini-Prix occur at :30, but Classic Mini-Prix frequency is
-the same as Standard Mini-Prix, unlike during the week days where it is one to two like default. The :40 special event is always Team Battle.
+the same as Standard Mini-Prix, unlike during the week days where it is one to two like default. Every special event slot is Team Battle.
 Secret League is enabled.
 
 **5. Mini World Tour Week**
@@ -276,10 +242,9 @@ python -m unittest discover -s tests
 
 ## Future improvements
 
-- Refactor schedule manager to more elegantly manage rotations
 - Bot Cogs
 - Migrate tests to Pytest and automate with Github Actions, add coverage report
-- Support for protracks/team battle as an upgrade to current /ninetynine command
+- Confirm in game the two points where the game's files and the previously fitted schedules disagree (see [docs/game-schedule.md](docs/game-schedule.md))
 
 ## References
 
@@ -297,3 +262,4 @@ These planning documents describe features that are now completed:
 
 - [Event profiles](docs/event-profiles.md)
 - [Schedule controller](docs/schedule-controller.md)
+- [Game schedule](docs/game-schedule.md)

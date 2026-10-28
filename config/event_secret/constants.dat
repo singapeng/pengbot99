@@ -1,3 +1,2 @@
-# Secret League Weekend event overrides
-# Secret League Cycle index offset observed for this event
-SECRET_LEAGUE_OFFSET=-9
+# The weekend event of the WeekendSchedule file, pinned for the whole profile
+WEEKEND_SCHEDULE_ID=MysteryLeagueWeekend

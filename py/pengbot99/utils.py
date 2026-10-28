@@ -92,10 +92,10 @@ def is_valid_profile(env, profile='default'):
     return os.path.isdir(get_schedule_dir(env, profile))
 
 
-def log_profile_csv_warnings(env, profile):
-    """ Logs a warning for CSV files in a profile folder that do not
-        match any file in the default folder. Such files would only be
-        loaded if a caller knew their name, so they are likely unused.
+def log_profile_file_warnings(env, profile):
+    """ Logs a warning for files in a profile folder that do not match any
+        file in the default folder. Such files are never loaded, so they
+        are likely misnamed.
     """
     if not profile or profile == 'default':
         return
@@ -103,9 +103,9 @@ def log_profile_csv_warnings(env, profile):
     default_dir = get_schedule_dir(env, 'default')
     if not os.path.isdir(profile_dir) or not os.path.isdir(default_dir):
         return
-    default_names = {name for name in os.listdir(default_dir) if name.endswith('.csv')}
+    default_names = set(os.listdir(default_dir))
     for name in os.listdir(profile_dir):
-        if name.endswith('.csv') and name not in default_names:
+        if name not in default_names:
             log("WARNING profile '{0}': file '{1}' does not match any default "
                 "schedule file.".format(profile, name))
 
@@ -113,6 +113,8 @@ def log_profile_csv_warnings(env, profile):
 def _sideload_data(env, data_name, base_path):
     if base_path and data_name in env:
         cfg_path = os.path.join(base_path, env[data_name])
+        if not os.path.isfile(cfg_path):
+            return None
         values = load_env(path=cfg_path)
     else:
         values = None

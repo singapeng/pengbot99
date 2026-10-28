@@ -1,9 +1,2 @@
-# Team Battle event overrides
-# Used for Public Classic Miniprix
-CLASSIC_LINE_UP_OFFSET=21
-# Used for Public Mini-Prix (standard)
-MINIPRIX_LINE_UP_OFFSET=36
-# Used to line mirror track occurence in Public Mini-Prix
-MIRROR_LINE_UP_OFFSET=7
-# Secret League Cycle index offset
-SECRET_LEAGUE_OFFSET=6
+# The weekend event of the WeekendSchedule file, pinned for the whole profile
+WEEKEND_SCHEDULE_ID=Teams

@@ -108,13 +108,34 @@ class Explainer(object):
                 active = name
         return upcoming
 
+    def _weekend_event(self, now):
+        """ (ID, end) of the weekend event the active profile runs at now,
+            or None.
+        """
+        lookup = getattr(self._holder, 'weekend_event', None)
+        if lookup is None:
+            return None
+        event_id = lookup(now)
+        if event_id is None:
+            return None
+        for start, end, name in self._holder.calendar():
+            if name == event_id and start <= now < end:
+                return event_id, end
+        return event_id, None
+
     def explain_current_schedule(self, now=None):
         now = now or datetime.now(timezone.utc)
-        name = self._holder.name
-        title, description = event_profiles.PROFILE_INFO.get(
-            name, (event_profiles.display_name(name),
-                   "No description is available for this profile."))
+        title, description = event_profiles.profile_info(self._holder.name)
         response = ["The currently active schedule is **{0}**.".format(title), "", description]
+        weekend = self._weekend_event(now)
+        if weekend:
+            event_id, end = weekend
+            title, description = event_profiles.weekend_event_info(event_id)
+            response += ["", "The game is running the **{0}** weekend event.".format(
+                title), description]
+            if end:
+                response += ["", "This event ends <t:{0}:F>.".format(
+                    int(end.timestamp()))]
         config = self._switch_config()
         if config:
             future = self._upcoming_switches(config.switches, now)
@@ -126,18 +147,36 @@ class Explainer(object):
                 response += ["", "No upcoming schedule change is listed."]
         return '\n'.join(response)
 
+    def _upcoming_calendar(self, now):
+        """ (start, title) of the weekend events the active profile's game
+            data lists after now.
+        """
+        calendar = getattr(self._holder, 'calendar', None)
+        if calendar is None:
+            return []
+        return [(start, event_profiles.weekend_event_info(event_id)[0])
+                for start, _, event_id in calendar() if start > now]
+
     def explain_upcoming_events(self, now=None):
         config = self._switch_config()
-        if config is None:
-            return "Sorry, the event schedule is not available."
         now = now or datetime.now(timezone.utc)
+        upcoming = self._upcoming_calendar(now)
+        if config is None and not upcoming:
+            return "Sorry, the event schedule is not available."
+        active = event_profiles.display_name(self._holder.name)
+        weekend = self._weekend_event(now)
+        if weekend:
+            title = event_profiles.weekend_event_info(weekend[0])[0]
+            active = "{0} ({1})".format(title, active)
         response = ["Current and Expected Game Events:", "",
-                    "**Currently Active**: {0}".format(
-                        event_profiles.display_name(self._holder.name))]
-        for day, name in self._upcoming_switches(config.switches, now)[:MAX_SCHEDULE_LINES - len(response)]:
-            switch = datetime.combine(day, time.min, tzinfo=timezone.utc)
-            response.append("<t:{0}:F>   {1}".format(
-                int(switch.timestamp()), event_profiles.display_name(name)))
+                    "**Currently Active**: {0}".format(active)]
+        if config is not None:
+            for day, name in self._upcoming_switches(config.switches, now):
+                switch = datetime.combine(day, time.min, tzinfo=timezone.utc)
+                upcoming.append((switch, event_profiles.display_name(name)))
+        upcoming = sorted(set(upcoming), key=lambda item: item[0])
+        for start, title in upcoming[:MAX_SCHEDULE_LINES - len(response)]:
+            response.append("<t:{0}:F>   {1}".format(int(start.timestamp()), title))
         return '\n'.join(response)
 
     @property
@@ -145,7 +184,8 @@ class Explainer(object):
         """ build a list of topics that can be auto-completed in the slash command
         """
         topics = list(self._topics.keys())
-        if self._switch_config() is None:
+        now = datetime.now(timezone.utc)
+        if self._switch_config() is None and not self._upcoming_calendar(now):
             # bot is operating with single --profile forever
             topics.remove('Current And Upcoming Events')
         return topics
@@ -155,13 +195,14 @@ class Explainer(object):
         Loads up a full rotation of Grand Prix to display
         how it is put together.
         """
-        cinfo = self._mgr.get_cycle_info(timestamp)
         gps = ui.event_choices.get("Grand Prix")
-        rotation = cinfo.find_rotation(gps)
-        evts = self._mgr.when_event(names=gps, count=len(rotation), timestamp=timestamp)
-        current = self._mgr.get_events(timestamp=timestamp, count=1)[0]
-        if not current.name in gps:
+        current = self._mgr.get_event(timestamp or datetime.now(timezone.utc))
+        if current.glitched_name not in gps:
             current = None
+        anchor = current or self._mgr.when_event(names=gps, count=1,
+                                                 timestamp=timestamp)[0]
+        evts = self._mgr.when_event(names=gps, count=len(anchor.rotation),
+                                    timestamp=timestamp)
 
         pre_evts, post_evts = _gp_rotation_split(evts)
         return _display_gp_rotation(evts, current, pre_evts, post_evts)

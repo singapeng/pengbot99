@@ -1,168 +1,135 @@
 """ Runtime profile-schedule management.
 
-    Owns the shared slot 1 (99 races) schedule, and a registry of
-    schedule profiles (slot 2, one per profile), with exactly one active
-    at any time. Reads on the controller delegate to the active schedule,
-    so existing consumers resolve the currently loaded managers at call
-    time.
+    A registry of schedule profiles, each built from the game's own schedule
+    files, with exactly one active at any time. Reads on the controller
+    delegate to the active profile, so consumers resolve the currently
+    loaded managers at call time.
 
     See docs/schedule-controller.md for the design.
 """
 
 import csv
+import json
 import os
-from datetime import datetime, timedelta
+from datetime import datetime
 
 # local imports
-from pengbot99 import choicerace, miniprix, schedule, secret_league, utils
+from pengbot99 import gameevents, gameschedule, utils
+
+GAME_SCHEDULE_FILE = 'GameScheduleV1.json'
+WEEKEND_SCHEDULE_FILE = 'WeekendSchedule.json'
+STAGE_LIST_FILE = 'StageList.json'
+# constants.dat key naming the weekend event to run: 'auto' follows the
+# calendar in the WeekendSchedule file, 'none' ignores it, any other value
+# is a WeekendScheduleID pinned for the whole profile.
+WEEKEND_SCHEDULE_KEY = 'WEEKEND_SCHEDULE_ID'
 
 
-def build_slot1(env, profile='default'):
-    """ Builds the slot-1 (99 races) schedule manager for a profile.
-        Slot 1 data does not vary between profiles, so this is built once
-        and never swapped by the controller.
+def load_json(path):
+    with open(path) as fd:
+        return json.load(fd)
+
+
+def load_profile_file(env, profile, name):
+    """ A file from the profile folder, or from the default folder when the
+        profile does not override it.
     """
-    sched_dir = utils.get_schedule_dir(env, profile)
-    default_dir = utils.get_schedule_dir(env, 'default')
-    r99sched = schedule.load_schedule(sched_dir, 'slot1_schedule', default_dir)
-    return schedule.Slot1ScheduleManager(schedule.glitch_origin, r99sched)
+    path = os.path.join(utils.get_schedule_dir(env, profile), name)
+    if not os.path.isfile(path):
+        path = os.path.join(utils.get_schedule_dir(env, 'default'), name)
+    return load_json(path)
 
 
-def build_r99(env, glitch_mgr, csts, profile='default'):
-    """ Builds the 99 races choice manager for a profile.
-        Needs the slots constants to compute its minute offset.
+def load_schedule_data(env, profile='default', csts=None):
+    """ The game's schedule data for a profile.
     """
-    r99_offset = int(csts["NINETYNINE_MINUTE_OFFSET"])
-    return choicerace.init_99_manager(name=None, glitch_mgr=glitch_mgr, env=env,
-            minutes_offset=r99_offset, profile=profile)
+    if csts is None:
+        csts = utils.load_csts(env, profile)
+    weekend_event = csts.get(WEEKEND_SCHEDULE_KEY, gameschedule.ScheduleData.AUTO)
+    return gameschedule.ScheduleData(
+            load_profile_file(env, profile, GAME_SCHEDULE_FILE),
+            load_profile_file(env, profile, WEEKEND_SCHEDULE_FILE),
+            weekend_event)
+
+
+def load_league_tracks(env):
+    """ Name to tracks of every league, from the StageList file in the
+        CONFIG_PATH root.
+    """
+    path = os.path.join(env['CONFIG_PATH'], STAGE_LIST_FILE)
+    return gameschedule.league_tracks(load_json(path))
 
 
 class ScheduleProfile(object):
-    """ One loaded schedule profile: Slot 2 for one profile
-        along with Private MP and CMP rotations.
+    """ One loaded schedule profile: the game's schedule files for one
+        drop, and every manager the bot reads from them.
 
-        For Slot 2, this covers:
-        - Base Slot 2 rotation (Prix and Special Events),
-        - Secret League overlay, if enabled,
-        - Mini-Prix and Classic Mini-Prix schedule,
-        for weekday plus weekend, including weekend variations
-        (such as Shuffle Mini-Prix, if the profile is active).
-
+        slot2mgr: Grand Prix, Mini-Prix and special event slots.
+        slot1mgr: Mystery track windows of the 99 races.
+        r99_mgr: 99-race track pairs.
+        mp_mgr, cmp_mgr, pmp_mgr, pcmp_mgr: public and private Mini-Prix and
+        Classic Mini-Prix track selections.
+        lineup_mgrs: Team Battle, Pro-Tracks and Classic track pairs, keyed
+        by (event name, private).
     """
     def __init__(self, env, name, csts=None):
         super().__init__()
         self.name = name
         if csts is None:
             csts = utils.load_csts(env, name)
-        sched_dir = utils.get_schedule_dir(env, name)
-        default_dir = utils.get_schedule_dir(env, 'default')
-        utils.log_profile_csv_warnings(env, name)
+        utils.log_profile_file_warnings(env, name)
+        self.data = load_schedule_data(env, name, csts)
+        leagues = load_league_tracks(env)
+        data = self.data
+        self.slot2mgr = gameevents.SlotScheduleManager(data)
+        self.slot1mgr = gameevents.MysteryTrackManager(data)
+        self.r99_mgr = gameevents.NinetyNineManager(data)
+        self.mp_mgr = gameevents.MiniPrixLineupManager(data, leagues, 'miniprix')
+        self.cmp_mgr = gameevents.MiniPrixLineupManager(data, leagues, 'classicprix')
+        self.pmp_mgr = gameevents.MiniPrixLineupManager(data, leagues, 'miniprix',
+                                                        private=True)
+        self.pcmp_mgr = gameevents.MiniPrixLineupManager(data, leagues, 'classicprix',
+                                                         private=True)
+        self.lineup_mgrs = {
+            (mode, private): gameevents.TrackPairManager(data, mode, private=private)
+            for mode in gameevents.TRACK_MODE_TYPES for private in (False, True)
+        }
+        window = data.active_window
+        if window:
+            start, end = (gameevents.from_unix(t).strftime('%Y-%m-%d %H:%M')
+                          for t in window)
+            utils.log("Schedule files of profile '{0}' are active "
+                      "from {1} to {2}.".format(name, start, end))
+        weekend_event = csts.get(WEEKEND_SCHEDULE_KEY, gameschedule.ScheduleData.AUTO)
+        if weekend_event == gameschedule.ScheduleData.AUTO:
+            weekend_event = 'calendar of {0}'.format(len(data.calendar))
+        utils.log("Profile '{0}' weekend events: {1}.".format(name, weekend_event))
 
-        # all env values are str, convert schedule offsets to int now
-        mp_offset = int(csts["MINIPRIX_LINE_UP_OFFSET"])
-        cmp_offset = int(csts["CLASSIC_LINE_UP_OFFSET"])
-        mirror_offset = int(csts["MIRROR_LINE_UP_OFFSET"])
-
-        # Glitch GP
-        secret_cfg = None
-        we_secret_cfg = None
-        if csts.get("SECRET_LEAGUE_ENABLED") == "1":
-            secret_cfg = secret_league.SecretLeagueConfig(
-                    csts["SECRET_LEAGUE_INTERVALS"],
-                    csts.get("SECRET_LEAGUE_OFFSET"),
-                )
-            utils.log("Secret League initialized with {0}".format(secret_cfg.indices))
-        if csts.get("WEEKEND_SECRET_LEAGUE_ENABLED") == "1" and secret_cfg:
-            we_secret_cfg = secret_league.SecretLeagueConfig(
-                    csts["WEEKEND_SECRET_LEAGUE_INTERVALS"],
-                    csts.get("WEEKEND_SECRET_LEAGUE_OFFSET"),
-                )
-            utils.log("Weekend Secret League is ON: {0}".format(we_secret_cfg.indices))
-
-        # load the weekday schedule for slot 2 (Prix and special events)
-        wdsched = schedule.load_schedule(sched_dir, 'slot2_schedule', default_dir)
-        # load the weekend schedule for slot 2 (Prix and special events)
-        wesched = schedule.load_schedule(sched_dir, 'slot2_schedule_weekend',
-                default_dir)
-        # load the Classic Mini Prix track schedule
-        cmpsched = schedule.load_schedule(sched_dir, 'classic_mp_schedule', default_dir)
-        # load the Mini Prix track schedule
-        mpsched = schedule.load_schedule(sched_dir, 'miniprix_schedule', default_dir)
-        mirrorsc = schedule.load_schedule(sched_dir, 'miniprix_mirroring_schedule',
-                default_dir)
-        # load the schedules for Private Lobbies Mini-Prix
-        plmpsched = schedule.load_schedule(sched_dir, "private_miniprix_schedule",
-                default_dir)
-        plcmpsched = schedule.load_schedule(sched_dir, "private_classic_mp_schedule",
-                default_dir)
-
-        # Create the Public schedule managers
-        self.slot2mgr = schedule.Slot2ScheduleManager(
-                origin=schedule.origin, weekday_sched=wdsched, weekend_sched=wesched,
-                secret_cfg=secret_cfg, we_secret_cfg=we_secret_cfg)
-        self.cmp_mgr = miniprix.MiniPrixManager("classicprix", self.slot2mgr,
-                cmpsched, offset=cmp_offset)
-        self.mp_mgr = miniprix.MiniPrixManager("miniprix", self.slot2mgr, mpsched,
-                mirrorsc, mp_offset, mirror_offset)
-        utils.log("Setting cycles to {0} for {1}.".format(
-                self.mp_mgr.mp_cycles, self.mp_mgr.name))
-
-        # Create Private Lobby schedule managers
-        pmp_origin = schedule.origin + timedelta(
-                minutes=int(csts["PRIVATE_MP_MINUTE_OFFSET"]))
-        pmp_mirror_origin = schedule.origin + timedelta(
-                minutes=int(csts["PRIVATE_MP_MIRROR_MINUTE_OFFSET"]))
-        pcmp_origin = schedule.origin + timedelta(
-                minutes=int(csts["PRIVATE_CMP_MINUTE_OFFSET"]))
-
-        pl_slot1 = schedule.Slot1ScheduleManager(pmp_origin, plmpsched)
-        mirror_slot1 = schedule.Slot1ScheduleManager(pmp_mirror_origin, mirrorsc)
-        self.pmp_mgr = miniprix.PrivateMPManager("miniprix", pl_slot1,
-                self.mp_mgr, mirror_slot1)
-        plcmp_slot1 = schedule.Slot1ScheduleManager(pcmp_origin, plcmpsched)
-        self.pcmp_mgr = miniprix.PrivateMPManager("classicprix", plcmp_slot1,
-                self.cmp_mgr)
-
-        # Shuffle Mini-Prix schedule managers
-        self.smp_mgr = None
-        self.psmp_mgr = None
-        if csts.get("SHUFFLE_ENABLED") == "1":
-            smp_offset = int(csts["SHUFFLE_MINIPRIX_LINE_UP_OFFSET"])
-            smp_mirror_offset = int(csts.get(
-                    "SHUFFLE_MIRROR_LINE_UP_OFFSET", mirror_offset))
-            self.smp_mgr = miniprix.MiniPrixManager("miniprix", self.slot2mgr,
-                    mpsched, mirrorsc, smp_offset, smp_mirror_offset)
-            psmp_origin = schedule.origin + timedelta(
-                    minutes=int(csts["PRIVATE_SHUFFLE_MP_MINUTE_OFFSET"]))
-            psl_slot1 = schedule.Slot1ScheduleManager(psmp_origin, plmpsched)
-            self.psmp_mgr = miniprix.PrivateMPManager("miniprix", psl_slot1,
-                    self.smp_mgr, None)
-            utils.log("!! Configured Shuffle Weekend !!")
-
-    def is_shuffle_on(self):
-        """ Whether the shuffle miniprix managers are configured.
+    def weekend_event(self, timestamp=None):
+        """ The weekend event in force, by the game's ID, or None.
         """
-        return self.smp_mgr is not None
+        return self.slot2mgr.weekend_event(timestamp)
+
+    def calendar(self):
+        """ (start, end, ID) of the weekend events the profile knows of, as
+            UTC datetimes.
+        """
+        return [(gameevents.from_unix(start), gameevents.from_unix(end), event_id)
+                for start, end, event_id in self.data.calendar
+                if end < gameschedule.FOREVER]
 
 
 class ScheduleController(object):
-    """ The registry of loaded schedule profiles plus the shared slot 1.
+    """ The registry of loaded schedule profiles.
 
         Exactly one schedule is active at any time. Unknown attribute
         reads delegate to the active ScheduleProfile so that consumers
-        keep working and always resolve the currently active managers.
+        always resolve the currently active managers.
     """
     def __init__(self, env, profile='default', csts=None):
         super().__init__()
         self.env = env
         self._profiles = {}
-        if csts is None:
-            csts = utils.load_csts(env, profile)
-        # Slot 1 schedule is built once from the startup profile and
-        # never swapped, so 99 races query state is preserved.
-        self.slot1mgr = build_slot1(env, profile)
-        self.r99_mgr = build_r99(env, self.slot1mgr, csts, profile)
-        # load the startup schedule profile
         self._active = self.load(profile, csts=csts)
 
     @property
