@@ -1,0 +1,5056 @@
+{
+  "ClassicMiniPrixDefaults": {
+    "HealPercent": 100,
+    "NumLaps": 4,
+    "PointsArray": "ClassicPrixPoints",
+    "RankCaps": [
+      24,
+      25,
+      26
+    ],
+    "RankOutMode": "SafeRank",
+    "Rules": "PointsRankElimination",
+    "Type": "ClassicMiniPrix"
+  },
+  "GPDefaults": {
+    "HealPercent": 100,
+    "NumLaps": 4,
+    "PointsArray": "Standard100Points",
+    "RankCaps": [
+      4,
+      5,
+      6,
+      8,
+      9
+    ],
+    "RankOutMode": "SafeRank",
+    "Rules": "PointsRankElimination",
+    "Type": "MiniPrix"
+  },
+  "GPList": [
+    {
+      "Name": "KnightLeague",
+      "PointsArray": "GrandPrix200Points",
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_I",
+          "VariationId": 1
+        },
+        {
+          "TrackId": "Big_Blue",
+          "VariationId": 2
+        },
+        {
+          "TrackId": "Sand_Ocean",
+          "VariationId": 1
+        },
+        {
+          "TrackId": "Death_Wind_I",
+          "VariationId": 2
+        },
+        {
+          "TrackId": "Silence",
+          "VariationId": 1
+        }
+      ],
+      "Type": "GrandPrix"
+    },
+    {
+      "Name": "QueenLeague",
+      "PointsArray": "GrandPrix200Points",
+      "Type": "GrandPrix",
+      "VariationList": [
+        {
+          "EventId": 0,
+          "Tracks": [
+            {
+              "TrackId": "Mute_City_II",
+              "VariationId": 1
+            },
+            {
+              "TrackId": "Port_Town_I",
+              "VariationId": 1
+            },
+            {
+              "TrackId": "Red_Canyon_I",
+              "VariationId": 2
+            },
+            {
+              "TrackId": "White_Land_I",
+              "VariationId": 2
+            },
+            {
+              "TrackId": "White_Land_II",
+              "VariationId": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Name": "KingLeague",
+      "PointsArray": "GrandPrix200Points",
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_III",
+          "VariationId": 2
+        },
+        {
+          "TrackId": "Death_Wind_II",
+          "VariationId": 1
+        },
+        {
+          "TrackId": "Port_Town_II",
+          "VariationId": 2
+        },
+        {
+          "TrackId": "Red_Canyon_II",
+          "VariationId": 2
+        },
+        {
+          "TrackId": "Fire_Field",
+          "VariationId": 1
+        }
+      ],
+      "Type": "GrandPrix"
+    },
+    {
+      "Name": "MirrorKnightLeague",
+      "PointsArray": "GrandPrix200Points",
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_I",
+          "VariationId": 9
+        },
+        {
+          "TrackId": "Big_Blue",
+          "VariationId": 6
+        },
+        {
+          "TrackId": "Sand_Ocean",
+          "VariationId": 6
+        },
+        {
+          "TrackId": "Death_Wind_I",
+          "VariationId": 5
+        },
+        {
+          "TrackId": "Silence",
+          "VariationId": 4
+        }
+      ],
+      "Type": "GrandPrix"
+    },
+    {
+      "Name": "MirrorQueenLeague",
+      "PointsArray": "GrandPrix200Points",
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_II",
+          "VariationId": 6
+        },
+        {
+          "TrackId": "Port_Town_I",
+          "VariationId": 6
+        },
+        {
+          "TrackId": "Red_Canyon_I",
+          "VariationId": 5
+        },
+        {
+          "TrackId": "White_Land_I",
+          "VariationId": 5
+        },
+        {
+          "TrackId": "White_Land_II",
+          "VariationId": 4
+        }
+      ],
+      "Type": "GrandPrix"
+    },
+    {
+      "Name": "MirrorKingLeague",
+      "PointsArray": "GrandPrix200Points",
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_III",
+          "VariationId": 5
+        },
+        {
+          "TrackId": "Death_Wind_II",
+          "VariationId": 6
+        },
+        {
+          "TrackId": "Port_Town_II",
+          "VariationId": 5
+        },
+        {
+          "TrackId": "Red_Canyon_II",
+          "VariationId": 5
+        },
+        {
+          "TrackId": "Fire_Field",
+          "VariationId": 4
+        }
+      ],
+      "Type": "GrandPrix"
+    },
+    {
+      "Name": "AceLeague",
+      "PointsArray": "GrandPrix200Points",
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_IV",
+          "VariationId": 3
+        },
+        {
+          "TrackId": "Sand_Storm_I",
+          "VariationId": 1
+        },
+        {
+          "TrackId": "Big_Blue_II",
+          "VariationId": 3
+        },
+        {
+          "TrackId": "Sand_Storm_II",
+          "VariationId": 3
+        },
+        {
+          "TrackId": "Silence_II",
+          "VariationId": 1
+        }
+      ],
+      "Type": "GrandPrix"
+    },
+    {
+      "Name": "WorldTour",
+      "Type": "GrandPrix",
+      "VariationList": [
+        {
+          "EventId": 0,
+          "Worlds": [
+            [
+              {
+                "NoHardTrackCount": 3,
+                "Pool": [
+                  {
+                    "WorldName": "MuteCityWorld"
+                  },
+                  {
+                    "WorldName": "BigBlueWorld"
+                  },
+                  {
+                    "WorldName": "SandOceanWorld"
+                  },
+                  {
+                    "WorldName": "DeathWindWorld"
+                  },
+                  {
+                    "WorldName": "PortTownWorld"
+                  },
+                  {
+                    "WorldName": "RedCanyonWorld"
+                  },
+                  {
+                    "WorldName": "WhiteLandWorld"
+                  }
+                ]
+              },
+              {
+                "Pool": [
+                  {
+                    "WorldName": "SilenceWorld"
+                  },
+                  {
+                    "WorldName": "FireFieldWorld"
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "NoHardTrackCount": 3,
+                "Pool": [
+                  {
+                    "WorldName": "MuteCityWorld"
+                  },
+                  {
+                    "WorldName": "BigBlueWorld"
+                  },
+                  {
+                    "WorldName": "SandOceanWorld"
+                  },
+                  {
+                    "WorldName": "DeathWindWorld"
+                  },
+                  {
+                    "WorldName": "PortTownWorld"
+                  },
+                  {
+                    "WorldName": "RedCanyonWorld"
+                  }
+                ]
+              },
+              {
+                "Pool": [
+                  {
+                    "WorldName": "SilenceWorld"
+                  },
+                  {
+                    "WorldName": "WhiteLand2World"
+                  },
+                  {
+                    "WorldName": "FireFieldWorld"
+                  }
+                ]
+              }
+            ]
+          ]
+        },
+        {
+          "EventId": 2,
+          "Worlds": [
+            [
+              {
+                "NoHardTrackCount": 3,
+                "Pool": [
+                  {
+                    "WorldName": "FestivalPortTownWorld"
+                  },
+                  {
+                    "WorldName": "FestivalBigBlueWorld"
+                  },
+                  {
+                    "WorldName": "FestivalRedCanyonWorld"
+                  },
+                  {
+                    "WorldName": "FestivalMuteCityWorld"
+                  },
+                  {
+                    "WorldName": "FestivalDeathWindWorld"
+                  },
+                  {
+                    "WorldName": "FestivalSandOceanWorld"
+                  },
+                  {
+                    "WorldName": "FestivalWhiteLandWorld"
+                  }
+                ]
+              },
+              {
+                "Pool": [
+                  {
+                    "WorldName": "FestivalSilenceWorld"
+                  },
+                  {
+                    "WorldName": "FestivalFireFieldWorld"
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "NoHardTrackCount": 3,
+                "Pool": [
+                  {
+                    "WorldName": "FestivalPortTownWorld"
+                  },
+                  {
+                    "WorldName": "FestivalBigBlueWorld"
+                  },
+                  {
+                    "WorldName": "FestivalRedCanyonWorld"
+                  },
+                  {
+                    "WorldName": "FestivalMuteCityWorld"
+                  },
+                  {
+                    "WorldName": "FestivalDeathWindWorld"
+                  },
+                  {
+                    "WorldName": "FestivalSandOceanWorld"
+                  }
+                ]
+              },
+              {
+                "Pool": [
+                  {
+                    "WorldName": "FestivalSilenceWorld"
+                  },
+                  {
+                    "WorldName": "FestivalWhiteLand2World"
+                  },
+                  {
+                    "WorldName": "FestivalFireFieldWorld"
+                  }
+                ]
+              }
+            ]
+          ]
+        },
+        {
+          "EventId": 3,
+          "Worlds": [
+            [
+              {
+                "NoHardTrackCount": 3,
+                "Pool": [
+                  {
+                    "WorldName": "FrozenPortTownWorld"
+                  },
+                  {
+                    "WorldName": "FrozenBigBlueWorld"
+                  },
+                  {
+                    "WorldName": "FrozenRedCanyonWorld"
+                  },
+                  {
+                    "WorldName": "FrozenMuteCityWorld"
+                  },
+                  {
+                    "WorldName": "FrozenDeathWindWorld"
+                  },
+                  {
+                    "WorldName": "FrozenSandOceanWorld"
+                  },
+                  {
+                    "WorldName": "FrozenWhiteLandWorld"
+                  }
+                ]
+              },
+              {
+                "Pool": [
+                  {
+                    "WorldName": "FrozenSilenceWorld"
+                  },
+                  {
+                    "WorldName": "FrozenFireFieldWorld"
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "NoHardTrackCount": 3,
+                "Pool": [
+                  {
+                    "WorldName": "FrozenPortTownWorld"
+                  },
+                  {
+                    "WorldName": "FrozenBigBlueWorld"
+                  },
+                  {
+                    "WorldName": "FrozenRedCanyonWorld"
+                  },
+                  {
+                    "WorldName": "FrozenMuteCityWorld"
+                  },
+                  {
+                    "WorldName": "FrozenDeathWindWorld"
+                  },
+                  {
+                    "WorldName": "FrozenSandOceanWorld"
+                  }
+                ]
+              },
+              {
+                "Pool": [
+                  {
+                    "WorldName": "FrozenSilenceWorld"
+                  },
+                  {
+                    "WorldName": "FrozenWhiteLand2World"
+                  },
+                  {
+                    "WorldName": "FrozenFireFieldWorld"
+                  }
+                ]
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "Name": "MirrorAceLeague",
+      "PointsArray": "GrandPrix200Points",
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_IV",
+          "VariationId": 7
+        },
+        {
+          "TrackId": "Sand_Storm_I",
+          "VariationId": 6
+        },
+        {
+          "TrackId": "Big_Blue_II",
+          "VariationId": 7
+        },
+        {
+          "TrackId": "Sand_Storm_II",
+          "VariationId": 6
+        },
+        {
+          "TrackId": "Silence_II",
+          "VariationId": 4
+        }
+      ],
+      "Type": "GrandPrix"
+    },
+    {
+      "Name": "WorldTour7Races",
+      "RankCaps": [
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        42
+      ],
+      "Type": "GrandPrix",
+      "VariationList": [
+        {
+          "EventId": 0,
+          "Worlds": [
+            [
+              {
+                "NoHardTrackCount": 3,
+                "Pool": [
+                  {
+                    "WorldName": "MuteCityWorld"
+                  },
+                  {
+                    "WorldName": "BigBlueWorld"
+                  },
+                  {
+                    "WorldName": "SandOceanWorld"
+                  },
+                  {
+                    "WorldName": "DeathWindWorld"
+                  },
+                  {
+                    "WorldName": "PortTownWorld"
+                  },
+                  {
+                    "WorldName": "RedCanyonWorld"
+                  },
+                  {
+                    "WorldName": "WhiteLandWorld"
+                  }
+                ],
+                "Select": 6
+              },
+              {
+                "Pool": [
+                  {
+                    "WorldName": "SilenceWorld"
+                  },
+                  {
+                    "WorldName": "FireFieldWorld"
+                  }
+                ],
+                "Select": 1
+              }
+            ],
+            [
+              {
+                "NoHardTrackCount": 3,
+                "Pool": [
+                  {
+                    "WorldName": "MuteCityWorld"
+                  },
+                  {
+                    "WorldName": "BigBlueWorld"
+                  },
+                  {
+                    "WorldName": "SandOceanWorld"
+                  },
+                  {
+                    "WorldName": "DeathWindWorld"
+                  },
+                  {
+                    "WorldName": "PortTownWorld"
+                  },
+                  {
+                    "WorldName": "RedCanyonWorld"
+                  }
+                ],
+                "Select": 6
+              },
+              {
+                "Pool": [
+                  {
+                    "WorldName": "SilenceWorld"
+                  },
+                  {
+                    "WorldName": "WhiteLand2World"
+                  },
+                  {
+                    "WorldName": "FireFieldWorld"
+                  }
+                ],
+                "Select": 1
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "Name": "MysteryLeague",
+      "PointsArray": "GrandPrix200Points",
+      "Tracks": [
+        {
+          "TrackId": "Mystery_4",
+          "VariationId": 2
+        },
+        {
+          "TrackId": "Mystery_5",
+          "VariationId": 1
+        },
+        {
+          "TrackId": "Mystery_7",
+          "VariationId": 1
+        },
+        {
+          "TrackId": "Mystery_3",
+          "VariationId": 2
+        },
+        {
+          "TrackId": "Mystery_6",
+          "VariationId": 3
+        }
+      ],
+      "Type": "GrandPrix"
+    },
+    {
+      "Name": "ClassicMiniPrix001",
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_I"
+        },
+        {
+          "TrackId": "Big_Blue_II"
+        },
+        {
+          "TrackId": "Red_Canyon_II"
+        }
+      ],
+      "Type": "ClassicMiniPrix"
+    },
+    {
+      "Name": "ClassicMiniPrix002",
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_IV"
+        },
+        {
+          "TrackId": "Sand_Storm_I"
+        },
+        {
+          "TrackId": "Silence_II"
+        }
+      ],
+      "Type": "ClassicMiniPrix"
+    },
+    {
+      "Name": "ClassicMiniPrix003",
+      "Tracks": [
+        {
+          "TrackId": "Big_Blue"
+        },
+        {
+          "TrackId": "Sand_Storm_II"
+        },
+        {
+          "TrackId": "White_Land_II"
+        }
+      ],
+      "Type": "ClassicMiniPrix"
+    },
+    {
+      "Name": "ClassicMiniPrix004",
+      "Tracks": [
+        {
+          "TrackId": "Sand_Ocean"
+        },
+        {
+          "TrackId": "Red_Canyon_I"
+        },
+        {
+          "TrackId": "White_Land_II"
+        }
+      ],
+      "Type": "ClassicMiniPrix"
+    },
+    {
+      "Name": "ClassicMiniPrix005",
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_II"
+        },
+        {
+          "TrackId": "Big_Blue_II"
+        },
+        {
+          "TrackId": "Death_Wind_II"
+        }
+      ],
+      "Type": "ClassicMiniPrix"
+    },
+    {
+      "Name": "ClassicMiniPrix006",
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_III"
+        },
+        {
+          "TrackId": "Sand_Storm_I"
+        },
+        {
+          "TrackId": "Silence"
+        }
+      ],
+      "Type": "ClassicMiniPrix"
+    },
+    {
+      "Name": "ClassicMiniPrix007",
+      "Tracks": [
+        {
+          "TrackId": "Silence"
+        },
+        {
+          "TrackId": "White_Land_II"
+        },
+        {
+          "TrackId": "Fire_Field"
+        }
+      ],
+      "Type": "ClassicMiniPrix"
+    },
+    {
+      "Name": "ClassicMiniPrix008",
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_III"
+        },
+        {
+          "TrackId": "Sand_Storm_II"
+        },
+        {
+          "TrackId": "Silence_II"
+        }
+      ],
+      "Type": "ClassicMiniPrix"
+    },
+    {
+      "Name": "ClassicMiniPrix009",
+      "Tracks": [
+        {
+          "TrackId": "Death_Wind_I"
+        },
+        {
+          "TrackId": "White_Land_I"
+        },
+        {
+          "TrackId": "Red_Canyon_II"
+        }
+      ],
+      "Type": "ClassicMiniPrix"
+    },
+    {
+      "Name": "ClassicMiniPrix010",
+      "Tracks": [
+        {
+          "TrackId": "Big_Blue"
+        },
+        {
+          "TrackId": "Port_Town_I"
+        },
+        {
+          "TrackId": "White_Land_II"
+        }
+      ],
+      "Type": "ClassicMiniPrix"
+    },
+    {
+      "Name": "ClassicMiniPrix011",
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_I"
+        },
+        {
+          "TrackId": "Sand_Storm_I"
+        },
+        {
+          "TrackId": "Death_Wind_II"
+        }
+      ],
+      "Type": "ClassicMiniPrix"
+    },
+    {
+      "Name": "ClassicMiniPrix012",
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_IV"
+        },
+        {
+          "TrackId": "Red_Canyon_I"
+        },
+        {
+          "TrackId": "Silence_II"
+        }
+      ],
+      "Type": "ClassicMiniPrix"
+    },
+    {
+      "Name": "ClassicMiniPrix013",
+      "Tracks": [
+        {
+          "TrackId": "Sand_Ocean"
+        },
+        {
+          "TrackId": "Big_Blue_II"
+        },
+        {
+          "TrackId": "Silence"
+        }
+      ],
+      "Type": "ClassicMiniPrix"
+    },
+    {
+      "Name": "ClassicMiniPrix014",
+      "Tracks": [
+        {
+          "TrackId": "Death_Wind_I"
+        },
+        {
+          "TrackId": "Sand_Storm_I"
+        },
+        {
+          "TrackId": "White_Land_II"
+        }
+      ],
+      "Type": "ClassicMiniPrix"
+    },
+    {
+      "Name": "ClassicMiniPrix015",
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_II"
+        },
+        {
+          "TrackId": "Sand_Storm_II"
+        },
+        {
+          "TrackId": "Port_Town_II"
+        }
+      ],
+      "Type": "ClassicMiniPrix"
+    },
+    {
+      "Name": "ClassicMiniPrix016",
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_III"
+        },
+        {
+          "TrackId": "Big_Blue_II"
+        },
+        {
+          "TrackId": "Fire_Field"
+        }
+      ],
+      "Type": "ClassicMiniPrix"
+    },
+    {
+      "Name": "ClassicMiniPrix017",
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_IV"
+        },
+        {
+          "TrackId": "Sand_Storm_II"
+        },
+        {
+          "TrackId": "Silence"
+        }
+      ],
+      "Type": "ClassicMiniPrix"
+    },
+    {
+      "Name": "ClassicMiniPrix018",
+      "Tracks": [
+        {
+          "TrackId": "Big_Blue"
+        },
+        {
+          "TrackId": "Sand_Storm_I"
+        },
+        {
+          "TrackId": "Port_Town_II"
+        }
+      ],
+      "Type": "ClassicMiniPrix"
+    },
+    {
+      "Name": "ClassicMiniPrix019",
+      "Tracks": [
+        {
+          "TrackId": "Sand_Ocean"
+        },
+        {
+          "TrackId": "White_Land_I"
+        },
+        {
+          "TrackId": "Silence_II"
+        }
+      ],
+      "Type": "ClassicMiniPrix"
+    },
+    {
+      "Name": "ClassicMiniPrix020",
+      "Tracks": [
+        {
+          "TrackId": "Silence_II"
+        },
+        {
+          "TrackId": "White_Land_II"
+        },
+        {
+          "TrackId": "Fire_Field"
+        }
+      ],
+      "Type": "ClassicMiniPrix"
+    },
+    {
+      "Name": "ClassicMiniPrix021",
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_I"
+        },
+        {
+          "TrackId": "Sand_Storm_II"
+        },
+        {
+          "TrackId": "Fire_Field"
+        }
+      ],
+      "Type": "ClassicMiniPrix"
+    },
+    {
+      "Name": "ClassicMiniPrix022",
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_IV"
+        },
+        {
+          "TrackId": "Port_Town_I"
+        },
+        {
+          "TrackId": "Silence_II"
+        }
+      ],
+      "Type": "ClassicMiniPrix"
+    },
+    {
+      "Name": "ClassicMiniPrix023",
+      "Tracks": [
+        {
+          "TrackId": "Death_Wind_I"
+        },
+        {
+          "TrackId": "Big_Blue_II"
+        },
+        {
+          "TrackId": "White_Land_II"
+        }
+      ],
+      "Type": "ClassicMiniPrix"
+    },
+    {
+      "Name": "ClassicMiniPrix024",
+      "Tracks": [
+        {
+          "TrackId": "Big_Blue"
+        },
+        {
+          "TrackId": "Red_Canyon_I"
+        },
+        {
+          "TrackId": "Port_Town_II"
+        }
+      ],
+      "Type": "ClassicMiniPrix"
+    },
+    {
+      "Name": "ClassicMiniPrix025",
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_II"
+        },
+        {
+          "TrackId": "Sand_Storm_I"
+        },
+        {
+          "TrackId": "Fire_Field"
+        }
+      ],
+      "Type": "ClassicMiniPrix"
+    },
+    {
+      "Name": "ClassicMiniPrix026",
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_III"
+        },
+        {
+          "TrackId": "White_Land_I"
+        },
+        {
+          "TrackId": "Silence"
+        }
+      ],
+      "Type": "ClassicMiniPrix"
+    },
+    {
+      "Name": "ClassicMiniPrix027",
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_IV"
+        },
+        {
+          "TrackId": "Big_Blue_II"
+        },
+        {
+          "TrackId": "Silence_II"
+        }
+      ],
+      "Type": "ClassicMiniPrix"
+    },
+    {
+      "Name": "ClassicMiniPrix028",
+      "Tracks": [
+        {
+          "TrackId": "Sand_Ocean"
+        },
+        {
+          "TrackId": "Port_Town_I"
+        },
+        {
+          "TrackId": "Death_Wind_II"
+        }
+      ],
+      "Type": "ClassicMiniPrix"
+    },
+    {
+      "Name": "ClassicMiniPrix029",
+      "Tracks": [
+        {
+          "TrackId": "Death_Wind_I"
+        },
+        {
+          "TrackId": "Sand_Storm_II"
+        },
+        {
+          "TrackId": "Red_Canyon_II"
+        }
+      ],
+      "Type": "ClassicMiniPrix"
+    },
+    {
+      "Name": "MiniPrix001",
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_I"
+        },
+        {
+          "TrackId": "Sand_Ocean"
+        },
+        {
+          "TrackId": "Sand_Storm_II"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix002",
+      "Tracks": [
+        {
+          "TrackId": "Big_Blue"
+        },
+        {
+          "TrackId": "Red_Canyon_I"
+        },
+        {
+          "TrackId": "Mystery_7"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix003",
+      "Tracks": [
+        {
+          "TrackId": "Sand_Storm_I"
+        },
+        {
+          "TrackId": "Big_Blue_II"
+        },
+        {
+          "TrackId": "Death_Wind_II"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix004",
+      "Tracks": [
+        {
+          "TrackId": "Death_Wind_I"
+        },
+        {
+          "TrackId": "Port_Town_I"
+        },
+        {
+          "TrackId": "Mystery_5"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix005",
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_III"
+        },
+        {
+          "TrackId": "White_Land_I"
+        },
+        {
+          "TrackId": "Sand_Storm_II"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix006",
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_IV"
+        },
+        {
+          "TrackId": "Mystery_3"
+        },
+        {
+          "TrackId": "Port_Town_II"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix007",
+      "Tracks": [
+        {
+          "TrackId": "Big_Blue"
+        },
+        {
+          "TrackId": "Port_Town_I"
+        },
+        {
+          "TrackId": "Red_Canyon_II"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix008",
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_II"
+        },
+        {
+          "TrackId": "Mystery_7"
+        },
+        {
+          "TrackId": "Death_Wind_II"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix009",
+      "Tracks": [
+        {
+          "TrackId": "Mystery_4"
+        },
+        {
+          "TrackId": "Big_Blue_II"
+        },
+        {
+          "TrackId": "Sand_Storm_II"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix010",
+      "Tracks": [
+        {
+          "TrackId": "Sand_Storm_I"
+        },
+        {
+          "TrackId": "White_Land_I"
+        },
+        {
+          "TrackId": "Port_Town_II"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix011",
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_III"
+        },
+        {
+          "TrackId": "Sand_Ocean"
+        },
+        {
+          "TrackId": "Red_Canyon_II"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix012",
+      "Tracks": [
+        {
+          "TrackId": "Mystery_5"
+        },
+        {
+          "TrackId": "Port_Town_I"
+        },
+        {
+          "TrackId": "Death_Wind_II"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix013",
+      "Tracks": [
+        {
+          "TrackId": "Death_Wind_I"
+        },
+        {
+          "TrackId": "Red_Canyon_I"
+        },
+        {
+          "TrackId": "Mystery_6"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix014",
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_I"
+        },
+        {
+          "TrackId": "Big_Blue_II"
+        },
+        {
+          "TrackId": "Port_Town_II"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix015",
+      "Tracks": [
+        {
+          "TrackId": "Big_Blue"
+        },
+        {
+          "TrackId": "White_Land_I"
+        },
+        {
+          "TrackId": "Red_Canyon_II"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix016",
+      "Tracks": [
+        {
+          "TrackId": "Sand_Storm_I"
+        },
+        {
+          "TrackId": "Sand_Ocean"
+        },
+        {
+          "TrackId": "Death_Wind_II"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix017",
+      "Tracks": [
+        {
+          "TrackId": "Mystery_5"
+        },
+        {
+          "TrackId": "Port_Town_I"
+        },
+        {
+          "TrackId": "Sand_Storm_II"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix018",
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_IV"
+        },
+        {
+          "TrackId": "Red_Canyon_I"
+        },
+        {
+          "TrackId": "Port_Town_II"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix019",
+      "Tracks": [
+        {
+          "TrackId": "Death_Wind_I"
+        },
+        {
+          "TrackId": "Big_Blue_II"
+        },
+        {
+          "TrackId": "Red_Canyon_II"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix020",
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_I"
+        },
+        {
+          "TrackId": "White_Land_I"
+        },
+        {
+          "TrackId": "Mystery_6"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix021",
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_II"
+        },
+        {
+          "TrackId": "Mystery_3"
+        },
+        {
+          "TrackId": "Sand_Storm_II"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix022",
+      "Tracks": [
+        {
+          "TrackId": "Sand_Storm_I"
+        },
+        {
+          "TrackId": "Red_Canyon_I"
+        },
+        {
+          "TrackId": "Port_Town_II"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix023",
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_III"
+        },
+        {
+          "TrackId": "Mystery_7"
+        },
+        {
+          "TrackId": "Death_Wind_II"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix024",
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_IV"
+        },
+        {
+          "TrackId": "Big_Blue_II"
+        },
+        {
+          "TrackId": "Red_Canyon_II"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix025",
+      "Tracks": [
+        {
+          "TrackId": "Death_Wind_I"
+        },
+        {
+          "TrackId": "White_Land_I"
+        },
+        {
+          "TrackId": "Sand_Storm_II"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix026",
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_I"
+        },
+        {
+          "TrackId": "Sand_Ocean"
+        },
+        {
+          "TrackId": "Port_Town_II"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix027",
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_II"
+        },
+        {
+          "TrackId": "Port_Town_I"
+        },
+        {
+          "TrackId": "Mystery_5"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix028",
+      "Tracks": [
+        {
+          "TrackId": "Big_Blue"
+        },
+        {
+          "TrackId": "Red_Canyon_I"
+        },
+        {
+          "TrackId": "Death_Wind_II"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix029",
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_III"
+        },
+        {
+          "TrackId": "Big_Blue_II"
+        },
+        {
+          "TrackId": "Sand_Storm_II"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix030",
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_IV"
+        },
+        {
+          "TrackId": "White_Land_I"
+        },
+        {
+          "TrackId": "Mystery_7"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix031",
+      "Tracks": [
+        {
+          "TrackId": "Death_Wind_I"
+        },
+        {
+          "TrackId": "Sand_Ocean"
+        },
+        {
+          "TrackId": "Red_Canyon_II"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix032",
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_I"
+        },
+        {
+          "TrackId": "Port_Town_I"
+        },
+        {
+          "TrackId": "Death_Wind_II"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix033",
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_II"
+        },
+        {
+          "TrackId": "Red_Canyon_I"
+        },
+        {
+          "TrackId": "Mystery_6"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix034",
+      "Tracks": [
+        {
+          "TrackId": "Sand_Storm_I"
+        },
+        {
+          "TrackId": "Big_Blue_II"
+        },
+        {
+          "TrackId": "Port_Town_II"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix035",
+      "Tracks": [
+        {
+          "TrackId": "Big_Blue"
+        },
+        {
+          "TrackId": "Mystery_3"
+        },
+        {
+          "TrackId": "Red_Canyon_II"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix036",
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_IV"
+        },
+        {
+          "TrackId": "Sand_Ocean"
+        },
+        {
+          "TrackId": "Death_Wind_II"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix037",
+      "Tracks": [
+        {
+          "TrackId": "Death_Wind_I"
+        },
+        {
+          "TrackId": "Port_Town_I"
+        },
+        {
+          "TrackId": "Sand_Storm_II"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix038",
+      "Tracks": [
+        {
+          "TrackId": "Mystery_4"
+        },
+        {
+          "TrackId": "Red_Canyon_I"
+        },
+        {
+          "TrackId": "Port_Town_II"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix039",
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_II"
+        },
+        {
+          "TrackId": "Mystery_3"
+        },
+        {
+          "TrackId": "Red_Canyon_II"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix040",
+      "Tracks": [
+        {
+          "TrackId": "Sand_Storm_I"
+        },
+        {
+          "TrackId": "White_Land_I"
+        },
+        {
+          "TrackId": "Death_Wind_II"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix041",
+      "Tracks": [
+        {
+          "TrackId": "Big_Blue"
+        },
+        {
+          "TrackId": "Sand_Ocean"
+        },
+        {
+          "TrackId": "Sand_Storm_II"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix042",
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_III"
+        },
+        {
+          "TrackId": "Red_Canyon_I"
+        },
+        {
+          "TrackId": "Port_Town_II"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix043",
+      "Tracks": [
+        {
+          "TrackId": "Mystery_4"
+        },
+        {
+          "TrackId": "Port_Town_I"
+        },
+        {
+          "TrackId": "Red_Canyon_II"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix101",
+      "Tracks": [
+        {
+          "TrackId": "Mystery_1"
+        },
+        {
+          "TrackId": "Mystery_3"
+        },
+        {
+          "TrackId": "Mystery_4"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix102",
+      "Tracks": [
+        {
+          "TrackId": "Mystery_2"
+        },
+        {
+          "TrackId": "Mystery_4"
+        },
+        {
+          "TrackId": "Mystery_3"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix103",
+      "Tracks": [
+        {
+          "TrackId": "Mystery_1"
+        },
+        {
+          "TrackId": "Mystery_4"
+        },
+        {
+          "TrackId": "Mystery_3"
+        }
+      ]
+    },
+    {
+      "Name": "MiniPrix104",
+      "Tracks": [
+        {
+          "TrackId": "Mystery_2"
+        },
+        {
+          "TrackId": "Mystery_3"
+        },
+        {
+          "TrackId": "Mystery_4"
+        }
+      ]
+    }
+  ],
+  "NoviceStageList": {
+    "GameTipLimit": 5,
+    "LevelThreshold": 1,
+    "NoviceLeagueName": "MiniKnightLeague",
+    "NumFinshedRacesRequired": 3,
+    "Tracks": [
+      {
+        "MaxAIPlayers": 0,
+        "NumLaps": 4,
+        "TrackId": "Mute_City_I",
+        "VariationId": 4
+      },
+      {
+        "GameTipIdx": [
+          7,
+          0,
+          1,
+          2,
+          3
+        ],
+        "LobbyCountdownTime": 10,
+        "LobbyFillIntervalMax": 25,
+        "LobbyFillIntervalMin": 15,
+        "LobbyFillIntervalStep": 8,
+        "MaxAIPlayers": 24,
+        "RankCap": 13,
+        "TrackId": "Mute_City_I",
+        "VariationId": 5
+      },
+      {
+        "GameTipIdx": [
+          8,
+          0,
+          1,
+          2,
+          7
+        ],
+        "LobbyCountdownTime": 10,
+        "LobbyFillIntervalMax": 14,
+        "LobbyFillIntervalMin": 8,
+        "LobbyFillIntervalStep": 10,
+        "MaxAIPlayers": 49,
+        "RankCap": 14,
+        "TrackId": "Big_Blue",
+        "VariationId": 4
+      },
+      {
+        "GameTipIdx": [
+          27,
+          7,
+          2,
+          3,
+          8
+        ],
+        "LobbyCountdownTime": 10,
+        "LobbyFillIntervalMax": 12,
+        "LobbyFillIntervalMin": 6,
+        "LobbyFillIntervalStep": 10,
+        "MaxAIPlayers": 98,
+        "RankCap": 1,
+        "TrackId": "Mute_City_I",
+        "VariationId": 6
+      }
+    ],
+    "TutorialThreshold": 3
+  },
+  "TeamsDefaults": {
+    "RankCap": 14
+  },
+  "TrackList": [
+    {
+      "TrackId": "Mute_City_I",
+      "VariationList": [
+        {
+          "IsRandomViable": true,
+          "StageName": "MC1_BoostCircular",
+          "VariationId": 1,
+          "VariationName": "MC1_BoostCircular"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "MC1_JumpDirtCircular",
+          "VariationId": 2,
+          "VariationName": "MC1_JumpDirtCircular"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "MC1_Practice",
+          "VariationId": 3,
+          "VariationName": "MC1_Practice"
+        },
+        {
+          "StageName": "OnboardingRace0",
+          "VariationId": 4,
+          "VariationName": "MC1_OnboardingRace0"
+        },
+        {
+          "StageName": "OnboardingRace1",
+          "VariationId": 5,
+          "VariationName": "MC1_OnboardingRace1"
+        },
+        {
+          "StageName": "OnboardingRace3",
+          "VariationId": 6,
+          "VariationName": "MC1_OnboardingRace3"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "MC1_Classic",
+          "TrackType": "Classic",
+          "VariationId": 7,
+          "VariationName": "MC1_Classic"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "MC1_BoostCircular_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 8,
+          "VariationName": "MC1_BoostCircular_Mirror"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "MC1_JumpDirtCircular_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 9,
+          "VariationName": "MC1_JumpDirtCircular_Mirror"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "MC1_Mirror_Practice",
+          "TrackType": "Mirror",
+          "VariationId": 10,
+          "VariationName": "MC1_Mirror_Practice"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "MC1_FrozenBoostCircular",
+          "VariationId": 11,
+          "VariationName": "MC1_FrozenBoostCircular"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "MC1_FrozenJumpDirtCircular",
+          "VariationId": 12,
+          "VariationName": "MC1_FrozenJumpDirtCircular"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "MC1_FrozenBoostCircular_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 13,
+          "VariationName": "MC1_FrozenBoostCircular_Mirror"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "MC1_FrozenJumpDirtCircular_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 14,
+          "VariationName": "MC1_FrozenJumpDirtCircular_Mirror"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "MC1_FestivalBoostCircular",
+          "VariationId": 15,
+          "VariationName": "MC1_FestivalBoostCircular"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "MC1_FestivalJumpDirtCircular",
+          "VariationId": 16,
+          "VariationName": "MC1_FestivalJumpDirtCircular"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "MC1_FestivalBoostCircular_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 17,
+          "VariationName": "MC1_FestivalBoostCircular_Mirror"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "MC1_FestivalJumpDirtCircular_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 18,
+          "VariationName": "MC1_FestivalJumpDirtCircular_Mirror"
+        }
+      ]
+    },
+    {
+      "TrackId": "Big_Blue",
+      "VariationList": [
+        {
+          "IsRandomViable": true,
+          "StageName": "BB_BoostCircular",
+          "VariationId": 1,
+          "VariationName": "BB_BoostCircular"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "BB_JumpDirtCircular",
+          "VariationId": 2,
+          "VariationName": "BB_JumpDirtCircular"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "BB_Practice",
+          "VariationId": 3,
+          "VariationName": "BB_Practice"
+        },
+        {
+          "StageName": "OnboardingRace2",
+          "VariationId": 4,
+          "VariationName": "BB_OnboardingRace2"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "BB_Classic",
+          "TrackType": "Classic",
+          "VariationId": 5,
+          "VariationName": "BB_Classic"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "BB_BoostCircular_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 6,
+          "VariationName": "BB_BoostCircular_Mirror"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "BB_JumpDirtCircular_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 7,
+          "VariationName": "BB_JumpDirtCircular_Mirror"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "BB_Mirror_Practice",
+          "TrackType": "Mirror",
+          "VariationId": 8,
+          "VariationName": "BB_Mirror_Practice"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "BB_FrozenBoostCircular",
+          "VariationId": 9,
+          "VariationName": "BB_FrozenBoostCircular"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "BB_FrozenJumpDirtCircular",
+          "VariationId": 10,
+          "VariationName": "BB_FrozenJumpDirtCircular"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "BB_FrozenBoostCircular_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 11,
+          "VariationName": "BB_FrozenBoostCircular_Mirror"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "BB_FrozenJumpDirtCircular_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 12,
+          "VariationName": "BB_FrozenJumpDirtCircular_Mirror"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "BB_FestivalBoostCircular",
+          "VariationId": 13,
+          "VariationName": "BB_FestivalBoostCircular"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "BB_FestivalJumpDirtCircular",
+          "VariationId": 14,
+          "VariationName": "BB_FestivalJumpDirtCircular"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "BB_FestivalBoostCircular_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 15,
+          "VariationName": "BB_FestivalBoostCircular_Mirror"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "BB_FestivalJumpDirtCircular_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 16,
+          "VariationName": "BB_FestivalJumpDirtCircular_Mirror"
+        }
+      ]
+    },
+    {
+      "TrackId": "Sand_Ocean",
+      "VariationList": [
+        {
+          "IsRandomViable": true,
+          "StageName": "SO_JumpOverUnder",
+          "VariationId": 1,
+          "VariationName": "SO_JumpOverUnder"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "SO_Runways",
+          "VariationId": 2,
+          "VariationName": "SO_Runways"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "SO_Practice",
+          "VariationId": 3,
+          "VariationName": "SO_Practice"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "SO_Classic",
+          "TrackType": "Classic",
+          "VariationId": 4,
+          "VariationName": "SO_Classic"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "SO_JumpOverUnder_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 5,
+          "VariationName": "SO_JumpOverUnder_Mirror"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "SO_Runways_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 6,
+          "VariationName": "SO_Runways_Mirror"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "SO_Mirror_Practice",
+          "TrackType": "Mirror",
+          "VariationId": 7,
+          "VariationName": "SO_Mirror_Practice"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "SO_FrozenJumpOverUnder",
+          "VariationId": 8,
+          "VariationName": "SO_FrozenJumpOverUnder"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "SO_FrozenRunways",
+          "VariationId": 9,
+          "VariationName": "SO_FrozenRunways"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "SO_FrozenJumpOverUnder_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 10,
+          "VariationName": "SO_FrozenJumpOverUnder_Mirror"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "SO_FrozenRunways_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 11,
+          "VariationName": "SO_FrozenRunways_Mirror"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "SO_FestivalJumpOverUnder",
+          "VariationId": 12,
+          "VariationName": "SO_FestivalJumpOverUnder"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "SO_FestivalRunways",
+          "VariationId": 13,
+          "VariationName": "SO_FestivalRunways"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "SO_FestivalJumpOverUnder_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 14,
+          "VariationName": "SO_FestivalJumpOverUnder_Mirror"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "SO_FestivalRunways_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 15,
+          "VariationName": "SO_FestivalRunways_Mirror"
+        }
+      ]
+    },
+    {
+      "TrackId": "Death_Wind_I",
+      "VariationList": [
+        {
+          "IsRandomViable": true,
+          "StageName": "DW1_BoostCircular",
+          "VariationId": 1,
+          "VariationName": "DW1_BoostCircular"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "DW1_MotoCross",
+          "VariationId": 2,
+          "VariationName": "DW1_MotoCross"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "DW1_Practice",
+          "VariationId": 3,
+          "VariationName": "DW1_Practice"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "DW1_Classic",
+          "TrackType": "Classic",
+          "VariationId": 4,
+          "VariationName": "DW1_Classic"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "DW1_BoostCircular_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 5,
+          "VariationName": "DW1_BoostCircular_Mirror"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "DW1_MotoCross_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 6,
+          "VariationName": "DW1_MotoCross_Mirror"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "DW1_Mirror_Practice",
+          "TrackType": "Mirror",
+          "VariationId": 7,
+          "VariationName": "DW1_Mirror_Practice"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "DW1_FrozenBoostCircular",
+          "VariationId": 8,
+          "VariationName": "DW1_FrozenBoostCircular"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "DW1_FrozenMotoCross",
+          "VariationId": 9,
+          "VariationName": "DW1_FrozenMotoCross"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "DW1_FrozenBoostCircular_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 10,
+          "VariationName": "DW1_FrozenBoostCircular_Mirror"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "DW1_FrozenMotoCross_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 11,
+          "VariationName": "DW1_FrozenMotoCross_Mirror"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "DW1_FestivalBoostCircular",
+          "VariationId": 12,
+          "VariationName": "DW1_FestivalBoostCircular"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "DW1_FestivalMotoCross",
+          "VariationId": 13,
+          "VariationName": "DW1_FestivalMotoCross"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "DW1_FestivalBoostCircular_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 14,
+          "VariationName": "DW1_FestivalBoostCircular_Mirror"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "DW1_FestivalMotoCross_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 15,
+          "VariationName": "DW1_FestivalMotoCross_Mirror"
+        }
+      ]
+    },
+    {
+      "TrackId": "Silence",
+      "VariationList": [
+        {
+          "StageName": "Silence_Knight_GP",
+          "VariationId": 1,
+          "VariationName": "Silence_GrandPrix"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "Silence_Practice",
+          "VariationId": 2,
+          "VariationName": "Silence_Practice"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "SI_Classic",
+          "TrackType": "Classic",
+          "VariationId": 3,
+          "VariationName": "SI_Classic"
+        },
+        {
+          "StageName": "SI_Knight_GP_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 4,
+          "VariationName": "Silence_GrandPrix_Mirror"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "SI_Mirror_Practice",
+          "TrackType": "Mirror",
+          "VariationId": 5,
+          "VariationName": "Silence_Mirror_Practice"
+        },
+        {
+          "EventId": 3,
+          "StageName": "SI_FrozenKnightGP",
+          "VariationId": 6,
+          "VariationName": "SI_FrozenKnightGP"
+        },
+        {
+          "EventId": 3,
+          "StageName": "SI_FrozenKnightGP_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 7,
+          "VariationName": "SI_FrozenKnightGP_Mirror"
+        },
+        {
+          "EventId": 2,
+          "StageName": "SI_FestivalKnightGP",
+          "VariationId": 8,
+          "VariationName": "SI_FestivalKnightGP"
+        },
+        {
+          "EventId": 2,
+          "StageName": "SI_FestivalKnightGP_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 9,
+          "VariationName": "SI_FestivalKnightGP_Mirror"
+        }
+      ]
+    },
+    {
+      "TrackId": "Mute_City_II",
+      "VariationList": [
+        {
+          "IsRandomViable": true,
+          "StageName": "MC2_BoostCircular",
+          "VariationId": 1,
+          "VariationName": "MC2_BoostCircular"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "MC2_JumpDirtCircular",
+          "VariationId": 2,
+          "VariationName": "MC2_JumpDirtCircular"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "MC2_Practice",
+          "VariationId": 3,
+          "VariationName": "MC2_Practice"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "MC2_Classic",
+          "TrackType": "Classic",
+          "VariationId": 4,
+          "VariationName": "MC2_Classic"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "MC2_BoostCircular_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 5,
+          "VariationName": "MC2_BoostCircular_Mirror"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "MC2_JumpDirtCircular_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 6,
+          "VariationName": "MC2_JumpDirtCircular_Mirror"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "MC2_Mirror_Practice",
+          "TrackType": "Mirror",
+          "VariationId": 7,
+          "VariationName": "MC2_Mirror_Practice"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "MC2_FestivalBoostCircular",
+          "VariationId": 8,
+          "VariationName": "MC2_FestivalBoostCircular"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "MC2_FestivalJumpDirtCircular",
+          "VariationId": 9,
+          "VariationName": "MC2_FestivalJumpDirtCircular"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "MC2_FrozenBoostCircular",
+          "VariationId": 10,
+          "VariationName": "MC2_FrozenBoostCircular"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "MC2_FrozenJumpDirtCircular",
+          "VariationId": 11,
+          "VariationName": "MC2_FrozenJumpDirtCircular"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "MC2_FrozenBoostCircular_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 12,
+          "VariationName": "MC2_FrozenBoostCircular_Mirror"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "MC2_FrozenJumpDirtCircular_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 13,
+          "VariationName": "MC2_FrozenJumpDirtCircular_Mirror"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "MC2_FestivalBoostCircular_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 14,
+          "VariationName": "MC2_FestivalBoostCircular_Mirror"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "MC2_FestivalJumpDirtCircular_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 15,
+          "VariationName": "MC2_FestivalJumpDirtCircular_Mirror"
+        }
+      ]
+    },
+    {
+      "TrackId": "Port_Town_I",
+      "VariationList": [
+        {
+          "IsRandomViable": true,
+          "StageName": "PT1_Runways",
+          "VariationId": 1,
+          "VariationName": "PT1_Runways"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "PT1_MotoCross",
+          "VariationId": 2,
+          "VariationName": "PT1_MotoCross"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "PT1_Practice",
+          "VariationId": 3,
+          "VariationName": "PT1_Practice"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "PT1_Classic",
+          "TrackType": "Classic",
+          "VariationId": 4,
+          "VariationName": "PT1_Classic"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "PT1_Runways_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 5,
+          "VariationName": "PT1_Runways_Mirror"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "PT1_MotoCross_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 6,
+          "VariationName": "PT1_MotoCross_Mirror"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "PT1_Mirror_Practice",
+          "TrackType": "Mirror",
+          "VariationId": 7,
+          "VariationName": "PT1_Mirror_Practice"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "PT1_FestivalRunways",
+          "VariationId": 8,
+          "VariationName": "PT1_FestivalRunways"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "PT1_FestivalMotoCross",
+          "VariationId": 9,
+          "VariationName": "PT1_FestivalMotoCross"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "PT1_FrozenRunways",
+          "VariationId": 10,
+          "VariationName": "PT1_FrozenRunways"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "PT1_FrozenMotoCross",
+          "VariationId": 11,
+          "VariationName": "PT1_FrozenMotoCross"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "PT1_FrozenMotoCross_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 12,
+          "VariationName": "PT1_FrozenMotoCross_Mirror"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "PT1_FrozenRunways_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 13,
+          "VariationName": "PT1_FrozenRunways_Mirror"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "PT1_FestivalMotoCross_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 14,
+          "VariationName": "PT1_FestivalMotoCross_Mirror"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "PT1_FestivalRunways_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 15,
+          "VariationName": "PT1_FestivalRunways_Mirror"
+        }
+      ]
+    },
+    {
+      "TrackId": "Red_Canyon_I",
+      "VariationList": [
+        {
+          "IsRandomViable": true,
+          "StageName": "RC1_MotoCross",
+          "VariationId": 1,
+          "VariationName": "RC1_MotoCross"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "RC1_JumpOverUnder",
+          "VariationId": 2,
+          "VariationName": "RC1_JumpOverUnder"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "RC1_Practice",
+          "VariationId": 3,
+          "VariationName": "RC1_Practice"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "RC1_Classic",
+          "TrackType": "Classic",
+          "VariationId": 4,
+          "VariationName": "RC1_Classic"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "RC1_MotoCross_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 5,
+          "VariationName": "RC1_MotoCross_Mirror"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "RC1_JumpOverUnder_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 6,
+          "VariationName": "RC1_JumpOverUnder_Mirror"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "RC1_Mirror_Practice",
+          "TrackType": "Mirror",
+          "VariationId": 7,
+          "VariationName": "RC1_Mirror_Practice"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "RC1_FestivalMotoCross",
+          "VariationId": 8,
+          "VariationName": "RC1_FestivalMotoCross"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "RC1_FestivalJumpOverUnder",
+          "VariationId": 9,
+          "VariationName": "RC1_FestivalJumpOverUnder"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "RC1_FrozenMotoCross",
+          "VariationId": 10,
+          "VariationName": "RC1_FrozenMotoCross"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "RC1_FrozenJumpOverUnder",
+          "VariationId": 11,
+          "VariationName": "RC1_FrozenJumpOverUnder"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "RC1_FrozenMotoCross_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 12,
+          "VariationName": "RC1_FrozenMotoCross_Mirror"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "RC1_FrozenJumpOverUnder_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 13,
+          "VariationName": "RC1_FrozenJumpOverUnder_Mirror"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "RC1_FestivalMotoCross_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 14,
+          "VariationName": "RC1_FestivalMotoCross_Mirror"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "RC1_FestivalJumpOverUnder_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 15,
+          "VariationName": "RC1_FestivalJumpOverUnder_Mirror"
+        }
+      ]
+    },
+    {
+      "TrackId": "White_Land_I",
+      "VariationList": [
+        {
+          "IsRandomViable": true,
+          "StageName": "WL1_Runways",
+          "VariationId": 1,
+          "VariationName": "WL1_Runways"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "WL1_Chicane",
+          "VariationId": 2,
+          "VariationName": "WL1_Chicane"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "WL1_Practice",
+          "VariationId": 3,
+          "VariationName": "WL1_Practice"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "WL1_Classic",
+          "TrackType": "Classic",
+          "VariationId": 4,
+          "VariationName": "WL1_Classic"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "WL1_Runways_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 5,
+          "VariationName": "WL1_Runways_Mirror"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "WL1_Chicane_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 6,
+          "VariationName": "WL1_Chicane_Mirror"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "WL1_Mirror_Practice",
+          "TrackType": "Mirror",
+          "VariationId": 7,
+          "VariationName": "WL1_Mirror_Practice"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "WL1_FestivalRunways",
+          "VariationId": 8,
+          "VariationName": "WL1_FestivalRunways"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "WL1_FestivalChicane",
+          "VariationId": 9,
+          "VariationName": "WL1_FestivalChicane"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "WL1_FrozenRunways",
+          "VariationId": 10,
+          "VariationName": "WL1_FrozenRunways"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "WL1_FrozenChicane",
+          "VariationId": 11,
+          "VariationName": "WL1_FrozenChicane"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "WL1_FrozenRunways_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 12,
+          "VariationName": "WL1_FrozenRunways_Mirror"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "WL1_FrozenChicane_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 13,
+          "VariationName": "WL1_FrozenChicane_Mirror"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "WL1_FestivalRunways_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 14,
+          "VariationName": "WL1_FestivalRunways_Mirror"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "WL1_FestivalChicane_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 15,
+          "VariationName": "WL1_FestivalChicane_Mirror"
+        }
+      ]
+    },
+    {
+      "TrackId": "White_Land_II",
+      "VariationList": [
+        {
+          "StageName": "WL2_Queen_GP",
+          "VariationId": 1,
+          "VariationName": "WL2_GrandPrix"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "WL2_Practice",
+          "VariationId": 2,
+          "VariationName": "WL2_Practice"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "WL2_Classic",
+          "TrackType": "Classic",
+          "VariationId": 3,
+          "VariationName": "WL2_Classic"
+        },
+        {
+          "StageName": "WL2_Queen_GP_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 4,
+          "VariationName": "WL2_GrandPrix_Mirror"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "WL2_Mirror_Practice",
+          "TrackType": "Mirror",
+          "VariationId": 5,
+          "VariationName": "WL2_Mirror_Practice"
+        },
+        {
+          "EventId": 2,
+          "StageName": "WL2_FestivalQueen_GP",
+          "VariationId": 6,
+          "VariationName": "WL2_GrandPrix_Festival"
+        },
+        {
+          "EventId": 3,
+          "StageName": "WL2_FrozenQueenGP",
+          "VariationId": 7,
+          "VariationName": "WL2_FrozenQueenGP"
+        },
+        {
+          "EventId": 3,
+          "StageName": "WL2_FrozenQueenGP_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 8,
+          "VariationName": "WL2_FrozenQueenGP_Mirror"
+        },
+        {
+          "EventId": 2,
+          "StageName": "WL2_FestivalQueenGP_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 9,
+          "VariationName": "WL2_FestivalQueenGP_Mirror"
+        }
+      ]
+    },
+    {
+      "TrackId": "Mute_City_III",
+      "VariationList": [
+        {
+          "IsRandomViable": true,
+          "StageName": "MC3_BoostCircular",
+          "VariationId": 1,
+          "VariationName": "MC3_BoostCircular"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "MC3_JumpDirtCircular",
+          "VariationId": 2,
+          "VariationName": "MC3_JumpDirtCircular"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "MC3_Practice",
+          "VariationId": 3,
+          "VariationName": "MC3_Practice"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "MC3_Classic",
+          "TrackType": "Classic",
+          "VariationId": 4,
+          "VariationName": "MC3_Classic"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "MC3_BoostCircular_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 5,
+          "VariationName": "MC3_BoostCircular_Mirror"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "MC3_JumpDirtCircular_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 6,
+          "VariationName": "MC3_JumpDirtCircular_Mirror"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "MC3_Mirror_Practice",
+          "TrackType": "Mirror",
+          "VariationId": 7,
+          "VariationName": "MC3_Mirror_Practice"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "MC3_FrozenBoostCircular",
+          "VariationId": 8,
+          "VariationName": "MC3_FrozenBoostCircular"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "MC3_FrozenJumpDirtCircular",
+          "VariationId": 9,
+          "VariationName": "MC3_FrozenJumpDirtCircular"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "MC3_FrozenBoostCircular_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 10,
+          "VariationName": "MC3_FrozenBoostCircular_Mirror"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "MC3_FrozenJumpDirtCircular_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 11,
+          "VariationName": "MC3_FrozenJumpDirtCircular_Mirror"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "MC3_FestivalBoostCircular",
+          "VariationId": 12,
+          "VariationName": "MC3_FestivalBoostCircular"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "MC3_FestivalJumpDirtCircular",
+          "VariationId": 13,
+          "VariationName": "MC3_FestivalJumpDirtCircular"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "MC3_FestivalBoostCircular_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 14,
+          "VariationName": "MC3_FestivalBoostCircular_Mirror"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "MC3_FestivalJumpDirtCircular_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 15,
+          "VariationName": "MC3_FestivalJumpDirtCircular_Mirror"
+        }
+      ]
+    },
+    {
+      "TrackId": "Death_Wind_II",
+      "VariationList": [
+        {
+          "IsRandomViable": true,
+          "StageName": "DW2_MotoCross",
+          "VariationId": 1,
+          "VariationName": "DW2_MotoCross"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "DW2_JumpDirtCircular",
+          "VariationId": 2,
+          "VariationName": "DW2_JumpDirtCircular"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "DW2_Practice",
+          "VariationId": 3,
+          "VariationName": "DW2_Practice"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "DW2_Classic",
+          "TrackType": "Classic",
+          "VariationId": 4,
+          "VariationName": "DW2_Classic"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "DW2_MotoCross_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 5,
+          "VariationName": "DW2_MotoCross_Mirror"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "DW2_JumpDirtCircular_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 6,
+          "VariationName": "DW2_JumpDirtCircular_Mirror"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "DW2_Mirror_Practice",
+          "TrackType": "Mirror",
+          "VariationId": 7,
+          "VariationName": "DW2_Mirror_Practice"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "DW2_FrozenMotoCross",
+          "VariationId": 8,
+          "VariationName": "DW2_FrozenMotoCross"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "DW2_FrozenJumpDirtCircular",
+          "VariationId": 9,
+          "VariationName": "DW2_FrozenJumpDirtCircular"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "DW2_FrozenMotoCross_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 10,
+          "VariationName": "DW2_FrozenMotoCross_Mirror"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "DW2_FrozenJumpDirtCircular_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 11,
+          "VariationName": "DW2_FrozenJumpDirtCircular_Mirror"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "DW2_FestivalMotoCross",
+          "VariationId": 12,
+          "VariationName": "DW2_FestivalMotoCross"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "DW2_FestivalJumpDirtCircular",
+          "VariationId": 13,
+          "VariationName": "DW2_FestivalJumpDirtCircular"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "DW2_FestivalMotoCross_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 14,
+          "VariationName": "DW2_FestivalMotoCross_Mirror"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "DW2_FestivalJumpDirtCircular_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 15,
+          "VariationName": "DW2_FestivalJumpDirtCircular_Mirror"
+        }
+      ]
+    },
+    {
+      "TrackId": "Port_Town_II",
+      "VariationList": [
+        {
+          "IsRandomViable": true,
+          "StageName": "PT2_Chicane",
+          "VariationId": 1,
+          "VariationName": "PT2_Chicane"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "PT2_Runways",
+          "VariationId": 2,
+          "VariationName": "PT2_Runways"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "PT2_Practice",
+          "VariationId": 3,
+          "VariationName": "PT2_Practice"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "PT2_Classic",
+          "TrackType": "Classic",
+          "VariationId": 4,
+          "VariationName": "PT2_Classic"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "PT2_Chicane_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 5,
+          "VariationName": "PT2_Chicane_Mirror"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "PT2_Runways_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 6,
+          "VariationName": "PT2_Runways_Mirror"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "PT2_Mirror_Practice",
+          "TrackType": "Mirror",
+          "VariationId": 7,
+          "VariationName": "PT2_Mirror_Practice"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "PT2_FrozenChicane",
+          "VariationId": 8,
+          "VariationName": "PT2_FrozenChicane"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "PT2_FrozenRunways",
+          "VariationId": 9,
+          "VariationName": "PT2_FrozenRunways"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "PT2_FrozenChicane_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 10,
+          "VariationName": "PT2_FrozenChicane_Mirror"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "PT2_FrozenRunways_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 11,
+          "VariationName": "PT2_FrozenRunways_Mirror"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "PT2_FestivalChicane",
+          "VariationId": 12,
+          "VariationName": "PT2_FestivalChicane"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "PT2_FestivalRunways",
+          "VariationId": 13,
+          "VariationName": "PT2_FestivalRunways"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "PT2_FestivalChicane_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 14,
+          "VariationName": "PT2_FestivalChicane_Mirror"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "PT2_FestivalRunways_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 15,
+          "VariationName": "PT2_FestivalRunways_Mirror"
+        }
+      ]
+    },
+    {
+      "TrackId": "Red_Canyon_II",
+      "VariationList": [
+        {
+          "IsRandomViable": true,
+          "StageName": "RC2_JumpOverUnder",
+          "VariationId": 1,
+          "VariationName": "RC2_JumpOverUnder"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "RC2_Chicane",
+          "VariationId": 2,
+          "VariationName": "RC2_Chicane"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "RC2_Practice",
+          "VariationId": 3,
+          "VariationName": "RC2_Practice"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "RC2_Classic",
+          "TrackType": "Classic",
+          "VariationId": 4,
+          "VariationName": "RC2_Classic"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "RC2_JumpOverUnder_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 5,
+          "VariationName": "RC2_JumpOverUnder_Mirror"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "RC2_Chicane_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 6,
+          "VariationName": "RC2_Chicane_Mirror"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "RC2_Mirror_Practice",
+          "TrackType": "Mirror",
+          "VariationId": 7,
+          "VariationName": "RC2_Mirror_Practice"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "RC2_FrozenJumpOverUnder",
+          "VariationId": 8,
+          "VariationName": "RC2_FrozenJumpOverUnder"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "RC2_FrozenChicane",
+          "VariationId": 9,
+          "VariationName": "RC2_FrozenChicane"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "RC2_FrozenJumpOverUnder_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 10,
+          "VariationName": "RC2_FrozenJumpOverUnder_Mirror"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "RC2_FrozenChicane_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 11,
+          "VariationName": "RC2_FrozenChicane_Mirror"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "RC2_FestivalJumpOverUnder",
+          "VariationId": 12,
+          "VariationName": "RC2_FestivalJumpOverUnder"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "RC2_FestivalChicane",
+          "VariationId": 13,
+          "VariationName": "RC2_FestivalChicane"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "RC2_FestivalJumpOverUnder_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 14,
+          "VariationName": "RC2_FestivalJumpOverUnder_Mirror"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "RC2_FestivalChicane_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 15,
+          "VariationName": "RC2_FestivalChicane_Mirror"
+        }
+      ]
+    },
+    {
+      "TrackId": "Fire_Field",
+      "VariationList": [
+        {
+          "StageName": "FF_King_GP",
+          "VariationId": 1,
+          "VariationName": "FF_GrandPrix"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "FF_Practice",
+          "VariationId": 2,
+          "VariationName": "FF_Practice"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "FF_Classic",
+          "TrackType": "Classic",
+          "VariationId": 3,
+          "VariationName": "FF_Classic"
+        },
+        {
+          "StageName": "FF_King_GP_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 4,
+          "VariationName": "FF_GrandPrix_Mirror"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "FF_Mirror_Practice",
+          "TrackType": "Mirror",
+          "VariationId": 5,
+          "VariationName": "FF_Mirror_Practice"
+        },
+        {
+          "EventId": 3,
+          "StageName": "FF_FrozenKingGP",
+          "VariationId": 6,
+          "VariationName": "FF_FrozenKingGP"
+        },
+        {
+          "EventId": 3,
+          "StageName": "FF_FrozenKingGP_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 7,
+          "VariationName": "FF_FrozenKingGP_Mirror"
+        },
+        {
+          "EventId": 2,
+          "StageName": "FF_FestivalKingGP",
+          "VariationId": 8,
+          "VariationName": "FF_FestivalKingGP"
+        },
+        {
+          "EventId": 2,
+          "StageName": "FF_FestivalKingGP_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 9,
+          "VariationName": "FF_FestivalKingGP_Mirror"
+        }
+      ]
+    },
+    {
+      "TrackId": "Mystery_1",
+      "VariationList": [
+        {
+          "IsRandomViable": true,
+          "StageName": "Mystery1_A",
+          "VariationId": 1,
+          "VariationName": "Mystery1_A"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "Mystery1_B",
+          "VariationId": 2,
+          "VariationName": "Mystery1_B"
+        }
+      ]
+    },
+    {
+      "TrackId": "Mystery_2",
+      "VariationList": [
+        {
+          "IsRandomViable": true,
+          "StageName": "Mystery2_A",
+          "VariationId": 1,
+          "VariationName": "Mystery2_A"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "Mystery2_B",
+          "VariationId": 2,
+          "VariationName": "Mystery2_B"
+        }
+      ]
+    },
+    {
+      "TrackId": "Mystery_3",
+      "VariationList": [
+        {
+          "IsRandomViable": true,
+          "StageName": "Mystery3_A",
+          "VariationId": 1,
+          "VariationName": "Mystery3_A"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "Mystery3_B",
+          "VariationId": 2,
+          "VariationName": "Mystery3_B"
+        }
+      ]
+    },
+    {
+      "TrackId": "Mystery_4",
+      "VariationList": [
+        {
+          "IsRandomViable": true,
+          "StageName": "Mystery4_A",
+          "VariationId": 1,
+          "VariationName": "Mystery4_A"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "Mystery4_B",
+          "VariationId": 2,
+          "VariationName": "Mystery4_B"
+        }
+      ]
+    },
+    {
+      "TrackId": "Mute_City_IV",
+      "VariationList": [
+        {
+          "IsRandomViable": true,
+          "StageName": "MC4_BoostCircular",
+          "VariationId": 1,
+          "VariationName": "MC4_BoostCircular"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "MC4_Practice",
+          "VariationId": 2,
+          "VariationName": "MC4_Practice"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "MC4_Runways",
+          "VariationId": 3,
+          "VariationName": "MC4_Runways"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "MC4_FrozenBoostCircular",
+          "VariationId": 4,
+          "VariationName": "MC4_FrozenBoostCircular"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "MC4_FrozenRunways",
+          "VariationId": 5,
+          "VariationName": "MC4_FrozenRunways"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "MC4_BoostCircular_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 6,
+          "VariationName": "MC4_BoostCircular_Mirror"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "MC4_Runways_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 7,
+          "VariationName": "MC4_Runways_Mirror"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "MC4_FestivalBoostCircular",
+          "VariationId": 8,
+          "VariationName": "MC4_FestivalBoostCircular"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "MC4_FestivalRunways",
+          "VariationId": 9,
+          "VariationName": "MC4_FestivalRunways"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "MC4_FestivalBoostCircular_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 10,
+          "VariationName": "MC4_FestivalBoostCircular_Mirror"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "MC4_FestivalRunways_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 11,
+          "VariationName": "MC4_FestivalRunways_Mirror"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "MC4_FrozenBoostCircular_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 12,
+          "VariationName": "MC4_FrozenBoostCircular_Mirror"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "MC4_FrozenRunways_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 13,
+          "VariationName": "MC4_FrozenRunways_Mirror"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "MC4_Mirror_Practice",
+          "TrackType": "Mirror",
+          "VariationId": 14,
+          "VariationName": "MC4_Mirror_Practice"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "MC4_Classic",
+          "TrackType": "Classic",
+          "VariationId": 15,
+          "VariationName": "MC4_Classic"
+        }
+      ]
+    },
+    {
+      "TrackId": "Sand_Storm_I",
+      "VariationList": [
+        {
+          "IsRandomViable": true,
+          "StageName": "SS1_Motocross",
+          "VariationId": 1,
+          "VariationName": "SS1_Motocross"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "SS1_Practice",
+          "VariationId": 2,
+          "VariationName": "SS1_Practice"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "SS1_Runways",
+          "VariationId": 3,
+          "VariationName": "SS1_Runways"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "SS1_FrozenMotocross",
+          "VariationId": 4,
+          "VariationName": "SS1_FrozenMotocross"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "SS1_FrozenRunways",
+          "VariationId": 5,
+          "VariationName": "SS1_FrozenRunways"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "SS1_MotoCross_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 6,
+          "VariationName": "SS1_MotoCross_Mirror"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "SS1_Runways_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 7,
+          "VariationName": "SS1_Runways_Mirror"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "SS1_FestivalMotoCross",
+          "VariationId": 8,
+          "VariationName": "SS1_FestivalMotoCross"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "SS1_FestivalRunways",
+          "VariationId": 9,
+          "VariationName": "SS1_FestivalRunways"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "SS1_FestivalMotoCross_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 10,
+          "VariationName": "SS1_FestivalMotoCross_Mirror"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "SS1_FestivalRunways_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 11,
+          "VariationName": "SS1_FestivalRunways_Mirror"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "SS1_FrozenMotoCross_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 12,
+          "VariationName": "SS1_FrozenMotoCross_Mirror"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "SS1_FrozenRunways_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 13,
+          "VariationName": "SS1_FrozenRunways_Mirror"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "SS1_Mirror_Practice",
+          "TrackType": "Mirror",
+          "VariationId": 14,
+          "VariationName": "SS1_Mirror_Practice"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "SS1_Classic",
+          "TrackType": "Classic",
+          "VariationId": 15,
+          "VariationName": "SS1_Classic"
+        }
+      ]
+    },
+    {
+      "TrackId": "Big_Blue_II",
+      "VariationList": [
+        {
+          "IsRandomViable": true,
+          "StageName": "BB2_JumpDirtCircular",
+          "VariationId": 1,
+          "VariationName": "BB2_JumpDirtCircular"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "BB2_Practice",
+          "VariationId": 2,
+          "VariationName": "BB2_Practice"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "BB2_JumpOverUnder",
+          "VariationId": 3,
+          "VariationName": "BB2_JumpOverUnder"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "BB2_FrozenJumpDirtCircular",
+          "VariationId": 4,
+          "VariationName": "BB2_FrozenJumpDirtCircular"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "BB2_FrozenJumpOverUnder",
+          "VariationId": 5,
+          "VariationName": "BB2_FrozenJumpOverUnder"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "BB2_JumpDirtCircular_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 6,
+          "VariationName": "BB2_JumpDirtCircular_Mirror"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "BB2_JumpOverUnder_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 7,
+          "VariationName": "BB2_JumpOverUnder_Mirror"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "BB2_FestivalJumpDirtCircular",
+          "VariationId": 8,
+          "VariationName": "BB2_FestivalJumpDirtCircular"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "BB2_FestivalJumpOverUnder",
+          "VariationId": 9,
+          "VariationName": "BB2_FestivalJumpOverUnder"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "BB2_FestivalJumpDirtCircular_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 10,
+          "VariationName": "BB2_FestivalJumpDirtCircular_Mirror"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "BB2_FestivalJumpOverUnder_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 11,
+          "VariationName": "BB2_FestivalJumpOverUnder_Mirror"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "BB2_FrozenJumpDirtCircular_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 12,
+          "VariationName": "BB2_FrozenJumpDirtCircular_Mirror"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "BB2_FrozenJumpOverUnder_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 13,
+          "VariationName": "BB2_FrozenJumpOverUnder_Mirror"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "BB2_Mirror_Practice",
+          "TrackType": "Mirror",
+          "VariationId": 14,
+          "VariationName": "BB2_Mirror_Practice"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "BB2_Classic",
+          "TrackType": "Classic",
+          "VariationId": 15,
+          "VariationName": "BB2_Classic"
+        }
+      ]
+    },
+    {
+      "TrackId": "Sand_Storm_II",
+      "VariationList": [
+        {
+          "IsRandomViable": true,
+          "StageName": "SS2_JumpOverUnder",
+          "VariationId": 1,
+          "VariationName": "SS2_JumpOverUnder"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "SS2_Practice",
+          "VariationId": 2,
+          "VariationName": "SS2_Practice"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "SS2_Chicane",
+          "VariationId": 3,
+          "VariationName": "SS2_Chicane"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "SS2_FrozenJumpOverUnder",
+          "VariationId": 4,
+          "VariationName": "SS2_FrozenJumpOverUnder"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "SS2_FrozenChicane",
+          "VariationId": 5,
+          "VariationName": "SS2_FrozenChicane"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "SS2_JumpOverUnder_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 6,
+          "VariationName": "SS2_JumpOverUnder_Mirror"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "SS2_Chicane_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 7,
+          "VariationName": "SS2_Chicane_Mirror"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "SS2_FestivalJumpOverUnder",
+          "VariationId": 8,
+          "VariationName": "SS2_FestivalJumpOverUnder"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "SS2_FestivalChicane",
+          "VariationId": 9,
+          "VariationName": "SS2_FestivalChicane"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "SS2_FestivalJumpOverUnder_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 10,
+          "VariationName": "SS2_FestivalJumpOverUnder_Mirror"
+        },
+        {
+          "EventId": 2,
+          "IsRandomViable": true,
+          "StageName": "SS2_FestivalChicane_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 11,
+          "VariationName": "SS2_FestivalChicane_Mirror"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "SS2_FrozenJumpOverUnder_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 12,
+          "VariationName": "SS2_FrozenJumpOverUnder_Mirror"
+        },
+        {
+          "EventId": 3,
+          "IsRandomViable": true,
+          "StageName": "SS2_FrozenChicane_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 13,
+          "VariationName": "SS2_FrozenChicane_Mirror"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "SS2_Mirror_Practice",
+          "TrackType": "Mirror",
+          "VariationId": 14,
+          "VariationName": "SS2_Mirror_Practice"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "SS2_Classic",
+          "TrackType": "Classic",
+          "VariationId": 15,
+          "VariationName": "SS2_Classic"
+        }
+      ]
+    },
+    {
+      "TrackId": "Silence_II",
+      "VariationList": [
+        {
+          "StageName": "SI2_GP",
+          "VariationId": 1,
+          "VariationName": "Silence2_GP"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "SI2_Practice",
+          "VariationId": 2,
+          "VariationName": "SI2_Practice"
+        },
+        {
+          "EventId": 3,
+          "StageName": "SI2_FrozenAceGP",
+          "VariationId": 3,
+          "VariationName": "SI2_FrozenAceGP"
+        },
+        {
+          "StageName": "SI2_GP_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 4,
+          "VariationName": "Silence2_GP_Mirror"
+        },
+        {
+          "EventId": 2,
+          "StageName": "SI2_FestivalAceGP",
+          "VariationId": 5,
+          "VariationName": "SI2_FestivalAceGP"
+        },
+        {
+          "EventId": 2,
+          "StageName": "SI2_FestivalAceGP_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 6,
+          "VariationName": "SI2_FestivalAceGP_Mirror"
+        },
+        {
+          "EventId": 3,
+          "StageName": "SI2_FrozenAceGP_Mirror",
+          "TrackType": "Mirror",
+          "VariationId": 7,
+          "VariationName": "SI2_FrozenAceGP_Mirror"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "SI2_Mirror_Practice",
+          "TrackType": "Mirror",
+          "VariationId": 8,
+          "VariationName": "SI2_Mirror_Practice"
+        },
+        {
+          "IsPractice": true,
+          "StageName": "SI2_Classic",
+          "TrackType": "Classic",
+          "VariationId": 9,
+          "VariationName": "SI2_Classic"
+        }
+      ]
+    },
+    {
+      "TrackId": "Mystery_5",
+      "VariationList": [
+        {
+          "IsRandomViable": true,
+          "StageName": "Mystery5_A",
+          "VariationId": 1,
+          "VariationName": "Mystery5_A"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "Mystery5_B",
+          "VariationId": 2,
+          "VariationName": "Mystery5_B"
+        }
+      ]
+    },
+    {
+      "TrackId": "Mystery_6",
+      "VariationList": [
+        {
+          "IsRandomViable": true,
+          "StageName": "Mystery6_A",
+          "VariationId": 1,
+          "VariationName": "Mystery6_A"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "Mystery6_B",
+          "VariationId": 2,
+          "VariationName": "Mystery6_B"
+        },
+        {
+          "StageName": "Mystery6_GP",
+          "VariationId": 3,
+          "VariationName": "Mystery6_GP"
+        }
+      ]
+    },
+    {
+      "TrackId": "Mystery_7",
+      "VariationList": [
+        {
+          "IsRandomViable": true,
+          "StageName": "Mystery7_A",
+          "VariationId": 1,
+          "VariationName": "Mystery7_A"
+        },
+        {
+          "IsRandomViable": true,
+          "StageName": "Mystery7_B",
+          "VariationId": 2,
+          "VariationName": "Mystery7_B"
+        }
+      ]
+    }
+  ],
+  "WorldList": [
+    {
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_I",
+          "VariationId": 1
+        },
+        {
+          "TrackId": "Mute_City_I",
+          "VariationId": 2
+        },
+        {
+          "TrackId": "Mute_City_I",
+          "VariationId": 8
+        },
+        {
+          "TrackId": "Mute_City_I",
+          "VariationId": 9
+        },
+        {
+          "TrackId": "Mute_City_II",
+          "VariationId": 1
+        },
+        {
+          "TrackId": "Mute_City_II",
+          "VariationId": 2
+        },
+        {
+          "TrackId": "Mute_City_II",
+          "VariationId": 5
+        },
+        {
+          "TrackId": "Mute_City_II",
+          "VariationId": 6
+        },
+        {
+          "TrackId": "Mute_City_III",
+          "VariationId": 1
+        },
+        {
+          "TrackId": "Mute_City_III",
+          "VariationId": 2
+        },
+        {
+          "TrackId": "Mute_City_III",
+          "VariationId": 5
+        },
+        {
+          "TrackId": "Mute_City_III",
+          "VariationId": 6
+        },
+        {
+          "TrackId": "Mute_City_IV",
+          "VariationId": 1
+        },
+        {
+          "TrackId": "Mute_City_IV",
+          "VariationId": 3
+        },
+        {
+          "TrackId": "Mute_City_IV",
+          "VariationId": 6
+        },
+        {
+          "TrackId": "Mute_City_IV",
+          "VariationId": 7
+        }
+      ],
+      "WorldName": "MuteCityWorld"
+    },
+    {
+      "Tracks": [
+        {
+          "TrackId": "Big_Blue",
+          "VariationId": 1
+        },
+        {
+          "TrackId": "Big_Blue",
+          "VariationId": 2
+        },
+        {
+          "TrackId": "Big_Blue",
+          "VariationId": 6
+        },
+        {
+          "TrackId": "Big_Blue",
+          "VariationId": 7
+        },
+        {
+          "TrackId": "Big_Blue_II",
+          "VariationId": 1
+        },
+        {
+          "TrackId": "Big_Blue_II",
+          "VariationId": 3
+        },
+        {
+          "TrackId": "Big_Blue_II",
+          "VariationId": 6
+        },
+        {
+          "TrackId": "Big_Blue_II",
+          "VariationId": 7
+        }
+      ],
+      "WorldName": "BigBlueWorld"
+    },
+    {
+      "Tracks": [
+        {
+          "TrackId": "Sand_Ocean",
+          "VariationId": 1
+        },
+        {
+          "TrackId": "Sand_Ocean",
+          "VariationId": 2
+        },
+        {
+          "TrackId": "Sand_Ocean",
+          "VariationId": 5
+        },
+        {
+          "TrackId": "Sand_Ocean",
+          "VariationId": 6
+        },
+        {
+          "TrackId": "Sand_Storm_I",
+          "VariationId": 1
+        },
+        {
+          "TrackId": "Sand_Storm_I",
+          "VariationId": 3
+        },
+        {
+          "TrackId": "Sand_Storm_I",
+          "VariationId": 6
+        },
+        {
+          "TrackId": "Sand_Storm_I",
+          "VariationId": 7
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Sand_Storm_II",
+          "VariationId": 1
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Sand_Storm_II",
+          "VariationId": 3
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Sand_Storm_II",
+          "VariationId": 6
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Sand_Storm_II",
+          "VariationId": 7
+        }
+      ],
+      "WorldName": "SandOceanWorld"
+    },
+    {
+      "Tracks": [
+        {
+          "TrackId": "Death_Wind_I",
+          "VariationId": 1
+        },
+        {
+          "TrackId": "Death_Wind_I",
+          "VariationId": 2
+        },
+        {
+          "TrackId": "Death_Wind_I",
+          "VariationId": 5
+        },
+        {
+          "TrackId": "Death_Wind_I",
+          "VariationId": 6
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Death_Wind_II",
+          "VariationId": 1
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Death_Wind_II",
+          "VariationId": 2
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Death_Wind_II",
+          "VariationId": 5
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Death_Wind_II",
+          "VariationId": 6
+        }
+      ],
+      "WorldName": "DeathWindWorld"
+    },
+    {
+      "Tracks": [
+        {
+          "TrackId": "Port_Town_I",
+          "VariationId": 1
+        },
+        {
+          "TrackId": "Port_Town_I",
+          "VariationId": 2
+        },
+        {
+          "TrackId": "Port_Town_I",
+          "VariationId": 5
+        },
+        {
+          "TrackId": "Port_Town_I",
+          "VariationId": 6
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Port_Town_II",
+          "VariationId": 1
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Port_Town_II",
+          "VariationId": 2
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Port_Town_II",
+          "VariationId": 5
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Port_Town_II",
+          "VariationId": 6
+        }
+      ],
+      "WorldName": "PortTownWorld"
+    },
+    {
+      "Tracks": [
+        {
+          "TrackId": "Red_Canyon_I",
+          "VariationId": 1
+        },
+        {
+          "TrackId": "Red_Canyon_I",
+          "VariationId": 2
+        },
+        {
+          "TrackId": "Red_Canyon_I",
+          "VariationId": 5
+        },
+        {
+          "TrackId": "Red_Canyon_I",
+          "VariationId": 6
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Red_Canyon_II",
+          "VariationId": 1
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Red_Canyon_II",
+          "VariationId": 2
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Red_Canyon_II",
+          "VariationId": 5
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Red_Canyon_II",
+          "VariationId": 6
+        }
+      ],
+      "WorldName": "RedCanyonWorld"
+    },
+    {
+      "Tracks": [
+        {
+          "IsHard": true,
+          "TrackId": "White_Land_I",
+          "VariationId": 1
+        },
+        {
+          "IsHard": true,
+          "TrackId": "White_Land_I",
+          "VariationId": 2
+        },
+        {
+          "IsHard": true,
+          "TrackId": "White_Land_I",
+          "VariationId": 5
+        },
+        {
+          "IsHard": true,
+          "TrackId": "White_Land_I",
+          "VariationId": 6
+        }
+      ],
+      "WorldName": "WhiteLandWorld"
+    },
+    {
+      "Tracks": [
+        {
+          "TrackId": "Silence",
+          "VariationId": 1
+        },
+        {
+          "TrackId": "Silence",
+          "VariationId": 4
+        },
+        {
+          "TrackId": "Silence_II",
+          "VariationId": 1
+        },
+        {
+          "TrackId": "Silence_II",
+          "VariationId": 4
+        }
+      ],
+      "WorldName": "SilenceWorld"
+    },
+    {
+      "Tracks": [
+        {
+          "TrackId": "White_Land_II",
+          "VariationId": 1
+        },
+        {
+          "TrackId": "White_Land_II",
+          "VariationId": 4
+        }
+      ],
+      "WorldName": "WhiteLand2World"
+    },
+    {
+      "Tracks": [
+        {
+          "TrackId": "Fire_Field",
+          "VariationId": 1
+        },
+        {
+          "TrackId": "Fire_Field",
+          "VariationId": 4
+        }
+      ],
+      "WorldName": "FireFieldWorld"
+    },
+    {
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_I",
+          "VariationId": 11
+        },
+        {
+          "TrackId": "Mute_City_I",
+          "VariationId": 12
+        },
+        {
+          "TrackId": "Mute_City_I",
+          "VariationId": 13
+        },
+        {
+          "TrackId": "Mute_City_I",
+          "VariationId": 14
+        },
+        {
+          "TrackId": "Mute_City_II",
+          "VariationId": 10
+        },
+        {
+          "TrackId": "Mute_City_II",
+          "VariationId": 11
+        },
+        {
+          "TrackId": "Mute_City_II",
+          "VariationId": 12
+        },
+        {
+          "TrackId": "Mute_City_II",
+          "VariationId": 13
+        },
+        {
+          "TrackId": "Mute_City_III",
+          "VariationId": 8
+        },
+        {
+          "TrackId": "Mute_City_III",
+          "VariationId": 9
+        },
+        {
+          "TrackId": "Mute_City_III",
+          "VariationId": 10
+        },
+        {
+          "TrackId": "Mute_City_III",
+          "VariationId": 11
+        },
+        {
+          "TrackId": "Mute_City_IV",
+          "VariationId": 4
+        },
+        {
+          "TrackId": "Mute_City_IV",
+          "VariationId": 5
+        },
+        {
+          "TrackId": "Mute_City_IV",
+          "VariationId": 12
+        },
+        {
+          "TrackId": "Mute_City_IV",
+          "VariationId": 13
+        }
+      ],
+      "WorldName": "FrozenMuteCityWorld"
+    },
+    {
+      "Tracks": [
+        {
+          "TrackId": "Big_Blue",
+          "VariationId": 9
+        },
+        {
+          "TrackId": "Big_Blue",
+          "VariationId": 10
+        },
+        {
+          "TrackId": "Big_Blue",
+          "VariationId": 11
+        },
+        {
+          "TrackId": "Big_Blue",
+          "VariationId": 12
+        },
+        {
+          "TrackId": "Big_Blue_II",
+          "VariationId": 4
+        },
+        {
+          "TrackId": "Big_Blue_II",
+          "VariationId": 5
+        },
+        {
+          "TrackId": "Big_Blue_II",
+          "VariationId": 12
+        },
+        {
+          "TrackId": "Big_Blue_II",
+          "VariationId": 13
+        }
+      ],
+      "WorldName": "FrozenBigBlueWorld"
+    },
+    {
+      "Tracks": [
+        {
+          "TrackId": "Sand_Ocean",
+          "VariationId": 8
+        },
+        {
+          "TrackId": "Sand_Ocean",
+          "VariationId": 9
+        },
+        {
+          "TrackId": "Sand_Ocean",
+          "VariationId": 10
+        },
+        {
+          "TrackId": "Sand_Ocean",
+          "VariationId": 11
+        },
+        {
+          "TrackId": "Sand_Storm_I",
+          "VariationId": 4
+        },
+        {
+          "TrackId": "Sand_Storm_I",
+          "VariationId": 5
+        },
+        {
+          "TrackId": "Sand_Storm_I",
+          "VariationId": 12
+        },
+        {
+          "TrackId": "Sand_Storm_I",
+          "VariationId": 13
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Sand_Storm_II",
+          "VariationId": 4
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Sand_Storm_II",
+          "VariationId": 5
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Sand_Storm_II",
+          "VariationId": 12
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Sand_Storm_II",
+          "VariationId": 13
+        }
+      ],
+      "WorldName": "FrozenSandOceanWorld"
+    },
+    {
+      "Tracks": [
+        {
+          "TrackId": "Death_Wind_I",
+          "VariationId": 8
+        },
+        {
+          "TrackId": "Death_Wind_I",
+          "VariationId": 9
+        },
+        {
+          "TrackId": "Death_Wind_I",
+          "VariationId": 10
+        },
+        {
+          "TrackId": "Death_Wind_I",
+          "VariationId": 11
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Death_Wind_II",
+          "VariationId": 8
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Death_Wind_II",
+          "VariationId": 9
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Death_Wind_II",
+          "VariationId": 10
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Death_Wind_II",
+          "VariationId": 11
+        }
+      ],
+      "WorldName": "FrozenDeathWindWorld"
+    },
+    {
+      "Tracks": [
+        {
+          "TrackId": "Port_Town_I",
+          "VariationId": 10
+        },
+        {
+          "TrackId": "Port_Town_I",
+          "VariationId": 11
+        },
+        {
+          "TrackId": "Port_Town_I",
+          "VariationId": 12
+        },
+        {
+          "TrackId": "Port_Town_I",
+          "VariationId": 13
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Port_Town_II",
+          "VariationId": 8
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Port_Town_II",
+          "VariationId": 9
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Port_Town_II",
+          "VariationId": 10
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Port_Town_II",
+          "VariationId": 11
+        }
+      ],
+      "WorldName": "FrozenPortTownWorld"
+    },
+    {
+      "Tracks": [
+        {
+          "TrackId": "Red_Canyon_I",
+          "VariationId": 10
+        },
+        {
+          "TrackId": "Red_Canyon_I",
+          "VariationId": 11
+        },
+        {
+          "TrackId": "Red_Canyon_I",
+          "VariationId": 12
+        },
+        {
+          "TrackId": "Red_Canyon_I",
+          "VariationId": 13
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Red_Canyon_II",
+          "VariationId": 8
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Red_Canyon_II",
+          "VariationId": 9
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Red_Canyon_II",
+          "VariationId": 10
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Red_Canyon_II",
+          "VariationId": 11
+        }
+      ],
+      "WorldName": "FrozenRedCanyonWorld"
+    },
+    {
+      "Tracks": [
+        {
+          "IsHard": true,
+          "TrackId": "White_Land_I",
+          "VariationId": 10
+        },
+        {
+          "IsHard": true,
+          "TrackId": "White_Land_I",
+          "VariationId": 11
+        },
+        {
+          "IsHard": true,
+          "TrackId": "White_Land_I",
+          "VariationId": 12
+        },
+        {
+          "IsHard": true,
+          "TrackId": "White_Land_I",
+          "VariationId": 13
+        }
+      ],
+      "WorldName": "FrozenWhiteLandWorld"
+    },
+    {
+      "Tracks": [
+        {
+          "TrackId": "Silence",
+          "VariationId": 6
+        },
+        {
+          "TrackId": "Silence",
+          "VariationId": 7
+        },
+        {
+          "TrackId": "Silence_II",
+          "VariationId": 3
+        },
+        {
+          "TrackId": "Silence_II",
+          "VariationId": 7
+        }
+      ],
+      "WorldName": "FrozenSilenceWorld"
+    },
+    {
+      "Tracks": [
+        {
+          "TrackId": "White_Land_II",
+          "VariationId": 7
+        },
+        {
+          "TrackId": "White_Land_II",
+          "VariationId": 8
+        }
+      ],
+      "WorldName": "FrozenWhiteLand2World"
+    },
+    {
+      "Tracks": [
+        {
+          "TrackId": "Fire_Field",
+          "VariationId": 6
+        },
+        {
+          "TrackId": "Fire_Field",
+          "VariationId": 7
+        }
+      ],
+      "WorldName": "FrozenFireFieldWorld"
+    },
+    {
+      "Tracks": [
+        {
+          "TrackId": "Mute_City_I",
+          "VariationId": 15
+        },
+        {
+          "TrackId": "Mute_City_I",
+          "VariationId": 16
+        },
+        {
+          "TrackId": "Mute_City_I",
+          "VariationId": 17
+        },
+        {
+          "TrackId": "Mute_City_I",
+          "VariationId": 18
+        },
+        {
+          "TrackId": "Mute_City_II",
+          "VariationId": 8
+        },
+        {
+          "TrackId": "Mute_City_II",
+          "VariationId": 9
+        },
+        {
+          "TrackId": "Mute_City_II",
+          "VariationId": 14
+        },
+        {
+          "TrackId": "Mute_City_II",
+          "VariationId": 15
+        },
+        {
+          "TrackId": "Mute_City_III",
+          "VariationId": 12
+        },
+        {
+          "TrackId": "Mute_City_III",
+          "VariationId": 13
+        },
+        {
+          "TrackId": "Mute_City_III",
+          "VariationId": 14
+        },
+        {
+          "TrackId": "Mute_City_III",
+          "VariationId": 15
+        },
+        {
+          "TrackId": "Mute_City_IV",
+          "VariationId": 8
+        },
+        {
+          "TrackId": "Mute_City_IV",
+          "VariationId": 9
+        },
+        {
+          "TrackId": "Mute_City_IV",
+          "VariationId": 10
+        },
+        {
+          "TrackId": "Mute_City_IV",
+          "VariationId": 11
+        }
+      ],
+      "WorldName": "FestivalMuteCityWorld"
+    },
+    {
+      "Tracks": [
+        {
+          "TrackId": "Big_Blue",
+          "VariationId": 13
+        },
+        {
+          "TrackId": "Big_Blue",
+          "VariationId": 14
+        },
+        {
+          "TrackId": "Big_Blue",
+          "VariationId": 15
+        },
+        {
+          "TrackId": "Big_Blue",
+          "VariationId": 16
+        },
+        {
+          "TrackId": "Big_Blue_II",
+          "VariationId": 8
+        },
+        {
+          "TrackId": "Big_Blue_II",
+          "VariationId": 9
+        },
+        {
+          "TrackId": "Big_Blue_II",
+          "VariationId": 10
+        },
+        {
+          "TrackId": "Big_Blue_II",
+          "VariationId": 11
+        }
+      ],
+      "WorldName": "FestivalBigBlueWorld"
+    },
+    {
+      "Tracks": [
+        {
+          "TrackId": "Sand_Ocean",
+          "VariationId": 12
+        },
+        {
+          "TrackId": "Sand_Ocean",
+          "VariationId": 13
+        },
+        {
+          "TrackId": "Sand_Ocean",
+          "VariationId": 14
+        },
+        {
+          "TrackId": "Sand_Ocean",
+          "VariationId": 15
+        },
+        {
+          "TrackId": "Sand_Storm_I",
+          "VariationId": 8
+        },
+        {
+          "TrackId": "Sand_Storm_I",
+          "VariationId": 9
+        },
+        {
+          "TrackId": "Sand_Storm_I",
+          "VariationId": 10
+        },
+        {
+          "TrackId": "Sand_Storm_I",
+          "VariationId": 11
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Sand_Storm_II",
+          "VariationId": 8
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Sand_Storm_II",
+          "VariationId": 9
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Sand_Storm_II",
+          "VariationId": 10
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Sand_Storm_II",
+          "VariationId": 11
+        }
+      ],
+      "WorldName": "FestivalSandOceanWorld"
+    },
+    {
+      "Tracks": [
+        {
+          "TrackId": "Death_Wind_I",
+          "VariationId": 12
+        },
+        {
+          "TrackId": "Death_Wind_I",
+          "VariationId": 13
+        },
+        {
+          "TrackId": "Death_Wind_I",
+          "VariationId": 14
+        },
+        {
+          "TrackId": "Death_Wind_I",
+          "VariationId": 15
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Death_Wind_II",
+          "VariationId": 12
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Death_Wind_II",
+          "VariationId": 13
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Death_Wind_II",
+          "VariationId": 14
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Death_Wind_II",
+          "VariationId": 15
+        }
+      ],
+      "WorldName": "FestivalDeathWindWorld"
+    },
+    {
+      "Tracks": [
+        {
+          "TrackId": "Port_Town_I",
+          "VariationId": 8
+        },
+        {
+          "TrackId": "Port_Town_I",
+          "VariationId": 9
+        },
+        {
+          "TrackId": "Port_Town_I",
+          "VariationId": 14
+        },
+        {
+          "TrackId": "Port_Town_I",
+          "VariationId": 15
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Port_Town_II",
+          "VariationId": 12
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Port_Town_II",
+          "VariationId": 13
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Port_Town_II",
+          "VariationId": 14
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Port_Town_II",
+          "VariationId": 15
+        }
+      ],
+      "WorldName": "FestivalPortTownWorld"
+    },
+    {
+      "Tracks": [
+        {
+          "TrackId": "Red_Canyon_I",
+          "VariationId": 8
+        },
+        {
+          "TrackId": "Red_Canyon_I",
+          "VariationId": 9
+        },
+        {
+          "TrackId": "Red_Canyon_I",
+          "VariationId": 14
+        },
+        {
+          "TrackId": "Red_Canyon_I",
+          "VariationId": 15
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Red_Canyon_II",
+          "VariationId": 12
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Red_Canyon_II",
+          "VariationId": 13
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Red_Canyon_II",
+          "VariationId": 14
+        },
+        {
+          "IsHard": true,
+          "TrackId": "Red_Canyon_II",
+          "VariationId": 15
+        }
+      ],
+      "WorldName": "FestivalRedCanyonWorld"
+    },
+    {
+      "Tracks": [
+        {
+          "IsHard": true,
+          "TrackId": "White_Land_I",
+          "VariationId": 8
+        },
+        {
+          "IsHard": true,
+          "TrackId": "White_Land_I",
+          "VariationId": 9
+        },
+        {
+          "IsHard": true,
+          "TrackId": "White_Land_I",
+          "VariationId": 14
+        },
+        {
+          "IsHard": true,
+          "TrackId": "White_Land_I",
+          "VariationId": 15
+        }
+      ],
+      "WorldName": "FestivalWhiteLandWorld"
+    },
+    {
+      "Tracks": [
+        {
+          "TrackId": "Silence",
+          "VariationId": 8
+        },
+        {
+          "TrackId": "Silence",
+          "VariationId": 9
+        },
+        {
+          "TrackId": "Silence_II",
+          "VariationId": 5
+        },
+        {
+          "TrackId": "Silence_II",
+          "VariationId": 6
+        }
+      ],
+      "WorldName": "FestivalSilenceWorld"
+    },
+    {
+      "Tracks": [
+        {
+          "TrackId": "White_Land_II",
+          "VariationId": 6
+        },
+        {
+          "TrackId": "White_Land_II",
+          "VariationId": 9
+        }
+      ],
+      "WorldName": "FestivalWhiteLand2World"
+    },
+    {
+      "Tracks": [
+        {
+          "TrackId": "Fire_Field",
+          "VariationId": 8
+        },
+        {
+          "TrackId": "Fire_Field",
+          "VariationId": 9
+        }
+      ],
+      "WorldName": "FestivalFireFieldWorld"
+    }
+  ],
+  "WorldTourDefaults": {
+    "HealPercent": 100,
+    "NumLaps": 3,
+    "PointsArray": "WorldTourPoints",
+    "RankCaps": [
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41
+    ],
+    "RankOutMode": "SafeRank",
+    "Rules": "PointsRankElimination",
+    "Type": "Normal"
+  }
+}

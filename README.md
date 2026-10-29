@@ -2,15 +2,12 @@
 
 A library and Discord bot for useful F-Zero 99 schedule info
 
+The bot answers slash commands about the public schedule (`/showevents`, `/when`, `/utc_when`, `/explain`), the Mini-Prix and Classic Mini-Prix track selections of public and private lobbies (`/miniprix`), the 99-race track pairs (`/ninetynine`), and the Team Battle, Pro-Tracks and Classic track pairs of public and private lobbies (`/lineup`). It also keeps a schedule message up to date in a channel.
+
 ## Setup
 
 This project uses `uv` for dependency management.
 From the repository root:
-
-`.python-version` pins Python 3.11, the oldest version `requires-python`
-supports and the one `ruff` targets. Developing against the floor is what keeps
-that floor honest for anything installing this package; the test suite also
-passes on 3.12, 3.13 and 3.14.
 
 ### Create & activate a virtual env
 
@@ -24,59 +21,48 @@ source .venv/bin/activate
 .venv\Scripts\Activate.ps1
 ```
 
-The Discord client library is an optional dependency, so the command above
-installs the schedule logic and the test suite but not `py-cord`. To work on or
-run the bot, ask for the `bot` extra as well:
-
-```bash
-uv sync --dev --extra bot
-```
-
 You may then import the module in your Python environment:
 
 ```bash
 python -c "import pengbot99"
 ```
 
-The game content the schedule is computed from ships inside the package, so a
-consumer that only wants the schedule logic needs neither a checkout nor a
-configuration file:
-
-```bash
-python -c "from pengbot99 import schedule; print(schedule.load_schedule(None, 'slot2_schedule'))"
-```
-
-`None` reads the packaged `default` profile. Passing a directory in its place
-reads that file from there instead.
+The game's schedule files ship inside the package, so a consumer that only
+wants the schedule logic needs neither a checkout nor a configuration file.
 
 ### Using it as a library
 
-Individual schedules are rarely what a caller wants. `pengbot99.managers` turns
-the constants and the content dumps into the managers that answer questions,
-which is the same call the bot makes at startup:
+`pengbot99.schedule_controller` builds the managers that answer every question
+the bot answers, from the game's own schedule files; it is the same call the
+bot makes at startup:
 
 ```python
 from datetime import datetime, timezone
 
-from pengbot99 import managers, utils
+from pengbot99 import schedule_controller
 
-csts = utils.load_constants()
-mgrs = managers.build_managers(csts)
-print(mgrs.slot2mgr.get_events(timestamp=datetime.now(timezone.utc), limit=120))
+profile = schedule_controller.ScheduleProfile({}, 'default')
+now = datetime.now(timezone.utc)
+# the Grand Prix, Mini-Prix and special event slots of the next two hours
+print(profile.slot2mgr.list_events(timestamp=now, next=120))
+# the track pairs of the ongoing or next public Pro-Tracks slot
+print(profile.lineup_mgrs[('protracks', False)].list_events(now))
 ```
 
-Both calls take the same two optional arguments: the `CONFIG_PATH` directory to
-read the content from, and the name of an event profile to lay over the default
-one. Without the first, the packaged copy is read; without the second, the
-default schedule alone:
+The first argument is the parsed `.env` as a dict, and the only keys read from
+it are `CONFIG_PATH`, a directory to read the schedule files from instead of
+the packaged copy, and `CONSTANTS_FILE`, the name of a profile's constants
+file. An empty dict reads the packaged files. The second is the name of an
+event profile, listed under "Event profiles" below; a name with no folder
+raises `FileNotFoundError`:
 
 ```python
-csts = utils.load_constants(None, "queen")
-mgrs = managers.build_managers(csts, None, "queen")
+queen = schedule_controller.ScheduleProfile({}, 'queen')
 ```
 
 Neither needs a `.env`, Discord or a particular working directory. The managers
-are described in the module, and profiles under "Event profiles" below.
+are described in `gameevents.py`, and the model in
+[docs/game-schedule.md](docs/game-schedule.md).
 
 To run the application as a Discord bot, you will first need to set up a configuration file.
 
@@ -95,11 +81,13 @@ DISCORD_BOT_TOKEN=Al0ngAlph4numericT0k3nSuppliedByD1scord
 ANNOUNCE_CHANNEL=1234567890
 # ID for the bot's schedule channel
 SCHEDULE_EDIT_CHANNEL=9876543210
-# Config files root folder (optional; overrides the packaged schedules).
-# Schedule profiles live as subfolders, e.g. default/
+# Config files root folder (schedule profiles live as event_<name> subfolders, e.g. event_default/)
+# Optional: the files that ship inside the package are read when it is unset
 CONFIG_PATH=C:/Path/to/config
-# Schedule constants file name (in the schedule profile folder)
+# Schedule constants file name (in the schedule profile folder); constants.dat when unset
 CONSTANTS_FILE=constants.dat
+# Scheduled event profile switches file name (in config folder)
+EVENT_SCHEDULE_FILE=server_events.csv
 # Main refresh interval (for primary schedule and ticker) in minutes
 REFRESH_INTERVAL=5
 ```
@@ -114,23 +102,11 @@ Therefore, once you have created one, you are responsible for tracking changes t
 **SCHEDULE_EDIT_CHANNEL**: A Discord channel ID. The bot will post its schedule messages in this channel, and then will regularly update them (every 10 minutes or `REFRESH_INTERVAL` minutes).
 It is suggested that only the bot has permission to post to this channel so that the schedule remains the last message on the channel.
 
-**CONSTANTS_FILE**: This file holds constants that are used for fine-tuning the schedule. It resides in the schedule profile folder (i.e. `default` by default).
-If omitted, `constants.dat` is used.
-
 ### Additional optional configuration
 
-**CONFIG_PATH**: The root path to a configuration directory. Schedule configuration lives in profile subfolders of it, with the baseline schedule in `CONFIG_PATH/default`.
+**CONFIG_PATH**: The root path to a configuration directory. Schedule configuration lives in profile subfolders of it, with the baseline schedule in `CONFIG_PATH/event_default`. The game's own schedule files, dumped to JSON, ship inside the package in `py/pengbot99/data`, and the bot loads those when `CONFIG_PATH` is unset (see "Schedule data"). Setting it overrides them: every file is then read from that directory instead, which is what you want if you keep a directory of hand-edited files. The override is all-or-nothing — a `CONFIG_PATH` needs a complete `event_default` folder of its own, and nothing in it is merged with the packaged one. A checkout's `py/pengbot99/data` is such a directory: pointing `CONFIG_PATH` at it lets you edit a profile and restart without reinstalling the package.
 
-A complete set of these files ships inside the package, in `py/pengbot99/data`, and the bot loads those when `CONFIG_PATH` is unset. Setting it overrides them: every file is then read from that directory instead, which is what you want if you keep a directory of hand-edited schedules. The override is all-or-nothing — a `CONFIG_PATH` needs a complete `default` folder of its own, and nothing in it is merged with the packaged one. A checkout's `py/pengbot99/data` is such a directory: pointing `CONFIG_PATH` at it lets you edit constants and restart without reinstalling the package. There is no top-level `config/` directory; a `.env` that points `CONFIG_PATH` at one should drop the setting or point it there.
-
-### Event profiles
-
-An in-game event is a folder next to `default`, named after the event, holding only the files that differ from the default ones:
-
-- any of the CSV schedules. A CSV in the event folder replaces the default file of the same name as a whole; one that is absent is read from `default`.
-- a constants file. Its constants override the default ones by name; all others are inherited. Features are switched by their `_ENABLED` flag, so an event can turn one off as well as on.
-
-To add an event, create the folder, add the files that differ, and start the bot with `--profile <folder name>` (see "Running the application"). A profile name with no folder is refused at startup. A CSV in an event folder that matches no default file is never loaded, and the bot logs a warning for it.
+**CONSTANTS_FILE**: This file names the weekend event a profile runs (see "Schedule data"). It resides in the schedule profile folder (i.e. `CONFIG_PATH/event_default` by default) and may be absent from a profile folder. It is `constants.dat` when unset.
 
 **TICKER_OVERRIDE**: This value can be omitted from the config. If missing or empty, the bot will update its status description every 10 minutes (or `REFRESH_INTERVAL` minutes) to show the current or next Grand Prix.
 If a text string is provided in this configuration entry, the bot will instead display its content as status. No automatic update will occur.
@@ -141,73 +117,70 @@ It is used to have the bot repeat a schedule message every hour in the given cha
 
 **REFRESH_INTERVAL**: How often the schedule and ticker message get refreshed, in minutes. If not specified, refresh every 10 minutes.
 
+**EVENT_SCHEDULE_FILE**: This file holds rows of dates at which specific game schedules become active. It resides in the config folder (`CONFIG_PATH/server_events.csv`
+by default). The content is read at startup time, if present, and no --profile flag is given. See how to run the bots below for details.
+
 If any other configuration key is defined (using the `NAME=value` scheme), it will be read but ignored by the bot.
 The configuration file may contain any number of comment lines starting with `#` character.
 
-### Constants information
+### Schedule data
 
-Constants are used to conveniently offset the schedule rotation without having to edit the schedule files.
-Constants are defined using `NAME=VALUE` syntax. Name is conventionally all-caps. Value is an integer that may be negative.
-The following constants are expected to be present:
+The bot computes every schedule the way the game does, from the game's own schedule files: the rotation position of a mode is the number of minutes that mode has been active since the Unix epoch, assuming the current tables had always been in force. Nothing is fitted; see [docs/game-schedule.md](docs/game-schedule.md) for the model.
 
-- CLASSIC_LINE_UP_OFFSET
-- MINIPRIX_LINE_UP_OFFSET
-- MIRROR_LINE_UP_OFFSET
-- PRIVATE_MP_MINUTE_OFFSET
-- PRIVATE_MP_MIRROR_MINUTE_OFFSET
-- PRIVATE_CMP_MINUTE_OFFSET
-- NINETYNINE_MINUTE_OFFSET
+A profile folder holds the JSON dumps of the two files the game reads, `GameScheduleV1.json` and `WeekendSchedule.json`, and optionally a constants file. A profile missing a file inherits it from `event_default`. The leagues' track lists come from `StageList.json` in the root of the data directory. All of it ships inside the package under `py/pengbot99/data`, or is read from `CONFIG_PATH` when that is set.
 
-To change the offset the bot is using, simply edit the Constant file and restart the bot.
+- `event_default` holds the game's built-in schedule (the 10/20-minute cycle) and its `WeekendSchedule` file, which lists every weekend event (Leagues Weekends, Machine Shuffle, Team Battle, Mini World Tour, Lucky Rank) with a calendar of when each one is in force.
+- `event_meteor` and `event_festival_world_tour` hold the files of their respective BCAT drops, which replace the weekday cycle for the duration of the event.
+- The other profiles pin one weekend event of the default files.
 
-Some of the schedule features are activated through feature flag constants defined in the constants file.
-Flags are set to `1` to enable a feature, or `0` to disable it. Their associated tuning constants may remain defined regardless.
+The constants file holds a single key:
 
-The bot activates the Machine Shuffle Weekend event when the `SHUFFLE_ENABLED` flag is set to `1`.
-In that case, it will use the specified offsets for Miniprix events occuring at weekend time (UTC):
+- `WEEKEND_SCHEDULE_ID`: `auto` to follow the calendar of the `WeekendSchedule` file, `none` to ignore it, or a `WeekendScheduleID` from the file (e.g. `QueenLeagueWeekend`, `Teams`, `MachineShuffle`, `WorldTourWeek`) to run that event on every weekend for as long as the profile is active.
 
-- SHUFFLE_MINIPRIX_LINE_UP_OFFSET
-- SHUFFLE_MIRROR_LINE_UP_OFFSET
-- PRIVATE_SHUFFLE_MP_MINUTE_OFFSET
-- PRIVATE_SHUFFLE_MP_MIRROR_MINUTE_OFFSET
-
-If there is no Machine Shuffle event, set the flag to `0`.
-As of F-Zero 99 version 1.6.1, there is no mirroring in Private Machine Shuffle-Miniprix, unless the lobby is started at the time of a public Machine Shuffle event. In this later case, the track selection will follow the public event's setting. In any case, the mirroring constant currently does not affect the results in any way.
-
-The Secret League feature can be activated by setting the `SECRET_LEAGUE_ENABLED` flag to `1`:
-
-- `SECRET_LEAGUE_INTERVALS`
-
-The value of SECRET_LEAGUE_INTERVALS is a comma-separated list of integers. Each integer represents an interval between Secret League Grand Prix. When enabled, the Grand Prix rotation proceeds as defined per the schedule, but some Grand Prix are replaced by Secret League as defined per the intervals. When this will happen, the Grand Prix will appear as `Secret League (replaces <replaced GP>)`, and the ticker will display Secret League instead of the replaced Grand Prix.
-Once all intervals in the list have elapsed, the process repeats from the start of the list.
-
-- SECRET_LEAGUE_OFFSET
-
-This may optionally be defined, as an integer value, to change the start Grand Prix of the Secret League intervals sequence. If not defined, it is set to zero.
-
-- WEEKEND_SECRET_LEAGUE_ENABLED
-- WEEKEND_SECRET_LEAGUE_INTERVALS
-- WEEKEND_SECRET_LEAGUE_OFFSET
-
-In cases where the schedule defines a separate Grand Prix rotation for the weekend, the `WEEKEND_SECRET_LEAGUE_ENABLED` flag (along with the `SECRET_LEAGUE_ENABLED` flag) can be used to apply a separate intervals list and a separate offset applying to the weekend schedule. For v1.7, this is useful for Leagues weekend events. `WEEKEND_SECRET_LEAGUE_OFFSET` is set to zero if the constant is left undefined.
+With `auto`, the `default` profile already runs the weekend events on the dates the game lists, so `EVENT_SCHEDULE_FILE` only needs rows for drops that replace the weekday cycle. A weekend event the calendar lacks can be added as a row of `Schedule` in `WeekendSchedule.json`, or pinned through a profile and a switch date. A new drop is a new profile folder holding its two files.
 
 ## Running the application
 
 The application can be started through the `bot.py` module.
 No assumption is made as to the target environment, therefore no shell script or similar is provided.
 
+There are two different ways to run the bot:
+
+**1. Automatic event profile switching mode**
+
+In this mode, the `EVENT_SCHEDULE_FILE` CSV is loaded at startup. To use this feature, simply supply a CSV file in the expected location. The repository provides an
+example event schedule file. 
+
+Each row is in the CSV should be `<YYYY-MM-DD>,<profile>`, meaning that the profile named by `<profile>` becomes active at 00:00 UTC on that date. Rows do not need to
+be sorted; they are sorted by date on load. Comments (lines starting with '#') and malformed rows are ignored with a warning.
+
+Upon starting, the bot will search for the present date and set the referenced schedule as active. It will then check the CSV daily and switch schedule profiles when
+appropriate. It should be noted that the daily check involves reloading the CSV, therefore the event schedule may be modified without restarting the bot; however, any
+change will only come in effect at the time of the daily check. For a change to become effective immediately, simply restart the bot.
+
+When all event dates are in the past, the bot will remain on the last specified schedule indefinitely.
+
+To start in this mode, make sure the environment file specifies `EVENT_SCHEDULE_FILE=file_name` and that `<filename>` is found in the `CONFIG_PATH` folder, or in the packaged data when `CONFIG_PATH` is unset.
+Then, start up the bot without specifying any flag.
+
 ```bash
 python -m pengbot99.bot
 ```
 
-The schedule profile to load can be selected with the `--profile` argument.
-The default profile is `default`; event profiles live in their own folder
-next to it and overlay the default config. For example, to run with
-the Queen Leagues Weekend Event schedule:
+**2. Single event profile mode**
+
+This mode is active if no EVENT_SCHEDULE_FILE constant is found, or if a --profile flag is given to the bot at start up. It is also in effect if the EVENT_SCHEDULE_FILE
+cannot be loaded.
+
+The schedule profile to load can be selected with the `--profile` argument. The default profile is `default`; event profiles live in their own folder (prefixed `event_`) under `CONFIG_PATH` and overlay the default config. For example, to run with the Queen Leagues Weekend Event schedule (loaded from `CONFIG_PATH/event_queen`):
 
 ```bash
 python -m pengbot99.bot --profile queen
 ```
+
+In this mode, the bot only ever runs the given event profile schedule. Any EVENT_SCHEDULE_FILE is ignored and there is no daily check.
+
+**Installing for either mode**
 
 The bot requires the `bot` extra, which brings in `py-cord`. Installing the
 package without it gives the schedule logic alone, and starting the bot then
@@ -219,10 +192,100 @@ uv pip install .          # schedule logic only, for use as a library
 ```
 
 The split exists because the schedule computation is useful on its own -- it
-reads CSV files and does arithmetic, and a caller that only wants that has no
-reason to install a Discord gateway client. `apiadapter.py` and `bot.py` are the
-only modules that require it, and a test in `tests/test_import_boundary.py`
-fails if a Discord import ever reaches the schedule modules.
+reads the game's schedule files and does arithmetic, and a caller that only
+wants that has no reason to install a Discord gateway client. `apiadapter.py`
+and `bot.py` are the only modules that require it, and a test in
+`tests/test_import_boundary.py` fails if a Discord import ever reaches the
+schedule modules.
+
+## Event profiles
+
+The following lists event profiles directories provided in the repository and what in-game event they correspond to.
+
+**1. Default Schedule**
+
+| Directory | Profile Name | In-Game name |
+|:----------|:-------------|:-------------|
+| event_default | default | Grand Prix Weekend Event (and, by calendar, every weekend event below) |
+
+During weekdays, Grand Prix occur every hour at :00. Mini-Prix or Classic Mini-Prix occur at :30.
+During weekend days, Grand Prix occur every 30 minutes. Secret League is enabled.
+This schedule is also used for Lucky Weekend Events.
+
+**2. Leagues Weekend**
+
+| Directory | Profile Name | In-Game name |
+|:----------|:-------------|:-------------|
+| event_ace | ace | Ace Leagues Weekend Event |
+| event_king | king | King Leagues Weekend Event |
+| event_knight | knight | Knight Leagues Weekend Event |
+| event_queen | queen | Queen Leagues Weekend Event |
+| event_secret | secret | Secret League Weekend Event |
+
+During weekdays, Grand Prix occur every hour at :00. Mini-Prix or Classic Mini-Prix occur at :30.
+During weekend days, Grand Prix occur every 15 minutes. The event's namesake prix (Ace/Mirror Ace, King/Mirror King, Knight/Mirror Knight,
+Queen/Mirror Queen or Secret League) appear at :00 and :30, with the other leagues appearing in :15 and :45 time slots.
+Outside of Secret League Weekend Event, Secret League is still enabled, and during the weekend, it can only override the event's namesake
+prix.
+
+**3. Machine Shuffle Mini-Prix Weekend Event**
+
+| Directory | Profile Name | In-Game name |
+|:----------|:-------------|:-------------|
+| event_machine_shuffle | machine_shuffle | Machine Shuffle Mini-Prix Weekend Event |
+
+During weekdays, Grand Prix occur every hour at :00. Mini-Prix or Classic Mini-Prix occur at :30.
+During weekend days, Grand Prix occur every two hours. Machine Shuffle Mini-Prix occur every 30 minutes between Grand Prix.
+Private Mini-Prix ran during the weekend are all Shuffle Mini-Prix, but do not feature Mirror tracks, unless the lobbies are opened while
+a public Machine Shuffle Mini-Prix event is running.
+Secret League is enabled.
+
+**4. Team Battle Weekend Event**
+
+| Directory | Profile Name | In-Game name |
+|:----------|:-------------|:-------------|
+| event_team_battle | team_battle | Team Battle Weekend Event |
+
+During weekdays, Grand Prix occur every hour at :00. Mini-Prix or Classic Mini-Prix occur at :30.
+During weekend days, Grand Prix occur every hour at :00. Mini-Prix or Classic Mini-Prix occur at :30, but Classic Mini-Prix frequency is
+the same as Standard Mini-Prix, unlike during the week days where it is one to two like default. Every special event slot is Team Battle.
+Secret League is enabled.
+
+**5. Mini World Tour Week**
+
+| Directory | Profile Name | In-Game name |
+|:----------|:-------------|:-------------|
+| event_mini_world_tour | mini_world_tour | Mini World Tour Week |
+
+This event runs the same schedule for weekdays and weekend days.
+A 7-races Mini World Tour slot runs every 40 minutes. Every 40 minutes in-between World Tour slots, a Prix takes place, alternating between
+the usual rotation of Grand Prix, or one of Mini-Prix or Classic Mini-Prix.
+There is no Secret League during Mini World Tour.
+
+**6. Festival World Tour/Frozen World Tour**
+
+| Directory | Profile Name | In-Game name |
+|:----------|:-------------|:-------------|
+| event_festival_world_tour | festival_world_tour | Festival World Tour/Frozen World Tour |
+
+Festival World Tour and Frozen World Tour use the same schedule.
+A 9-races World Tour slot runs every 40 minutes. Every 40 minutes in-between World Tour slots, a Prix takes place.
+During Weekdays, this alternates between the usual rotation of Grand Prix, or one of Mini-Prix or Classic Mini-Prix.
+During Weekend days, only Grand Prix run during the Prix slots.
+There is no Secret League during these events.
+Contrary to Mini World Tour, these events run for multiple weeks (normally five weeks), hence the schedule variation between weekdays and
+weekends.
+
+**7. Meteor Festival/Lightning Festival**
+
+| Directory | Profile Name | In-Game name |
+|:----------|:-------------|:-------------|
+| event_meteor | meteor | Meteor Festival/Lightning Festival |
+
+Both these events share the same schedule.
+The sequence of events is identical to the default schedule, but compressed to run in 40 minutes instead of 60 during weekdays, and 20
+minutes instead of 30 during weekends. Contrary to default schedule, Secret League is disabled during Meteor or Lightning Festival.
+
 
 ## Running tests
 
@@ -252,8 +315,8 @@ change is ready to be depended on, tag it.
 
 ```bash
 # bump `version` in pyproject.toml first
-git tag -a v0.2.0 -m "Short summary of what changed"
-git push origin v0.2.0
+git tag -a v0.3.0 -m "Short summary of what changed"
+git push origin v0.3.0
 ```
 
 Use annotated tags (`-a`) rather than lightweight ones, and keep the tag in step
@@ -266,16 +329,24 @@ the consumer a newer release has happened.
 
 ## Future improvements
 
-- Refactor schedule manager to more elegantly manage rotations
 - Bot Cogs
 - Migrate tests to Pytest and automate with Github Actions, add coverage report
-- Expand the /explain command to cover other topics than GP Rotation
-- Support for protracks/team battle as an upgrade to current /ninetynine command
+- Confirm in game the two points where the game's files and the previously fitted schedules disagree (see [docs/game-schedule.md](docs/game-schedule.md))
 
 ## References
+
+### Possible investigations
 
 - Rotation may be simplified by using Python's own deque implementation, since it has a .rotate function
   - deque docs <https://docs.python.org/3/library/collections.html#collections.deque>
 - Event schedule could be written as a tree using anytree or bigtree
   - anytree <https://github.com/c0fec0de/anytree>
   - bigtree <https://bigtree.readthedocs.io/stable/>
+
+### Planning Documents
+
+These planning documents describe features that are now completed:
+
+- [Event profiles](docs/event-profiles.md)
+- [Schedule controller](docs/schedule-controller.md)
+- [Game schedule](docs/game-schedule.md)

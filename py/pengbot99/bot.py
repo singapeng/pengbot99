@@ -1,91 +1,103 @@
 # Python imports
 import argparse
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, time, timedelta, timezone
+
 
 # 3rd party imports
 import discord
 from discord.ext import tasks
 
-# local imports
-from pengbot99 import (
-    apiadapter,
-    explain_cmd,
-    formatters,
-    managers,
-    ui,
-    utils,
-)
 
-parser = argparse.ArgumentParser(description="pengbot99 Discord bot")
-parser.add_argument(
-    "--profile",
-    default="default",
-    help="Schedule config profile to load, e.g. 'queen'. Defaults to 'default'.",
-)
+# local imports
+from pengbot99 import apiadapter
+from pengbot99 import explain_cmd
+from pengbot99 import formatters
+from pengbot99 import schedule_controller
+from pengbot99 import ui
+from pengbot99 import utils
+
+
+# enable console logging (timestamps as before); the logger is otherwise
+# silent so importing the package never spews
+utils.configure_logging()
+
+
+parser = argparse.ArgumentParser(description='pengbot99 Discord bot')
+parser.add_argument('--profile', default=None,
+    help="Schedule config profile to load, e.g. 'queen'. Using this "
+         "overrides any EVENT_SCHEDULE_FILE config.")
 args = parser.parse_args()
 
 # Load tokens, ids, etc from an unversioned env file
-# Load schedule constants from a env-defined versioned config file
-env, csts, xpln = utils.load_config(profile=args.profile)
+env = utils.load_env()
+# read the profile switch config if present (EVENT_SCHEDULE_FILE in CONFIG_PATH)
+profile_switch = schedule_controller.load_profile_switches(env)
 
+# Choose the startup profile: an explicit --profile always wins, then the
+# active profile from EVENT_SCHEDULE_FILE, then the 'default' profile.
+schedule_file = env.get('EVENT_SCHEDULE_FILE')
+auto_switch = False
+if args.profile is not None:
+    profile = args.profile
+    utils.log("Using --profile '{0}' (manual override, auto-switch disabled).".format(profile))
+elif profile_switch is not None:
+    profile = profile_switch.active_on(datetime.now(timezone.utc).date())
+    auto_switch = True
+    utils.log("Schedule loaded from '{0}'; active profile '{1}'.".format(schedule_file, profile))
+else:
+    profile = 'default'
+    utils.log("No --profile and no EVENT_SCHEDULE_FILE; using profile 'default'.")
 
-class Pengbot(object):
-    def __init__(self, env, csts, profile="default"):
-        self.env = env
-        self.csts = csts
-        utils.log_profile_csv_warnings(env, profile)
+# Active profile validation:
+# fail gracefully on an invalid profile. Explicit --profile values are
+# fatal; config-derived ones fall back to 'default' with a warning.
+if not utils.is_valid_profile(env, profile):
+    if args.profile is not None:
+        parser.error(
+            "Invalid '--profile' value '{0}': no profile folder '{1}' in {2}.".format(
+                args.profile,
+                utils.get_schedule_dir(env, args.profile),
+                env.get('CONFIG_PATH') or 'the packaged data',
+            ))
+    else:
+        utils.log("WARNING: profile '{0}' from file '{1}' is invalid; "
+                  "falling back to 'default'.".format(profile, schedule_file))
+        profile = 'default'
 
-        # Where the game content is read from. Absent from the env means the
-        # copy that shipped inside the package; set means that directory wins.
-        mgrs = managers.build_managers(csts, env.get("CONFIG_PATH"), profile)
+# Load schedule constants and the schedule profiles, silently: startup
+# should only report its decision above and let a schedule announce
+# itself when it is actually set active.
+with utils.silence_logging():
+    env, csts = utils.load_config(profile=profile)
 
-        self.slot1mgr = mgrs.slot1mgr
-        self.slot2mgr = mgrs.slot2mgr
-        self.cmp_mgr = mgrs.cmp_mgr
-        self.mp_mgr = mgrs.mp_mgr
-        self.r99_mgr = mgrs.r99_mgr
-        self.pmp_mgr = mgrs.pmp_mgr
-        self.pcmp_mgr = mgrs.pcmp_mgr
-        # Shuffle Mini-Prix managers, None while Shuffle Weekend is off
-        self.smp_mgr = mgrs.smp_mgr
-        self.psmp_mgr = mgrs.psmp_mgr
+    # The ScheduleController holds the shared slot 1 and a registry
+    # of schedule profiles. Reads such as controller.slot2mgr resolve
+    # against the currently active schedule at call time.
+    controller = schedule_controller.ScheduleController(env, profile=profile, csts=csts)
 
-        if mgrs.secret_cfg:
-            utils.log(
-                "Secret League initialized with {0}".format(mgrs.secret_cfg.indices)
-            )
-        if mgrs.we_secret_cfg:
-            utils.log(
-                "Weekend Secret League is ON: {0}".format(mgrs.we_secret_cfg.indices)
-            )
-        utils.log(
-            "Setting cycles to {0} for {1}.".format(
-                self.mp_mgr.mp_cycles, self.mp_mgr.name
-            )
-        )
-        if mgrs.is_shuffle_on:
-            utils.log("!! Configured Shuffle Weekend !!")
+    # Preload the schedule profiles referenced by EVENT_SCHEDULE_FILE so that
+    # any load failure is reported at startup.
+    if auto_switch:
+        for name in profile_switch.profiles:
+            if not utils.is_valid_profile(env, name):
+                utils.log("WARNING: file '{0}' references unknown profile "
+                          "'{1}'; skipping.".format(schedule_file, name))
+                continue
+            try:
+                controller.load(name)
+            except Exception as exc:
+                utils.log("WARNING: could not preload schedule profile '{0}': {1}".format(name, exc))
 
-    def is_shuffle_on(self):
-        if self.smp_mgr:
-            return True
-        return False
-
-
-# Using the Pengbot class as a holder for all schedule managers for now.
-pb = Pengbot(env, csts, args.profile)
 bot = discord.Bot()
 
-explainer = explain_cmd.Explainer(xpln, pb.slot2mgr)
+explainer = explain_cmd.Explainer(controller, env=env, auto_switch=auto_switch)
 
 
 def _validate_utc_time(str_time):
     if not str_time:
         return None, None
     try:
-        utc_time = datetime.strptime(str_time, "%Y-%m-%d %H:%M").replace(
-            tzinfo=timezone.utc
-        )
+        utc_time = datetime.strptime(str_time, "%Y-%m-%d %H:%M").replace(tzinfo=timezone.utc)
     except ValueError:
         msg = "Disqualified! Invalid 'from_time' value '{0}'. Need 'YYYY-MM-DD HH:MM'."
         return msg.format(str_time), None
@@ -93,17 +105,20 @@ def _validate_utc_time(str_time):
 
 
 async def get_event_types(ctx: discord.AutocompleteContext):
-    """ """
+    """ 
+    """
     return list(ui.event_choices.keys())
 
 
 async def get_mp_types(ctx: discord.AutocompleteContext):
-    """ """
+    """ 
+    """
     return list(ui.mp_event_choices.keys())
 
 
 async def get_tracks(ctx: discord.AutocompleteContext):
-    """ """
+    """ 
+    """
     if ctx.options.get("event_type") == "Classic Mini-Prix":
         return list(ui.cmp_track_choices.keys())
     else:
@@ -111,7 +126,8 @@ async def get_tracks(ctx: discord.AutocompleteContext):
 
 
 async def get_topics(ctx: discord.AutocompleteContext):
-    """explain command options"""
+    """ explain command options
+    """
     return explainer.topics
 
 
@@ -119,11 +135,11 @@ async def create_schedule_messages():
     mp_thread_id, mp_msg_id = await post_miniprix_thread("miniprix")
     cmp_thread_id, cmp_msg_id = await post_miniprix_thread("classicprix")
     msg_env = {
-        "MINIPRIX_MSG_ID": mp_msg_id,
-        "MINIPRIX_THREAD_ID": mp_thread_id,
-        "CLASSICPRIX_MSG_ID": cmp_msg_id,
-        "CLASSICPRIX_THREAD_ID": cmp_thread_id,
-    }
+            "MINIPRIX_MSG_ID": mp_msg_id,
+            "MINIPRIX_THREAD_ID": mp_thread_id,
+            "CLASSICPRIX_MSG_ID": cmp_msg_id,
+            "CLASSICPRIX_THREAD_ID": cmp_thread_id,
+        }
     env.update(msg_env)
     main_id = await post_schedule_message()
     msg_env["ANNOUNCE_MSG_ID"] = main_id
@@ -153,10 +169,7 @@ async def configure_schedule_edit(interval=10):
     minute = now.minute // interval * interval
     # add interval minutes delta
     delta = timedelta(minutes=interval)
-    kickoff_time = (
-        datetime(now.year, now.month, now.day, now.hour, minute, tzinfo=timezone.utc)
-        + delta
-    )
+    kickoff_time = datetime(now.year, now.month, now.day, now.hour, minute, tzinfo=timezone.utc) + delta
 
     @tasks.loop(time=kickoff_time.time(), count=1)
     async def start_schedule_edit():
@@ -167,55 +180,81 @@ async def configure_schedule_edit(interval=10):
     start_schedule_edit.start()
 
 
+async def configure_auto_switch():
+    """ Schedules the nightly profile switch check at 23:54 UTC.
+        Runs only in auto mode (no explicit --profile).
+    """
+    utils.log("Automatic profile switching is active.")
+
+    @tasks.loop(time=time(hour=23, minute=54, tzinfo=timezone.utc))
+    async def check_profile_switch():
+        profile_switch = schedule_controller.load_profile_switches(env)
+        if profile_switch is None:
+            return
+        tomorrow = (datetime.now(timezone.utc) + timedelta(days=1)).date()
+        next_profile = profile_switch.active_on(tomorrow)
+        if next_profile == controller.name:
+            # tomorrow's profile is the same as today
+            return
+        if not utils.is_valid_profile(env, next_profile):
+            utils.log("WARNING: next profile '{0}' in EVENT_SCHEDULE_FILE is an "
+                      "unknown profile; skipping automatic switch.".format(next_profile))
+            return
+        utils.log("Switching to schedule profile '{0}' ...".format(next_profile))
+        controller.switch(next_profile)
+        for mp_type in ("miniprix", "classicprix"):
+            await _edit_miniprix_message(mp_type)
+        await _refresh_schedule_message()
+        if not env.get("TICKER_OVERRIDE"):
+            await _update_bot_status(bot)
+
+    check_profile_switch.start()
+
+
 @bot.event
 async def on_ready():
     utils.log(f"{bot.user} is ready and online!")
     # configure schedule edit task
     interval = int(env.get("REFRESH_INTERVAL"), 10)
     await configure_schedule_edit(interval)
+    # automatic profile switching at midnight UTC (auto mode only)
+    if auto_switch:
+        await configure_auto_switch()
     # if ticker override is set, set description now.
     ticker = env.get("TICKER_OVERRIDE")
     if ticker:
         utils.log("Ticker override is active, schedule ticker disabled.")
         await apiadapter.update_activity(bot, ticker)
     # Kick-off the automatic announce
-    # announce_schedule.start()
+    #announce_schedule.start()
 
 
 # command option help tips
-TIP_SHOWEVENTS_FROM_TIME = (
-    "The UTC time from which to display events as YYYY-MM-DD HH:MM"
-)
+TIP_SHOWEVENTS_FROM_TIME = "The UTC time from which to display events as YYYY-MM-DD HH:MM"
 # limit count to avoid tripping Discord message length limit
 MAX_COUNT_VALUE = 12
 # command option help tips
 TIP_WHEN_FROM_TIME = "The UTC time from which to display events as YYYY-MM-DD HH:MM"
-TIP_WHEN_COUNT = (
-    "How many events to display - must be from 1 to {0} (default 5)".format(
-        MAX_COUNT_VALUE
-    )
-)
+TIP_WHEN_COUNT = "How many events to display - must be from 1 to {0} (default 5)".format(MAX_COUNT_VALUE)
 
 
-@bot.slash_command(name="showevents", description="Shows upcoming events")
+@bot.slash_command(name = "showevents", description = "Shows upcoming events")
 async def showevents(
-    ctx: discord.ApplicationContext,
-    utc_time: discord.Option(str, required=False, description=TIP_SHOWEVENTS_FROM_TIME),
-):
+        ctx: discord.ApplicationContext,
+        utc_time: discord.Option(str, required=False, description=TIP_SHOWEVENTS_FROM_TIME),
+        ):
     utils.log(f"{ctx.author.name} used {ctx.command}.")
     err, from_time = _validate_utc_time(utc_time)
     if err:
         await ctx.respond(err)
         return None
-    evts = pb.slot2mgr.list_events(timestamp=from_time, next=80)
+    evts = controller.slot2mgr.list_events(timestamp=from_time, next=80)
     if not evts:
         await ctx.respond("Could not fetch any event :(")
         return None
     if from_time:
         header = "F-Zero 99 events {0} local time:"
-        response = [
-            header.format(formatters.format_discord_timestamp(from_time, inline=True))
-        ]
+        response = [header.format(formatters.format_discord_timestamp(from_time, inline=True))]
     else:
         response = ["F-Zero 99 Upcoming events in your local time:"]
         ongoing_evt = evts[0].name
@@ -224,38 +263,18 @@ async def showevents(
         evts = evts[1:]
     for evt in evts:
         response.append(formatters.format_future_event(evt))
-    await ctx.respond("\n".join(response))
-
-
-def _when_secret_league(mgr, count, from_time):
-    if not mgr.is_secret_league_on():
-        return None
-    # let's look for all Grand Prix first.
-    names = ui.event_choices.get("Grand Prix")
-    # We need to query enough GPs for the secret league pattern to generate matches
-    # This might result in more results than we need so we will trim later.
-    gp_count = ((count // mgr._secret_cfg.interval_count) + 1) * mgr._secret_cfg.length
-    gp_evts = mgr.when_event(names=names, count=gp_count, timestamp=from_time)
-    # only keep glitch GPs
-    evts = [evt for evt in gp_evts if evt.glitch]
-    if len(evts) > count:
-        return evts[:count]
-    return evts
+    await ctx.respond('\n'.join(response))
 
 
 def _when(event_type, from_time=None, count=5):
     names = ui.event_choices.get(event_type)
     evts = None
     if event_type == "Glitch 99":
-        mgr = pb.slot1mgr
+        mgr = controller.slot1mgr
         evts = mgr.when_event(names=names, count=count, timestamp=from_time)
         fmt_func = formatters.format_glitch_event
-    elif event_type == "Secret League":
-        mgr = pb.slot2mgr
-        evts = _when_secret_league(mgr, count, from_time)
-        fmt_func = formatters.format_future_event
     else:
-        mgr = pb.slot2mgr
+        mgr = controller.slot2mgr
         evts = mgr.when_event(names=names, count=count, timestamp=from_time)
         fmt_func = formatters.format_future_event
     if not evts:
@@ -269,24 +288,18 @@ def _when(event_type, from_time=None, count=5):
         response = ["Next {0} events in your local time:".format(event_type)]
     for evt in evts:
         response.append(fmt_func(evt))
-    return "\n".join(response)
+    return '\n'.join(response)
 
 
 @bot.slash_command(name="when", description="List time for specific events")
 async def when(
-    ctx: discord.ApplicationContext,
-    event_type: discord.Option(
-        str, autocomplete=discord.utils.basic_autocomplete(get_event_types)
-    ),
-    count: discord.Option(int, required=False, default=5, description=TIP_WHEN_COUNT),
-):
+        ctx: discord.ApplicationContext,
+        event_type: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_event_types)),
+        count: discord.Option(int, required=False, default=5, description=TIP_WHEN_COUNT),
+        ):
     utils.log(f"{ctx.author.name} used {ctx.command}.")
     if not 0 < count <= MAX_COUNT_VALUE:
-        response = (
-            "Disqualified! Invalid 'count' value {0}. Must be between 1 and 12.".format(
-                count
-            )
-        )
+        response = "Disqualified! Invalid 'count' value {0}. Must be between 1 and 12.".format(count)
     else:
         response = _when(event_type, count=count)
     if response:
@@ -295,25 +308,17 @@ async def when(
         await ctx.respond("POWER DOWN! No result for '{0}' :(".format(event_type))
 
 
-@bot.slash_command(
-    name="utc_when", description="List time for events starting from UTC time"
-)
+@bot.slash_command(name="utc_when", description="List time for events starting from UTC time")
 async def utc_when(
-    ctx: discord.ApplicationContext,
-    event_type: discord.Option(
-        str, autocomplete=discord.utils.basic_autocomplete(get_event_types)
-    ),
-    from_time: discord.Option(str, description=TIP_WHEN_FROM_TIME),
-    count: discord.Option(int, required=False, default=5, description=TIP_WHEN_COUNT),
-):
+        ctx: discord.ApplicationContext,
+        event_type: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_event_types)),
+        from_time: discord.Option(str, description=TIP_WHEN_FROM_TIME),
+        count: discord.Option(int, required=False, default=5, description=TIP_WHEN_COUNT),
+        ):
     utils.log(f"{ctx.author.name} used {ctx.command}.")
     err, response = None, None
     if not 0 < count <= MAX_COUNT_VALUE:
-        err = (
-            "Disqualified! Invalid 'count' value {0}. Must be between 1 and 12.".format(
-                count
-            )
-        )
+        err = "Disqualified! Invalid 'count' value {0}. Must be between 1 and 12.".format(count)
     else:
         err, from_time = _validate_utc_time(from_time)
     if not err:
@@ -329,40 +334,33 @@ TIP_MINIPRIX_TRACK_FILTER = "Only show track selections that include this track.
 
 
 def _fetch_miniprix_events(event_type, from_time, private):
+    """
+    """
     if event_type == "classicprix":
         if private:
-            mgr = pb.pcmp_mgr
+            mgr = controller.pcmp_mgr
         else:
-            mgr = pb.cmp_mgr
+            mgr = controller.cmp_mgr
     else:
         if private:
-            mgr = pb.pmp_mgr
+            mgr = controller.pmp_mgr
         else:
-            mgr = pb.mp_mgr
-    evts = mgr.get_miniprix(timestamp=from_time)
-    if evts and event_type != "classicprix" and pb.is_shuffle_on():
-        if not pb.slot2mgr.is_weekday(evts[0].start_time):
-            if private:
-                mgr = pb.psmp_mgr
-            else:
-                mgr = pb.smp_mgr
-            evts = mgr.get_miniprix(timestamp=from_time)
-    return evts
+            mgr = controller.mp_mgr
+    return mgr.get_miniprix(timestamp=from_time)
 
 
-def _build_mp_event_name(event_type, private, start_time):
+def _build_mp_event_name(event_type, private, evt):
     evt_name = formatters.event_display_names.get(event_type)
-    if event_type != "classicprix":
-        if pb.is_shuffle_on() and not pb.slot2mgr.is_weekday(start_time):
-            evt_name = "Machine Shuffle {0}".format(evt_name)
+    if event_type != "classicprix" and evt.shuffle:
+        evt_name = "Machine Shuffle {0}".format(evt_name)
     if private:
         evt_name = "Private {0}".format(evt_name)
     return evt_name
 
 
-def _create_miniprix_message(
-    event_type, track_filter, utc_time, verbose, private=False
-):
+def _create_miniprix_message(event_type, track_filter, utc_time, verbose, private=False):
+    """
+    """
     response = None
     err, from_time = _validate_utc_time(utc_time)
 
@@ -374,30 +372,24 @@ def _create_miniprix_message(
 
         evts = _fetch_miniprix_events(event_type, from_time, private)
         if evts:
-            evt_name = _build_mp_event_name(event_type, private, evts[0].start_time)
+            evt_name = _build_mp_event_name(event_type, private, evts[0])
             start = int(evts[0].start_time.timestamp())
-            header = "Track selection for {0} scheduled <t:{1}:R>".format(
-                evt_name, start
-            )
+            header = "Track selection for {0} scheduled <t:{1}:R>".format(evt_name, start)
             response = [header]
             for evt in evts:
                 if not track_filter or evt.has_track(track):
                     response.append(formatters.format_track_selection(evt, verbose))
             if len(response) == 1:
                 response.append("No results :(")
-            response = "\n".join(response)
+            response = '\n'.join(response)
     return err, response
 
 
 async def post_miniprix_thread(event_type):
     channel = bot.get_channel(int(env["SCHEDULE_EDIT_CHANNEL"]))
     ctype = discord.ChannelType.public_thread
-    thread_name = "See {0} schedule".format(
-        formatters.event_display_names.get(event_type)
-    )
-    thread = await channel.create_thread(
-        name=thread_name, message=None, auto_archive_duration=10080, type=ctype
-    )
+    thread_name = "See {0} schedule".format(formatters.event_display_names.get(event_type))
+    thread = await channel.create_thread(name=thread_name, message=None, auto_archive_duration=10080, type=ctype)
 
     err, response = _create_miniprix_message(event_type, None, None, False)
     if not response:
@@ -439,49 +431,82 @@ async def _edit_miniprix_message(mp_type):
     utils.log("Update complete.")
 
 
-@bot.slash_command(
-    name="miniprix",
-    description="List the track selection for the ongoing or next Mini-Prix",
-)
+@bot.slash_command(name="miniprix", description="List the track selection for the ongoing or next Mini-Prix")
 async def miniprix(
-    ctx: discord.ApplicationContext,
-    event_type: discord.Option(
-        str, autocomplete=discord.utils.basic_autocomplete(get_mp_types)
-    ),
-    track_filter: discord.Option(
-        str,
-        required=False,
-        autocomplete=discord.utils.basic_autocomplete(get_tracks),
-        description=TIP_MINIPRIX_TRACK_FILTER,
-    ),
-    utc_time: discord.Option(str, required=False, description=TIP_WHEN_FROM_TIME),
-    verbose: discord.Option(
-        bool, required=False, default=False, description=TIP_MINIPRIX_VERBOSE
-    ),
-):
-    """ """
+        ctx: discord.ApplicationContext,
+        event_type: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_mp_types)),
+        track_filter: discord.Option(str, required=False, autocomplete=discord.utils.basic_autocomplete(get_tracks),
+                            description=TIP_MINIPRIX_TRACK_FILTER),
+        utc_time: discord.Option(str, required=False, description=TIP_WHEN_FROM_TIME),
+        verbose: discord.Option(bool, required=False, default=False, description=TIP_MINIPRIX_VERBOSE),
+        ):
+    """
+    """
     utils.log(f"{ctx.author.name} used {ctx.command}.")
     private = "Private" in event_type
     event_type = ui.mp_event_choices.get(event_type)
-    err, response = _create_miniprix_message(
-        event_type, track_filter, utc_time, verbose, private
-    )
+    err, response = _create_miniprix_message(event_type, track_filter, utc_time, verbose, private)
+    await ctx.respond(err or response)
+
+
+def _lineup(event_type, timestamp=None):
+    """ The track pairs of a Team Battle, Pro-Tracks or Classic slot, or
+        of a private lobby of that mode opened at the timestamp.
+    """
+    name, private = ui.lineup_event_choices[event_type]
+    mgr = controller.lineup_mgrs[(name, private)]
+    evts = mgr.list_events(timestamp)
+    if not evts:
+        return "POWER DOWN! No {0} slot in the coming week :(".format(event_type)
+    if private:
+        opened = formatters.format_discord_timestamp(evts[0].start_time, inline=True)
+        header = "Track pairs for a {0} lobby opened {1} (local time):".format(
+                event_type, opened)
+    else:
+        start = int(evts[0].start_time.timestamp())
+        header = "Track pairs for {0} scheduled <t:{1}:R>:".format(event_type, start)
+    response = [header]
+    for evt in evts:
+        response.append(formatters.format_track_choice(evt))
+    return '\n'.join(response)
+
+
+async def get_lineup_types(ctx: discord.AutocompleteContext):
+    return list(ui.lineup_event_choices.keys())
+
+
+@bot.slash_command(name="lineup",
+                   description="List the track pairs of Team Battle, Pro-Tracks or Classic")
+async def lineup(
+        ctx: discord.ApplicationContext,
+        event_type: discord.Option(
+            str, autocomplete=discord.utils.basic_autocomplete(get_lineup_types)),
+        utc_time: discord.Option(str, required=False, description=TIP_WHEN_FROM_TIME),
+        ):
+    utils.log(f"{ctx.author.name} used {ctx.command}.")
+    response = None
+    err, from_time = _validate_utc_time(utc_time)
+    if not err:
+        if event_type not in ui.lineup_event_choices:
+            err = "Disqualified! Unknown event type '{0}'.".format(event_type)
+        else:
+            response = _lineup(event_type, from_time)
     await ctx.respond(err or response)
 
 
 def _ninetynine(timestamp=None):
-    """ """
-    return "\n".join(pb.r99_mgr.get_formatted_events(timestamp))
+    """
+    """
+    return '\n'.join(controller.r99_mgr.get_formatted_events(timestamp))
 
 
-@bot.slash_command(
-    name="ninetynine", description="List the track selection for the upcoming 99 races"
-)
+@bot.slash_command(name="ninetynine", description="List the track selection for the upcoming 99 races")
 async def ninetynine(
-    ctx: discord.ApplicationContext,
-    utc_time: discord.Option(str, required=False, description=TIP_WHEN_FROM_TIME),
-):
-    """ """
+        ctx: discord.ApplicationContext,
+        utc_time: discord.Option(str, required=False, description=TIP_WHEN_FROM_TIME),
+        ):
+    """
+    """
     utils.log(f"{ctx.author.name} used {ctx.command}.")
     response = None
     err, from_time = _validate_utc_time(utc_time)
@@ -491,26 +516,23 @@ async def ninetynine(
 
 
 def get_missing_event_types(evts):
-    """Print the next occurence of events of a type missing from the must-have list."""
+    """ Print the next occurence of events of a type
+        missing from the must-have list
+    """
     present_evts = list(set([evt.name for evt in evts]))
     results = []
     # we want to show the next Glitch GP if available
     if "glitchgp" not in present_evts:
-        extra = _when_secret_league(pb.slot2mgr, 1, None)
+        extra = controller.slot2mgr.when_event(names=["glitchgp"], count=1)
         if extra:
             results.append(extra[0])
 
     # we should show one of each standard/mirror prix pair
-    for mprix in [
-        ["knight", "mknight"],
-        ["queen", "mqueen"],
-        ["king", "mking"],
-        ["ace", "mace"],
-    ]:
+    for mprix in [["knight", "mknight"], ["queen", "mqueen"], ["king", "mking"], ["ace", "mace"]]:
         if mprix[0] not in present_evts and mprix[1] not in present_evts:
             # for mirrored prix, we query both names but will only get the closest
             # that is not a glitch gp
-            extra = pb.slot2mgr.when_event(names=mprix, count=5)
+            extra = controller.slot2mgr.when_event(names=mprix, count=5)
             for item in extra:
                 if not item.glitch:
                     results.append(item)
@@ -519,12 +541,12 @@ def get_missing_event_types(evts):
     # now add other events that don't have a mirror version
     for name in ["miniprix", "classicprix"]:
         if name not in present_evts:
-            extra = pb.slot2mgr.when_event(names=[name], count=1)
+            extra = controller.slot2mgr.when_event(names=[name], count=1)
             if extra:
                 results.append(extra[0])
 
     # make sure results are ordered from next to last
-    results = sorted(results, key=lambda item: item.start_time)
+    results = sorted(results, key=lambda item:item.start_time)
     return results
 
 
@@ -543,17 +565,15 @@ def kick_off_mp_update(mp_evt):
     async def start_mp_edit():
         await _edit_miniprix_message(mp_evt.name)
 
-    utils.log(
-        "{0} will be edited at {1}.".format(mp_evt.name, kickoff_time.strftime("%H:%M"))
-    )
+    utils.log("{0} will be edited at {1}.".format(mp_evt.name, kickoff_time.strftime("%H:%M")))
     start_mp_edit.start()
 
 
 async def _update_bot_status(bot):
     gps = ui.event_choices["Grand Prix"] + ["glitchgp"]
-    evt = pb.slot2mgr.get_current_event()
+    evt = controller.slot2mgr.get_current_event()
     if evt.name not in gps:
-        evts = pb.slot2mgr.get_events(names=gps, count=1)
+        evts = controller.slot2mgr.get_events(names=gps, count=1)
         evt = evts[0]
         evt_name = formatters.event_display_names.get(evt.name, evt.name)
         delta = (evt.start_time - datetime.now(timezone.utc)).seconds // 60
@@ -569,8 +589,8 @@ async def _update_bot_status(bot):
 
 def _create_schedule_message():
     glitch_evts = ui.event_choices.get("Glitch 99")
-    evts = pb.slot2mgr.list_events(next=119)
-    glitches = pb.slot1mgr.when_event(names=glitch_evts, count=5, limit=119)
+    evts = controller.slot2mgr.list_events(next=119)
+    glitches = controller.slot1mgr.when_event(names=glitch_evts, count=5, limit=119)
     if not evts:
         utils.log("Could not fetch any event :(")
         return []
@@ -609,12 +629,12 @@ async def post_schedule_message():
     if not response:
         return
 
-    msg = await channel.send("\n".join(response))
+    msg = await channel.send('\n'.join(response))
     return msg.id
 
-
-@tasks.loop(seconds=int(env.get("REFRESH_INTERVAL"), 10) * 60)
-async def edit_schedule_message():
+async def _refresh_schedule_message():
+    """ Replaces the main schedule message in place.
+    """
     channel = bot.get_channel(int(env["SCHEDULE_EDIT_CHANNEL"]))
     msg_id = int(env["ANNOUNCE_MSG_ID"])
     msg = await channel.fetch_message(msg_id)
@@ -624,7 +644,11 @@ async def edit_schedule_message():
         return
 
     # Edit message in place
-    await msg.edit("\n".join(response))
+    await msg.edit('\n'.join(response))
+
+@tasks.loop(seconds=int(env.get("REFRESH_INTERVAL"), 10) * 60)
+async def edit_schedule_message():
+    await _refresh_schedule_message()
 
     # Update status
     if not env.get("TICKER_OVERRIDE"):
@@ -635,9 +659,8 @@ async def edit_schedule_message():
 
 # these functions are currently unused
 
-
 def _create_track_selection_message():
-    response = pb.r99_mgr.get_formatted_events()
+    response = controller.r99_mgr.get_formatted_events()
     if not response:
         utils.log("Could not fetch track selection :(")
         return []
@@ -652,7 +675,7 @@ async def post_track_selection_message():
     if not response:
         return
 
-    msg = await channel.send("\n".join(response))
+    msg = await channel.send('\n'.join(response))
     return msg.id
 
 
@@ -667,27 +690,26 @@ async def edit_track_selection_message():
         return
 
     # Edit message in place
-    await msg.edit("\n".join(response))
-
+    await msg.edit('\n'.join(response))
 
 ### End Festival League auto-update 99 race schedule ###
 
 
 @tasks.loop(seconds=3600)
 async def announce_schedule():
-    """Deprecated, currently unused and may not work.
+    """ Deprecated, currently unused and may not work.
 
-    This creates a new message every hour in the given channel.
-    It will cause the channel to go unread each time, which may
-    or may not be desirable. On some clients, it may be necessary
-    to scroll down from the last unread message when catching up.
-    That is most likely not desirable.
+        This creates a new message every hour in the given channel.
+        It will cause the channel to go unread each time, which may
+        or may not be desirable. On some clients, it may be necessary
+        to scroll down from the last unread message when catching up.
+        That is most likely not desirable.
     """
     await bot.wait_until_ready()
     channel = bot.get_channel(int(env["ANNOUNCE_CHANNEL"]))
     glitch_evts = ui.event_choices.get("Glitch 99")
-    evts = pb.slot2mgr.list_events(next=110)
-    glitches = pb.slot1mgr.when_event(names=glitch_evts, count=5, limit=110)
+    evts = controller.slot2mgr.list_events(next=110)
+    glitches = controller.slot1mgr.when_event(names=glitch_evts, count=5, limit=110)
     if not evts:
         print("Could not fetch any event :(")
         return None
@@ -705,33 +727,27 @@ async def announce_schedule():
         for glitch in glitches:
             response.append(formatters.format_glitch_event(glitch))
     if not has_king_gp:
-        king_evt = pb.slot2mgr.when_event(names=["king"], count=1)
+        king_evt = controller.slot2mgr.when_event(names=["king"], count=1)
         if king_evt:
             response.append("\nNext King League:")
             response.append(formatters.format_future_event(king_evt[0]))
-    await channel.send("\n".join(response))
+    await channel.send('\n'.join(response))
 
 
-@bot.slash_command(name="explain", description="Explain a thing.")
+@bot.slash_command(name="explain", description="Explain a Grand Prix rotation or event schedule.")
 async def explain(
-    ctx: discord.ApplicationContext,
-    topic: discord.Option(
-        str, autocomplete=discord.utils.basic_autocomplete(get_topics)
-    ),
-):
+        ctx: discord.ApplicationContext,
+        topic: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_topics)),
+        ):
     utils.log(f"{ctx.author.name} used {ctx.command}.")
     await ctx.respond(explainer.explain(topic))
 
 
-@bot.slash_command(
-    name="ping",
-    description="Sends the bot's latency.",
-    guild_ids=[env["TEST_GUILD_ID"]],
-)
-async def ping(ctx):  # a slash command will be created with the name "ping"
+@bot.slash_command(name="ping", description="Sends the bot's latency.", guild_ids=[env['TEST_GUILD_ID']])
+async def ping(ctx): # a slash command will be created with the name "ping"
     utils.log(f"{ctx.author.name} used {ctx.command}.")
     await ctx.respond(f"Pong! Latency is {bot.latency}")
 
 
 if __name__ == "__main__":
-    bot.run(env["DISCORD_BOT_TOKEN"])  # run the bot with the token
+    bot.run(env['DISCORD_BOT_TOKEN']) # run the bot with the token

@@ -42,6 +42,18 @@ event_choices = {
 }
 
 
+# Internal track-pair modes to look up upon user selection,
+# as (event name, private lobby)
+lineup_event_choices = {
+    "Team Battle": ("teambattle", False),
+    "Pro-Tracks": ("protracks", False),
+    "Classic": ("classic", False),
+    "Private Team Battle": ("teambattle", True),
+    "Private Pro-Tracks": ("protracks", True),
+    "Private Classic": ("classic", True),
+}
+
+
 # Internal mini-prix types to look up upon user selection
 mp_event_choices = {
     "Classic Mini-Prix": "classicprix",
@@ -68,10 +80,10 @@ mp_track_choices = {
     "Red Canyon I": "Red_Canyon_I",
     "Red Canyon II": "Red_Canyon_II",
     "Sand Ocean": "Sand_Ocean",
-    "Sand Ocean + Port Town": "Mystery_6",
+    "Sand Ocean + Port Town": "Mystery_7",
     "Sand Storm I": "Sand_Storm_I",
     "Sand Storm II": "Sand_Storm_II",
-    "Silence + Sand Storm": "Mystery_7",
+    "Silence + Sand Storm": "Mystery_6",
     "White Land I": "White_Land_I",
 }
 

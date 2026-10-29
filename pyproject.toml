@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pengbot99"
-version = "0.2.0"
+version = "0.3.0"
 description = "F-Zero 99 Schedule Discord Bot"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -28,12 +28,12 @@ bot = ["py-cord>=2.5"]
 [tool.setuptools]
 include-package-data = true
 
-# The CSV and .dat dumps of game content are what this package computes over.
-# An installed copy that does not carry them is of no use to a caller that has
-# no checkout. CONFIG_PATH still overrides them at runtime -- see README.md.
-# The schedule config sits one level down, a folder per profile.
+# The JSON dumps of the game's schedule files are what this package computes
+# over. An installed copy that does not carry them is of no use to a caller
+# that has no checkout. CONFIG_PATH still overrides them at runtime -- see
+# README.md. The schedule files sit one level down, a folder per profile.
 [tool.setuptools.package-data]
-pengbot99 = ["data/*.csv", "data/*.dat", "data/*/*.csv", "data/*/*.dat"]
+pengbot99 = ["data/*.json", "data/*.csv", "data/*/*.json", "data/*/*.dat"]
 
 [tool.setuptools.packages.find]
 where = ["py"]

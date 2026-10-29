@@ -3,14 +3,16 @@ import subprocess
 import sys
 import unittest
 
-# Modules that compute the schedule, plus the assembly that turns the content
-# dumps into managers. They are consumed by the Discord bot, but also by
-# callers that have no Discord client and no business installing one.
+# Modules that compute the schedule, plus the assembly that turns the game's
+# schedule files into managers. They are consumed by the Discord bot, but also
+# by callers that have no Discord client and no business installing one.
 SCHEDULE_MODULES = (
+    "pengbot99.gameschedule",
+    "pengbot99.gameevents",
+    "pengbot99.schedule_controller",
+    "pengbot99.events",
     "pengbot99.schedule",
     "pengbot99.miniprix",
-    "pengbot99.events",
-    "pengbot99.managers",
 )
 
 

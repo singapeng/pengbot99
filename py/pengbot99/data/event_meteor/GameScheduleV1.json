@@ -1,0 +1,1778 @@
+{
+  "ActiveEndTime": "2026-11-09T00:00",
+  "ActiveStartTime": "2026-10-19T00:00",
+  "AvailableTracks": [
+    {
+      "LeagueId": "All",
+      "TrackTypes": [
+        "Normal",
+        "Mirror",
+        "Classic"
+      ]
+    }
+  ],
+  "ClassicTrackSchedule": {
+    "AvailabilityInterval": 1,
+    "DifficultyInterval": 1,
+    "DifficultyOrder": [
+      1,
+      2
+    ],
+    "Sets": [
+      {
+        "SetId": 1,
+        "Tracks": [
+          {
+            "TrackId": "Mute_City_I",
+            "TrackType": "Classic"
+          },
+          {
+            "TrackId": "Red_Canyon_I",
+            "TrackType": "Classic"
+          }
+        ]
+      },
+      {
+        "SetId": 2,
+        "Tracks": [
+          {
+            "TrackId": "Sand_Storm_II",
+            "TrackType": "Classic"
+          },
+          {
+            "TrackId": "Death_Wind_II",
+            "TrackType": "Classic"
+          }
+        ]
+      },
+      {
+        "SetId": 3,
+        "Tracks": [
+          {
+            "TrackId": "Big_Blue_II",
+            "TrackType": "Classic"
+          },
+          {
+            "TrackId": "Mute_City_IV",
+            "TrackType": "Classic"
+          }
+        ]
+      },
+      {
+        "SetId": 4,
+        "Tracks": [
+          {
+            "TrackId": "Sand_Storm_I",
+            "TrackType": "Classic"
+          },
+          {
+            "TrackId": "Silence",
+            "TrackType": "Classic"
+          }
+        ]
+      },
+      {
+        "SetId": 5,
+        "Tracks": [
+          {
+            "TrackId": "Mute_City_II",
+            "TrackType": "Classic"
+          },
+          {
+            "TrackId": "Big_Blue",
+            "TrackType": "Classic"
+          }
+        ]
+      },
+      {
+        "SetId": 6,
+        "Tracks": [
+          {
+            "TrackId": "Silence",
+            "TrackType": "Classic"
+          },
+          {
+            "TrackId": "White_Land_II",
+            "TrackType": "Classic"
+          }
+        ]
+      },
+      {
+        "SetId": 7,
+        "Tracks": [
+          {
+            "TrackId": "Death_Wind_I",
+            "TrackType": "Classic"
+          },
+          {
+            "TrackId": "Sand_Ocean",
+            "TrackType": "Classic"
+          }
+        ]
+      },
+      {
+        "SetId": 8,
+        "Tracks": [
+          {
+            "TrackId": "Big_Blue_II",
+            "TrackType": "Classic"
+          },
+          {
+            "TrackId": "Silence_II",
+            "TrackType": "Classic"
+          }
+        ]
+      },
+      {
+        "SetId": 9,
+        "Tracks": [
+          {
+            "TrackId": "Mute_City_III",
+            "TrackType": "Classic"
+          },
+          {
+            "TrackId": "Port_Town_I",
+            "TrackType": "Classic"
+          }
+        ]
+      },
+      {
+        "SetId": 10,
+        "Tracks": [
+          {
+            "TrackId": "Sand_Storm_II",
+            "TrackType": "Classic"
+          },
+          {
+            "TrackId": "White_Land_I",
+            "TrackType": "Classic"
+          }
+        ]
+      },
+      {
+        "SetId": 11,
+        "Tracks": [
+          {
+            "TrackId": "Port_Town_II",
+            "TrackType": "Classic"
+          },
+          {
+            "TrackId": "Red_Canyon_II",
+            "TrackType": "Classic"
+          }
+        ]
+      },
+      {
+        "SetId": 12,
+        "Tracks": [
+          {
+            "TrackId": "Mute_City_IV",
+            "TrackType": "Classic"
+          },
+          {
+            "TrackId": "Death_Wind_II",
+            "TrackType": "Classic"
+          }
+        ]
+      },
+      {
+        "SetId": 13,
+        "Tracks": [
+          {
+            "TrackId": "Sand_Storm_I",
+            "TrackType": "Classic"
+          },
+          {
+            "TrackId": "Big_Blue_II",
+            "TrackType": "Classic"
+          }
+        ]
+      },
+      {
+        "SetId": 14,
+        "Tracks": [
+          {
+            "TrackId": "Death_Wind_II",
+            "TrackType": "Classic"
+          },
+          {
+            "TrackId": "White_Land_I",
+            "TrackType": "Classic"
+          }
+        ]
+      },
+      {
+        "SetId": 15,
+        "Tracks": [
+          {
+            "TrackId": "Mute_City_I",
+            "TrackType": "Classic"
+          },
+          {
+            "TrackId": "Sand_Storm_II",
+            "TrackType": "Classic"
+          }
+        ]
+      },
+      {
+        "SetId": 16,
+        "Tracks": [
+          {
+            "TrackId": "White_Land_II",
+            "TrackType": "Classic"
+          },
+          {
+            "TrackId": "Fire_Field",
+            "TrackType": "Classic"
+          }
+        ]
+      },
+      {
+        "SetId": 17,
+        "Tracks": [
+          {
+            "TrackId": "Sand_Storm_I",
+            "TrackType": "Classic"
+          },
+          {
+            "TrackId": "Red_Canyon_II",
+            "TrackType": "Classic"
+          }
+        ]
+      },
+      {
+        "SetId": 18,
+        "Tracks": [
+          {
+            "TrackId": "Big_Blue",
+            "TrackType": "Classic"
+          },
+          {
+            "TrackId": "Port_Town_II",
+            "TrackType": "Classic"
+          }
+        ]
+      },
+      {
+        "SetId": 19,
+        "Tracks": [
+          {
+            "TrackId": "Mute_City_II",
+            "TrackType": "Classic"
+          },
+          {
+            "TrackId": "Red_Canyon_II",
+            "TrackType": "Classic"
+          }
+        ]
+      },
+      {
+        "SetId": 20,
+        "Tracks": [
+          {
+            "TrackId": "Sand_Ocean",
+            "TrackType": "Classic"
+          },
+          {
+            "TrackId": "Port_Town_I",
+            "TrackType": "Classic"
+          }
+        ]
+      },
+      {
+        "SetId": 21,
+        "Tracks": [
+          {
+            "TrackId": "Mute_City_IV",
+            "TrackType": "Classic"
+          },
+          {
+            "TrackId": "Death_Wind_I",
+            "TrackType": "Classic"
+          }
+        ]
+      },
+      {
+        "SetId": 22,
+        "Tracks": [
+          {
+            "TrackId": "Big_Blue",
+            "TrackType": "Classic"
+          },
+          {
+            "TrackId": "Red_Canyon_I",
+            "TrackType": "Classic"
+          }
+        ]
+      },
+      {
+        "SetId": 23,
+        "Tracks": [
+          {
+            "TrackId": "Mute_City_III",
+            "TrackType": "Classic"
+          },
+          {
+            "TrackId": "Sand_Storm_I",
+            "TrackType": "Classic"
+          }
+        ]
+      },
+      {
+        "SetId": 24,
+        "Tracks": [
+          {
+            "TrackId": "Big_Blue_II",
+            "TrackType": "Classic"
+          },
+          {
+            "TrackId": "Sand_Storm_II",
+            "TrackType": "Classic"
+          }
+        ]
+      },
+      {
+        "SetId": 25,
+        "Tracks": [
+          {
+            "TrackId": "Silence_II",
+            "TrackType": "Classic"
+          },
+          {
+            "TrackId": "Fire_Field",
+            "TrackType": "Classic"
+          }
+        ]
+      },
+      {
+        "SetId": 26,
+        "Tracks": [
+          {
+            "TrackId": "Port_Town_I",
+            "TrackType": "Classic"
+          },
+          {
+            "TrackId": "Red_Canyon_I",
+            "TrackType": "Classic"
+          }
+        ]
+      },
+      {
+        "SetId": 27,
+        "Tracks": [
+          {
+            "TrackId": "Mute_City_IV",
+            "TrackType": "Classic"
+          },
+          {
+            "TrackId": "White_Land_I",
+            "TrackType": "Classic"
+          }
+        ]
+      },
+      {
+        "SetId": 28,
+        "Tracks": [
+          {
+            "TrackId": "Port_Town_II",
+            "TrackType": "Classic"
+          },
+          {
+            "TrackId": "Silence_II",
+            "TrackType": "Classic"
+          }
+        ]
+      }
+    ]
+  },
+  "EventRivalsSchedule": {
+    "NormalRivals99": [
+      3,
+      5,
+      7,
+      13
+    ],
+    "NormalRivalsGP": [
+      2,
+      5,
+      7,
+      9
+    ],
+    "SpecialRivals99": [
+      10,
+      7,
+      6,
+      1,
+      11,
+      8,
+      1,
+      7
+    ],
+    "SpecialRivalsGP": [
+      7
+    ]
+  },
+  "GameModeList": [
+    {
+      "Name": "Closed",
+      "Type": "Closed"
+    },
+    {
+      "Leagues": [
+        {
+          "Name": "KnightLeague"
+        },
+        {
+          "Name": "QueenLeague"
+        },
+        {
+          "Name": "KingLeague"
+        },
+        {
+          "Name": "MirrorKnightLeague"
+        },
+        {
+          "Name": "MirrorQueenLeague"
+        },
+        {
+          "Name": "MirrorKingLeague"
+        },
+        {
+          "Name": "AceLeague"
+        },
+        {
+          "Name": "MirrorAceLeague"
+        },
+        {
+          "Name": "WorldTour"
+        }
+      ],
+      "Name": "GrandPrixRotation",
+      "RotationInterval": 5,
+      "RotationOrder": [
+        8,
+        1,
+        5,
+        3,
+        4,
+        2,
+        6,
+        7,
+        5,
+        3,
+        8,
+        1,
+        6,
+        7,
+        4,
+        2
+      ],
+      "Type": "GrandPrix"
+    },
+    {
+      "Leagues": [
+        {
+          "Name": "MiniPrix001"
+        },
+        {
+          "Name": "MiniPrix002"
+        },
+        {
+          "Name": "MiniPrix003"
+        },
+        {
+          "Name": "MiniPrix004"
+        },
+        {
+          "Name": "MiniPrix005"
+        },
+        {
+          "Name": "MiniPrix006"
+        },
+        {
+          "Name": "MiniPrix007"
+        },
+        {
+          "Name": "MiniPrix008"
+        },
+        {
+          "Name": "MiniPrix009"
+        },
+        {
+          "Name": "MiniPrix010"
+        },
+        {
+          "Name": "MiniPrix011"
+        },
+        {
+          "Name": "MiniPrix012"
+        },
+        {
+          "Name": "MiniPrix013"
+        },
+        {
+          "Name": "MiniPrix014"
+        },
+        {
+          "Name": "MiniPrix015"
+        },
+        {
+          "Name": "MiniPrix016"
+        },
+        {
+          "Name": "MiniPrix017"
+        },
+        {
+          "Name": "MiniPrix018"
+        },
+        {
+          "Name": "MiniPrix019"
+        },
+        {
+          "Name": "MiniPrix020"
+        },
+        {
+          "Name": "MiniPrix021"
+        },
+        {
+          "Name": "MiniPrix022"
+        },
+        {
+          "Name": "MiniPrix023"
+        },
+        {
+          "Name": "MiniPrix024"
+        },
+        {
+          "Name": "MiniPrix025"
+        },
+        {
+          "Name": "MiniPrix026"
+        },
+        {
+          "Name": "MiniPrix027"
+        },
+        {
+          "Name": "MiniPrix028"
+        },
+        {
+          "Name": "MiniPrix029"
+        },
+        {
+          "Name": "MiniPrix030"
+        },
+        {
+          "Name": "MiniPrix031"
+        },
+        {
+          "Name": "MiniPrix032"
+        },
+        {
+          "Name": "MiniPrix033"
+        },
+        {
+          "Name": "MiniPrix034"
+        },
+        {
+          "Name": "MiniPrix035"
+        },
+        {
+          "Name": "MiniPrix036"
+        },
+        {
+          "Name": "MiniPrix037"
+        },
+        {
+          "Name": "MiniPrix038"
+        },
+        {
+          "Name": "MiniPrix039"
+        },
+        {
+          "Name": "MiniPrix040"
+        },
+        {
+          "Name": "MiniPrix041"
+        },
+        {
+          "Name": "MiniPrix042"
+        },
+        {
+          "Name": "MiniPrix043"
+        }
+      ],
+      "MirrorTrackSubstitutionPatterns": [
+        "110",
+        "000",
+        "101",
+        "010",
+        "101",
+        "001",
+        "100",
+        "010",
+        "111"
+      ],
+      "Name": "MiniPrixRotation",
+      "RotationInterval": 1,
+      "Type": "MiniPrix"
+    },
+    {
+      "Leagues": [
+        {
+          "Offset": 5,
+          "TrackId": "INVALID_STAGE_ID"
+        }
+      ],
+      "Name": "WildCardMiniPrixRotation",
+      "Type": "WildCardMiniPrix"
+    },
+    {
+      "Name": "HardTracks",
+      "Tracks": [
+        {
+          "Offset": 0,
+          "TrackId": "INVALID_STAGE_ID"
+        }
+      ],
+      "Type": "HardTracks"
+    },
+    {
+      "Name": "Teams",
+      "RotationInterval": 1,
+      "Tracks": [
+        {
+          "Offset": 6,
+          "TrackId": "INVALID_STAGE_ID"
+        }
+      ],
+      "Type": "ColorTeams"
+    },
+    {
+      "Name": "Classic",
+      "RotationInterval": 1,
+      "Tracks": [
+        {
+          "Offset": 0,
+          "TrackId": "INVALID_STAGE_ID"
+        }
+      ],
+      "Type": "Classic"
+    },
+    {
+      "Leagues": [
+        {
+          "Name": "ClassicMiniPrix001"
+        },
+        {
+          "Name": "ClassicMiniPrix002"
+        },
+        {
+          "Name": "ClassicMiniPrix003"
+        },
+        {
+          "Name": "ClassicMiniPrix004"
+        },
+        {
+          "Name": "ClassicMiniPrix005"
+        },
+        {
+          "Name": "ClassicMiniPrix006"
+        },
+        {
+          "Name": "ClassicMiniPrix007"
+        },
+        {
+          "Name": "ClassicMiniPrix008"
+        },
+        {
+          "Name": "ClassicMiniPrix009"
+        },
+        {
+          "Name": "ClassicMiniPrix010"
+        },
+        {
+          "Name": "ClassicMiniPrix011"
+        },
+        {
+          "Name": "ClassicMiniPrix012"
+        },
+        {
+          "Name": "ClassicMiniPrix013"
+        },
+        {
+          "Name": "ClassicMiniPrix014"
+        },
+        {
+          "Name": "ClassicMiniPrix015"
+        },
+        {
+          "Name": "ClassicMiniPrix016"
+        },
+        {
+          "Name": "ClassicMiniPrix017"
+        },
+        {
+          "Name": "ClassicMiniPrix018"
+        },
+        {
+          "Name": "ClassicMiniPrix019"
+        },
+        {
+          "Name": "ClassicMiniPrix020"
+        },
+        {
+          "Name": "ClassicMiniPrix021"
+        },
+        {
+          "Name": "ClassicMiniPrix022"
+        },
+        {
+          "Name": "ClassicMiniPrix023"
+        },
+        {
+          "Name": "ClassicMiniPrix024"
+        },
+        {
+          "Name": "ClassicMiniPrix025"
+        },
+        {
+          "Name": "ClassicMiniPrix026"
+        },
+        {
+          "Name": "ClassicMiniPrix027"
+        },
+        {
+          "Name": "ClassicMiniPrix028"
+        },
+        {
+          "Name": "ClassicMiniPrix029"
+        }
+      ],
+      "Name": "ClassicMiniPrixRotation",
+      "RotationInterval": 1,
+      "Type": "ClassicMiniPrix"
+    }
+  ],
+  "GameModeSchedule": {
+    "Interval": [
+      {
+        "Duration": 5,
+        "SetName": "GrandPrixRotation"
+      },
+      {
+        "Duration": 15,
+        "SetName": "Teams"
+      },
+      {
+        "Duration": 5,
+        "SetName": "ClassicMiniPrixRotation"
+      },
+      {
+        "Duration": 15,
+        "SetName": "HardTracks"
+      },
+      {
+        "Duration": 5,
+        "SetName": "GrandPrixRotation"
+      },
+      {
+        "Duration": 15,
+        "SetName": "Classic"
+      },
+      {
+        "Duration": 5,
+        "SetName": "MiniPrixRotation"
+      },
+      {
+        "Duration": 15,
+        "SetName": "Teams"
+      },
+      {
+        "Duration": 5,
+        "SetName": "GrandPrixRotation"
+      },
+      {
+        "Duration": 15,
+        "SetName": "HardTracks"
+      },
+      {
+        "Duration": 5,
+        "SetName": "MiniPrixRotation"
+      },
+      {
+        "Duration": 15,
+        "SetName": "Classic"
+      }
+    ],
+    "Sets": [
+      {
+        "Game Modes": [
+          {
+            "Name": "Closed"
+          }
+        ]
+      },
+      {
+        "Game Modes": [
+          {
+            "Name": "GrandPrixRotation"
+          }
+        ]
+      },
+      {
+        "Game Modes": [
+          {
+            "Name": "MiniPrixRotation"
+          }
+        ]
+      },
+      {
+        "Game Modes": [
+          {
+            "Name": "HardTracks"
+          }
+        ]
+      },
+      {
+        "Game Modes": [
+          {
+            "Name": "Teams"
+          }
+        ]
+      },
+      {
+        "Game Modes": [
+          {
+            "Name": "Classic"
+          }
+        ]
+      },
+      {
+        "Game Modes": [
+          {
+            "Name": "ClassicMiniPrixRotation"
+          }
+        ]
+      },
+      {
+        "Game Modes": [
+          {
+            "Name": "WildCardMiniPrixRotation"
+          }
+        ]
+      }
+    ]
+  },
+  "GenericPopUpInfo": {
+    "End": "2026-02-09T00:00",
+    "PageInfo": [
+      {
+        "ContentMessageLabel": "GenericPopUpText",
+        "FormatType": "RightImageAndText",
+        "HeaderMessageLabel": "GenericPopUpTitle"
+      }
+    ],
+    "Start": "2026-01-19T00:00"
+  },
+  "HardTrackSchedule": {
+    "AvailabilityInterval": 1,
+    "DifficultyInterval": 1,
+    "DifficultyOrder": [
+      1,
+      2
+    ],
+    "Sets": [
+      {
+        "SetId": 1,
+        "Tracks": [
+          {
+            "TrackId": "Death_Wind_II"
+          },
+          {
+            "TrackId": "Port_Town_II"
+          }
+        ]
+      },
+      {
+        "SetId": 2,
+        "Tracks": [
+          {
+            "TrackId": "Red_Canyon_II",
+            "TrackType": "Mirror"
+          },
+          {
+            "TrackId": "Sand_Storm_II",
+            "TrackType": "Mirror"
+          }
+        ]
+      },
+      {
+        "SetId": 3,
+        "Tracks": [
+          {
+            "TrackId": "Port_Town_II"
+          },
+          {
+            "TrackId": "Red_Canyon_II",
+            "TrackType": "Mirror"
+          }
+        ]
+      },
+      {
+        "SetId": 4,
+        "Tracks": [
+          {
+            "TrackId": "White_Land_I",
+            "TrackType": "Mirror"
+          },
+          {
+            "TrackId": "Sand_Storm_II",
+            "TrackType": "Mirror"
+          }
+        ]
+      },
+      {
+        "SetId": 5,
+        "Tracks": [
+          {
+            "TrackId": "Death_Wind_II",
+            "TrackType": "Mirror"
+          },
+          {
+            "TrackId": "Red_Canyon_II"
+          }
+        ]
+      },
+      {
+        "SetId": 6,
+        "Tracks": [
+          {
+            "TrackId": "Death_Wind_II"
+          },
+          {
+            "TrackId": "White_Land_I",
+            "TrackType": "Mirror"
+          }
+        ]
+      },
+      {
+        "SetId": 7,
+        "Tracks": [
+          {
+            "TrackId": "Port_Town_II",
+            "TrackType": "Mirror"
+          },
+          {
+            "TrackId": "Sand_Storm_II"
+          }
+        ]
+      },
+      {
+        "SetId": 8,
+        "Tracks": [
+          {
+            "TrackId": "Red_Canyon_II",
+            "TrackType": "Mirror"
+          },
+          {
+            "TrackId": "White_Land_I"
+          }
+        ]
+      },
+      {
+        "SetId": 9,
+        "Tracks": [
+          {
+            "TrackId": "Death_Wind_II",
+            "TrackType": "Mirror"
+          },
+          {
+            "TrackId": "Port_Town_II"
+          }
+        ]
+      },
+      {
+        "SetId": 10,
+        "Tracks": [
+          {
+            "TrackId": "Red_Canyon_II"
+          },
+          {
+            "TrackId": "Sand_Storm_II",
+            "TrackType": "Mirror"
+          }
+        ]
+      },
+      {
+        "SetId": 11,
+        "Tracks": [
+          {
+            "TrackId": "Port_Town_II"
+          },
+          {
+            "TrackId": "Red_Canyon_II"
+          }
+        ]
+      },
+      {
+        "SetId": 12,
+        "Tracks": [
+          {
+            "TrackId": "White_Land_I",
+            "TrackType": "Mirror"
+          },
+          {
+            "TrackId": "Sand_Storm_II"
+          }
+        ]
+      },
+      {
+        "SetId": 13,
+        "Tracks": [
+          {
+            "TrackId": "Death_Wind_II",
+            "TrackType": "Mirror"
+          },
+          {
+            "TrackId": "Red_Canyon_II",
+            "TrackType": "Mirror"
+          }
+        ]
+      },
+      {
+        "SetId": 14,
+        "Tracks": [
+          {
+            "TrackId": "Death_Wind_II"
+          },
+          {
+            "TrackId": "White_Land_I"
+          }
+        ]
+      },
+      {
+        "SetId": 15,
+        "Tracks": [
+          {
+            "TrackId": "Port_Town_II",
+            "TrackType": "Mirror"
+          },
+          {
+            "TrackId": "Sand_Storm_II",
+            "TrackType": "Mirror"
+          }
+        ]
+      },
+      {
+        "SetId": 16,
+        "Tracks": [
+          {
+            "TrackId": "Red_Canyon_II",
+            "TrackType": "Mirror"
+          },
+          {
+            "TrackId": "White_Land_I",
+            "TrackType": "Mirror"
+          }
+        ]
+      },
+      {
+        "SetId": 17,
+        "Tracks": [
+          {
+            "TrackId": "Death_Wind_II",
+            "TrackType": "Mirror"
+          },
+          {
+            "TrackId": "Port_Town_II",
+            "TrackType": "Mirror"
+          }
+        ]
+      },
+      {
+        "SetId": 18,
+        "Tracks": [
+          {
+            "TrackId": "Red_Canyon_II"
+          },
+          {
+            "TrackId": "Sand_Storm_II"
+          }
+        ]
+      },
+      {
+        "SetId": 19,
+        "Tracks": [
+          {
+            "TrackId": "Port_Town_II",
+            "TrackType": "Mirror"
+          },
+          {
+            "TrackId": "Red_Canyon_II"
+          }
+        ]
+      },
+      {
+        "SetId": 20,
+        "Tracks": [
+          {
+            "TrackId": "White_Land_I"
+          },
+          {
+            "TrackId": "Sand_Storm_II"
+          }
+        ]
+      },
+      {
+        "SetId": 21,
+        "Tracks": [
+          {
+            "TrackId": "Death_Wind_II"
+          },
+          {
+            "TrackId": "Red_Canyon_II",
+            "TrackType": "Mirror"
+          }
+        ]
+      },
+      {
+        "SetId": 22,
+        "Tracks": [
+          {
+            "TrackId": "Death_Wind_II",
+            "TrackType": "Mirror"
+          },
+          {
+            "TrackId": "White_Land_I"
+          }
+        ]
+      },
+      {
+        "SetId": 23,
+        "Tracks": [
+          {
+            "TrackId": "Port_Town_II"
+          },
+          {
+            "TrackId": "Sand_Storm_II",
+            "TrackType": "Mirror"
+          }
+        ]
+      },
+      {
+        "SetId": 24,
+        "Tracks": [
+          {
+            "TrackId": "Red_Canyon_II"
+          },
+          {
+            "TrackId": "White_Land_I",
+            "TrackType": "Mirror"
+          }
+        ]
+      },
+      {
+        "SetId": 25,
+        "Tracks": [
+          {
+            "TrackId": "Death_Wind_II"
+          },
+          {
+            "TrackId": "Port_Town_II",
+            "TrackType": "Mirror"
+          }
+        ]
+      },
+      {
+        "SetId": 26,
+        "Tracks": [
+          {
+            "TrackId": "Red_Canyon_II",
+            "TrackType": "Mirror"
+          },
+          {
+            "TrackId": "Sand_Storm_II"
+          }
+        ]
+      },
+      {
+        "SetId": 27,
+        "Tracks": [
+          {
+            "TrackId": "Port_Town_II",
+            "TrackType": "Mirror"
+          },
+          {
+            "TrackId": "Red_Canyon_II",
+            "TrackType": "Mirror"
+          }
+        ]
+      },
+      {
+        "SetId": 28,
+        "Tracks": [
+          {
+            "TrackId": "White_Land_I"
+          },
+          {
+            "TrackId": "Sand_Storm_II",
+            "TrackType": "Mirror"
+          }
+        ]
+      },
+      {
+        "SetId": 29,
+        "Tracks": [
+          {
+            "TrackId": "Death_Wind_II"
+          },
+          {
+            "TrackId": "Red_Canyon_II"
+          }
+        ]
+      },
+      {
+        "SetId": 30,
+        "Tracks": [
+          {
+            "TrackId": "Death_Wind_II",
+            "TrackType": "Mirror"
+          },
+          {
+            "TrackId": "White_Land_I",
+            "TrackType": "Mirror"
+          }
+        ]
+      },
+      {
+        "SetId": 31,
+        "Tracks": [
+          {
+            "TrackId": "Port_Town_II"
+          },
+          {
+            "TrackId": "Sand_Storm_II"
+          }
+        ]
+      },
+      {
+        "SetId": 32,
+        "Tracks": [
+          {
+            "TrackId": "Red_Canyon_II"
+          },
+          {
+            "TrackId": "White_Land_I"
+          }
+        ]
+      }
+    ]
+  },
+  "MysteryPrixSchedule": {
+    "AvailabilityInterval": 10,
+    "InactivePeriods": null,
+    "Leagues": [
+      {
+        "Name": "MysteryLeague"
+      }
+    ],
+    "Start": "2026-01-19T00:00"
+  },
+  "MysteryTrackSchedule": {
+    "AvailabilityInterval": 2,
+    "InactivePeriods": [
+      46,
+      31,
+      37,
+      23,
+      40,
+      28
+    ],
+    "Tracks": [
+      {
+        "TrackId": "Mystery_3"
+      },
+      {
+        "TrackId": "Mystery_4"
+      },
+      {
+        "TrackId": "Mystery_5"
+      },
+      {
+        "TrackId": "Mystery_6"
+      },
+      {
+        "TrackId": "Mystery_7"
+      }
+    ]
+  },
+  "NewTrackSet": {
+    "EndTime": "2025-05-12",
+    "Tracks": [
+      {
+        "TrackId": "Mute_City_IV",
+        "TrackType": "Mirror"
+      },
+      {
+        "TrackId": "Mute_City_IV",
+        "TrackType": "Classic"
+      },
+      {
+        "TrackId": "Sand_Storm_I",
+        "TrackType": "Mirror"
+      },
+      {
+        "TrackId": "Sand_Storm_I",
+        "TrackType": "Classic"
+      },
+      {
+        "TrackId": "Big_Blue_II",
+        "TrackType": "Mirror"
+      },
+      {
+        "TrackId": "Big_Blue_II",
+        "TrackType": "Classic"
+      },
+      {
+        "TrackId": "Sand_Storm_II",
+        "TrackType": "Mirror"
+      },
+      {
+        "TrackId": "Sand_Storm_II",
+        "TrackType": "Classic"
+      },
+      {
+        "TrackId": "Silence_II",
+        "TrackType": "Mirror"
+      },
+      {
+        "TrackId": "Silence_II",
+        "TrackType": "Classic"
+      }
+    ]
+  },
+  "PrivateLobbyHasWorldTour": false,
+  "TrackSchedule": {
+    "AvailabilityInterval": 1,
+    "DifficultyInterval": 1,
+    "DifficultyOrder": [
+      1,
+      2,
+      1,
+      2,
+      1,
+      2
+    ],
+    "Sets": [
+      {
+        "SetId": 1,
+        "Tracks": [
+          {
+            "TrackId": "Big_Blue_II"
+          },
+          {
+            "TrackId": "Red_Canyon_I",
+            "TrackType": "Mirror"
+          }
+        ]
+      },
+      {
+        "SetId": 2,
+        "Tracks": [
+          {
+            "TrackId": "Big_Blue",
+            "TrackType": "Mirror"
+          },
+          {
+            "TrackId": "Sand_Storm_I",
+            "TrackType": "Mirror"
+          }
+        ]
+      },
+      {
+        "SetId": 3,
+        "Tracks": [
+          {
+            "TrackId": "Mute_City_I",
+            "TrackType": "Mirror"
+          },
+          {
+            "TrackId": "Port_Town_I"
+          }
+        ]
+      },
+      {
+        "SetId": 4,
+        "Tracks": [
+          {
+            "TrackId": "Sand_Ocean"
+          },
+          {
+            "TrackId": "Red_Canyon_I"
+          }
+        ]
+      },
+      {
+        "SetId": 5,
+        "Tracks": [
+          {
+            "TrackId": "Sand_Storm_I"
+          },
+          {
+            "TrackId": "Mute_City_II",
+            "TrackType": "Mirror"
+          }
+        ]
+      },
+      {
+        "SetId": 6,
+        "Tracks": [
+          {
+            "TrackId": "Big_Blue_II",
+            "TrackType": "Mirror"
+          },
+          {
+            "TrackId": "Sand_Ocean",
+            "TrackType": "Mirror"
+          }
+        ]
+      },
+      {
+        "SetId": 7,
+        "Tracks": [
+          {
+            "TrackId": "Big_Blue"
+          },
+          {
+            "TrackId": "Port_Town_I",
+            "TrackType": "Mirror"
+          }
+        ]
+      },
+      {
+        "SetId": 8,
+        "Tracks": [
+          {
+            "TrackId": "Death_Wind_I",
+            "TrackType": "Mirror"
+          },
+          {
+            "TrackId": "Mute_City_III"
+          }
+        ]
+      },
+      {
+        "SetId": 9,
+        "Tracks": [
+          {
+            "TrackId": "Sand_Ocean"
+          },
+          {
+            "TrackId": "Port_Town_I"
+          }
+        ]
+      },
+      {
+        "SetId": 10,
+        "Tracks": [
+          {
+            "TrackId": "Death_Wind_I"
+          },
+          {
+            "TrackId": "Red_Canyon_I",
+            "TrackType": "Mirror"
+          }
+        ]
+      },
+      {
+        "SetId": 11,
+        "Tracks": [
+          {
+            "TrackId": "Mute_City_IV",
+            "TrackType": "Mirror"
+          },
+          {
+            "TrackId": "Red_Canyon_I"
+          }
+        ]
+      },
+      {
+        "SetId": 12,
+        "Tracks": [
+          {
+            "TrackId": "Big_Blue",
+            "TrackType": "Mirror"
+          },
+          {
+            "TrackId": "Mute_City_II"
+          }
+        ]
+      },
+      {
+        "SetId": 13,
+        "Tracks": [
+          {
+            "TrackId": "Mute_City_I"
+          },
+          {
+            "TrackId": "Sand_Storm_I",
+            "TrackType": "Mirror"
+          }
+        ]
+      },
+      {
+        "SetId": 14,
+        "Tracks": [
+          {
+            "TrackId": "Sand_Storm_I"
+          },
+          {
+            "TrackId": "Death_Wind_I"
+          }
+        ]
+      },
+      {
+        "SetId": 15,
+        "Tracks": [
+          {
+            "TrackId": "Big_Blue_II"
+          },
+          {
+            "TrackId": "Mute_City_III",
+            "TrackType": "Mirror"
+          }
+        ]
+      },
+      {
+        "SetId": 16,
+        "Tracks": [
+          {
+            "TrackId": "Sand_Ocean",
+            "TrackType": "Mirror"
+          },
+          {
+            "TrackId": "Death_Wind_I",
+            "TrackType": "Mirror"
+          }
+        ]
+      },
+      {
+        "SetId": 17,
+        "Tracks": [
+          {
+            "TrackId": "Mute_City_IV",
+            "TrackType": "Mirror"
+          },
+          {
+            "TrackId": "Port_Town_I"
+          }
+        ]
+      },
+      {
+        "SetId": 18,
+        "Tracks": [
+          {
+            "TrackId": "Big_Blue_II",
+            "TrackType": "Mirror"
+          },
+          {
+            "TrackId": "Red_Canyon_I"
+          }
+        ]
+      },
+      {
+        "SetId": 19,
+        "Tracks": [
+          {
+            "TrackId": "Big_Blue"
+          },
+          {
+            "TrackId": "Sand_Storm_I"
+          }
+        ]
+      },
+      {
+        "SetId": 20,
+        "Tracks": [
+          {
+            "TrackId": "Mute_City_I"
+          },
+          {
+            "TrackId": "Port_Town_I",
+            "TrackType": "Mirror"
+          }
+        ]
+      },
+      {
+        "SetId": 21,
+        "Tracks": [
+          {
+            "TrackId": "Sand_Ocean",
+            "TrackType": "Mirror"
+          },
+          {
+            "TrackId": "Red_Canyon_I",
+            "TrackType": "Mirror"
+          }
+        ]
+      },
+      {
+        "SetId": 22,
+        "Tracks": [
+          {
+            "TrackId": "Sand_Storm_I",
+            "TrackType": "Mirror"
+          },
+          {
+            "TrackId": "Mute_City_II"
+          }
+        ]
+      },
+      {
+        "SetId": 23,
+        "Tracks": [
+          {
+            "TrackId": "Big_Blue_II"
+          },
+          {
+            "TrackId": "Sand_Ocean"
+          }
+        ]
+      },
+      {
+        "SetId": 24,
+        "Tracks": [
+          {
+            "TrackId": "Big_Blue",
+            "TrackType": "Mirror"
+          },
+          {
+            "TrackId": "Port_Town_I"
+          }
+        ]
+      },
+      {
+        "SetId": 25,
+        "Tracks": [
+          {
+            "TrackId": "Death_Wind_I",
+            "TrackType": "Mirror"
+          },
+          {
+            "TrackId": "Mute_City_III",
+            "TrackType": "Mirror"
+          }
+        ]
+      },
+      {
+        "SetId": 26,
+        "Tracks": [
+          {
+            "TrackId": "Sand_Ocean",
+            "TrackType": "Mirror"
+          },
+          {
+            "TrackId": "Port_Town_I",
+            "TrackType": "Mirror"
+          }
+        ]
+      },
+      {
+        "SetId": 27,
+        "Tracks": [
+          {
+            "TrackId": "Death_Wind_I"
+          },
+          {
+            "TrackId": "Red_Canyon_I"
+          }
+        ]
+      },
+      {
+        "SetId": 28,
+        "Tracks": [
+          {
+            "TrackId": "Mute_City_IV"
+          },
+          {
+            "TrackId": "Red_Canyon_I",
+            "TrackType": "Mirror"
+          }
+        ]
+      },
+      {
+        "SetId": 29,
+        "Tracks": [
+          {
+            "TrackId": "Big_Blue"
+          },
+          {
+            "TrackId": "Mute_City_II",
+            "TrackType": "Mirror"
+          }
+        ]
+      },
+      {
+        "SetId": 30,
+        "Tracks": [
+          {
+            "TrackId": "Mute_City_I",
+            "TrackType": "Mirror"
+          },
+          {
+            "TrackId": "Sand_Storm_I"
+          }
+        ]
+      },
+      {
+        "SetId": 31,
+        "Tracks": [
+          {
+            "TrackId": "Sand_Storm_I",
+            "TrackType": "Mirror"
+          },
+          {
+            "TrackId": "Death_Wind_I",
+            "TrackType": "Mirror"
+          }
+        ]
+      },
+      {
+        "SetId": 32,
+        "Tracks": [
+          {
+            "TrackId": "Big_Blue_II",
+            "TrackType": "Mirror"
+          },
+          {
+            "TrackId": "Mute_City_III"
+          }
+        ]
+      },
+      {
+        "SetId": 33,
+        "Tracks": [
+          {
+            "TrackId": "Sand_Ocean"
+          },
+          {
+            "TrackId": "Death_Wind_I"
+          }
+        ]
+      },
+      {
+        "SetId": 34,
+        "Tracks": [
+          {
+            "TrackId": "Mute_City_IV"
+          },
+          {
+            "TrackId": "Port_Town_I",
+            "TrackType": "Mirror"
+          }
+        ]
+      }
+    ]
+  },
+  "Version": 6
+}

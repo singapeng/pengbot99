@@ -1,0 +1,3 @@
+# Which weekend event to run: auto follows the calendar in WeekendSchedule.json,
+# none ignores it, any other value is a WeekendScheduleID pinned for the whole profile
+WEEKEND_SCHEDULE_ID=auto
