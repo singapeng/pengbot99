@@ -162,3 +162,4 @@ cython_debug/
 
 # Pengbot-specific
 .msg_struct
+CLAUDE.local.md
